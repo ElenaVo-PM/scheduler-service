@@ -1,1 +1,37 @@
 services:
+
+  scheduler-database:
+    image: postgres:17.5
+    container_name: schedular-database
+    ports:
+      - "${SCHEDULER_DATABASE_EXTERNAL_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${SCHEDULER_DATABASE_NAME}
+      - POSTGRES_USER=${SCHEDULER_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${SCHEDULER_DATABASE_PASSWORD}
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+  scheduler-service:
+    build: /
+    image: scheduler
+    container_name: scheduler
+    ports:
+      - "${SCHEDULER_EXTERNAL_PORT}:8080"
+    depends_on:
+      scheduler-database:
+        condition: service_healthy
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://${SCHEDULER_DATABASE_NAME}:5432/${SCHEDULER_DATABASE_NAME}
+      - SPRING_DATASOURCE_USERNAME=${SCHEDULER_DATABASE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SCHEDULER_DATABASE_PASSWORD}
+    networks:
+      - backend
+
+networks:
+  backend:

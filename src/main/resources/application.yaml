@@ -1,1 +1,8 @@
-spring.application.name=sh-test
+spring:
+  application:
+    name: sh-test
+  datasource:
+    url: jdbc:postgresql://localhost:6432/schedulardb
+    username: user
+    password: 12345
+    driver: org.postgresql.Driver
