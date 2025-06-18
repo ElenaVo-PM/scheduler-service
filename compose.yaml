@@ -2,7 +2,7 @@ services:
 
   scheduler-database:
     image: postgres:17.5
-    container_name: schedular-database
+    container_name: scheduler-database
     ports:
       - "${SCHEDULER_DATABASE_EXTERNAL_PORT}:5432"
     environment:
@@ -27,7 +27,7 @@ services:
       scheduler-database:
         condition: service_healthy
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://${SCHEDULER_DATABASE_NAME}:5432/${SCHEDULER_DATABASE_NAME}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://scheduler-database:5432/${SCHEDULER_DATABASE_NAME}
       - SPRING_DATASOURCE_USERNAME=${SCHEDULER_DATABASE_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${SCHEDULER_DATABASE_PASSWORD}
     networks:
