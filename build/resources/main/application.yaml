@@ -1,0 +1,11 @@
+server:
+  port: ${SCHEDULER_EXTERNAL_PORT}
+
+spring:
+  application:
+    name: scheduler
+  datasource:
+    url: jdbc:postgresql://${SCHEDULER_DATABASE_URL}/${SCHEDULER_DATABASE_NAME}
+    username: ${SCHEDULER_DATABASE_USERNAME}
+    password: ${SCHEDULER_DATABASE_PASSWORD}
+    driver: org.postgresql.Driver
