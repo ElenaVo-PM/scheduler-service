@@ -9,3 +9,14 @@ spring:
     username: ${SCHEDULER_DATABASE_USERNAME}
     password: ${SCHEDULER_DATABASE_PASSWORD}
     driver: org.postgresql.Driver
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  docker:
+    compose:
+      enabled: true
+#    based-on-migrate: true
+#  datasource:
+#    url: url
+#    username: username
+#    password: password
