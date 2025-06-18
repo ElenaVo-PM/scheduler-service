@@ -6,7 +6,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * Для использования в тестах БД Postgres унаследуйтесь от данного класса
+ * Для использования в тестах приложений, запущенных в контейнере, унаследуйтесь от данного класса
  */
 public abstract class AbstractTestContainerTest {
 

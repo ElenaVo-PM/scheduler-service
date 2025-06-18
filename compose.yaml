@@ -18,7 +18,7 @@ services:
       - backend
 
   scheduler-service:
-    build: /
+    build: .
     image: scheduler
     container_name: scheduler
     ports:
