@@ -1,5 +1,3 @@
-# задайте указанные ниже параметры через environment variables
-
 server:
   port: ${SCHEDULER_EXTERNAL_PORT}
 
