@@ -1,9 +1,10 @@
 package com.example.scheduler.domain.model;
 
+import java.util.TimeZone;
+
 public record User(
     Long id,
-    String username,
+    String publicUserName, //имя, которое отображается для других пользователей
     String email,
-    String passwordHash,
-    boolean enabled
+    TimeZone userTimeZone //временная зона пользователя
 ) {}
