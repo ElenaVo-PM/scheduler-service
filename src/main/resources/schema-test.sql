@@ -27,7 +27,7 @@ VALUES (
 INSERT INTO event_templates (
     user_id, title, description, duration_minutes,
     buffer_before_minutes, buffer_after_minutes,
-    group_event, slug, timezone
+    is_group_event, slug, timezone
 )
 VALUES (
     (SELECT id FROM users WHERE email = 'test@example.com'),
@@ -70,7 +70,7 @@ INSERT INTO bookings (
 )
 VALUES (
     (SELECT id FROM event_templates WHERE slug = 'test-consult'),
-    (SELECT id FROM time_slots LIMIT 1),
+    (SELECT id FROM time_slots WHERE event_template_id = (SELECT id FROM event_templates WHERE slug = 'test-consult') ORDER BY start_time LIMIT 1),
     'Иван Тестовый',
     'ivan@test.com',
     '2023-11-20 10:00:00',
@@ -83,16 +83,16 @@ JOIN event_templates et ON b.event_template_id = et.id
 LEFT JOIN time_slots ts ON b.slot_id = ts.id;
 
 -- 7. Получение всех активных шаблонов событий пользователя
-SELECT id, title, description, active
+SELECT id, title, description, is_active
 FROM event_templates
 WHERE user_id = (SELECT id FROM users WHERE email = 'test@example.com')
-  AND active = TRUE;
+  AND is_active = TRUE;
 
--- 8. Получение всех доступных (available = TRUE) временных слотов для конкретного шаблона события
+-- 8. Получение всех доступных (is_available = TRUE) временных слотов для конкретного шаблона события
 SELECT id, start_time, end_time
 FROM time_slots
 WHERE event_template_id = (SELECT id FROM event_templates WHERE slug = 'test-consult')
-  AND available = TRUE
+  AND is_available = TRUE
 ORDER BY start_time;
 
 SELECT * FROM availability_rules
@@ -107,13 +107,13 @@ WHERE user_id = (SELECT id FROM users WHERE email = 'test@example.com')
 --10. Проверка количества бронирований для каждого шаблона события
 SELECT et.title, COUNT(b.id) AS bookings_count
 FROM event_templates et
-LEFT JOIN bookings b ON et.id = b.event_template_id AND b.canceled = FALSE
+LEFT JOIN bookings b ON et.id = b.event_template_id AND b.is_canceled = FALSE
 GROUP BY et.title
 ORDER BY bookings_count DESC;
 
 -- 11. Получение пользователей с количеством их активных шаблонов событий
 SELECT u.email, COUNT(et.id) AS active_event_templates
 FROM users u
-LEFT JOIN event_templates et ON u.id = et.user_id AND et.active = TRUE
+LEFT JOIN event_templates et ON u.id = et.user_id AND et.is_active = TRUE
 GROUP BY u.email
 ORDER BY active_event_templates DESC;
