@@ -1,72 +1,75 @@
 package com.example.scheduler.domain.repository;
 
+import com.example.scheduler.AbstractTestContainerTest;
+import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
-@SpringBootTest
+@SpringBootTest(properties = {
+        "SCHEDULER_EXTERNAL_PORT=8081"
+})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserRepositoryImplTest {
+class UserRepositoryImplTest extends AbstractTestContainerTest {
 
     @Autowired
     private UserRepository repository;
+    @Autowired
+    private DataSource dataSource;
 
-    static PostgreSQLContainer<?> postgres;
+    @Test
+    @DisplayName("Checking USERS exists")
+    void usersTableShouldExist() throws SQLException {
+        try (Connection connection = dataSource.getConnection();
+             ResultSet resultSet = connection.getMetaData()
+                     .getTables(null, null, "users", new String[]{"TABLE"})) {
 
-    static {
-        postgres = new PostgreSQLContainer<>("postgres:15")
-                .withDatabaseName("testDb")
-                .withUsername("user")
-                .withPassword("password");
-        postgres.start();
-    }
-
-    @BeforeAll
-    static void startContainer() {
-        postgres.start();
-    }
-
-    @DynamicPropertySource
-    static void config(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
+            boolean tableExists = resultSet.next();
+            assertTrue(tableExists, "Таблица 'users' должна существовать в БД");
+        }
     }
 
     @Test
+    @DisplayName("Add new user and get the same from DB")
     void userSaveAndFind() {
 
-        User user = new User(UUID.randomUUID(),
-                "testName",
-                "email@email.com",
-                "password",
-                true,
-                Set.of(role));
+        String username = "username00";
+        String password = "password";
+        String email = "email@ex.com";
 
-        repository.save(user);
+        User newUser = repository.save(username, password, email);
 
-        Optional<User> dbUser = repository.findByUsername(user.username());
+        Optional<User> dbUser = repository.findByUsername(username);
+        Optional<Credential> usersCredits = repository.getCredential(username);
+
         assertTrue(dbUser.isPresent());
+        assertTrue(usersCredits.isPresent());
+
         assertAll("All fields matches",
-                () -> assertEquals(dbUser.get().id(), user.id(), "ID match"),
-                () -> assertEquals(dbUser.get().username(), user.username(), "LOGIN match"),
-                () -> assertEquals(dbUser.get().email(), user.email(), "EMAIL match"),
-                () -> assertEquals(dbUser.get().passwordHash(), user.passwordHash(), "PASSWORD match"),
-                () -> assertEquals(dbUser.get().role(), user.role(), "ROLES match")
+                () -> assertEquals(dbUser.get().id(), newUser.id(), "ID match"),
+                () -> assertEquals(dbUser.get().username(), newUser.username(), "LOGIN match"),
+                () -> assertEquals(dbUser.get().email(), newUser.email(), "EMAIL match"),
+                () -> assertEquals(usersCredits.get().getPassword(), password, "PASSWORD match")
         );
+    }
+
+    @Test
+    @DisplayName("Get null on unknown user")
+    void shouldThrowUserNotFound() {
+
+        String username = "anyUser";
+
+        assertTrue(repository.getCredential(username).isEmpty());
     }
 }

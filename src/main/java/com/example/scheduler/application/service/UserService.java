@@ -2,18 +2,14 @@ package com.example.scheduler.application.service;
 
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
-import com.example.scheduler.domain.model.UserDetail;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -31,10 +27,13 @@ public class UserService implements UserDetailsService {
     @Override
     public Credential loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User dbUser = userRepo.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Optional<User> dbUser = userRepo.findByUsername(username);
 
-        return new Credential();
+        if (dbUser.isEmpty()) {
+            return null;
+        }
+
+        return userRepo.getCredential(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public User registerUser(String username, String password, String email) throws IllegalArgumentException {
@@ -47,14 +46,7 @@ public class UserService implements UserDetailsService {
 
         String encodedPassword = encoder.encode(password);
 
-        User newUser = new User(UUID.randomUUID(),
-                username,
-                email,
-                encodedPassword,
-                true,
-                Set.of(role));
-
-        return userRepo.save(newUser);
+        return userRepo.save(username, encodedPassword, email);
     }
 
 }

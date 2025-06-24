@@ -1,5 +1,6 @@
 package com.example.scheduler.infrastructure.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,15 +22,14 @@ public class SecurityConfig {
 
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .formLogin(AbstractHttpConfigurer::disable)
+                .httpBasic(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated())
-                .formLogin(
-                        form -> form
-                                .loginPage("/login")
-                                //.successForwardUrl("")
-                                .permitAll()
-                )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, ex1) -> {
+                    res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                }))
                 .logout(
                         LogoutConfigurer::permitAll
                 )

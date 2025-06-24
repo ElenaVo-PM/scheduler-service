@@ -4,11 +4,9 @@ import com.example.scheduler.adapters.dto.AuthRequest;
 import com.example.scheduler.adapters.dto.AuthResponse;
 import com.example.scheduler.adapters.dto.RegisterRequest;
 import com.example.scheduler.application.service.UserService;
-import com.example.scheduler.domain.model.User;
-import com.example.scheduler.domain.model.UserDetail;
+import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.infrastructure.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -47,9 +45,9 @@ public class AuthController {
                 )
         );
 
-        UserDetail user = (UserDetail) auth.getPrincipal();
+        Credential user = (Credential) auth.getPrincipal();
 
-        String token = tokenProvider.generateToken(user.getUser());
+        String token = "";
 
         return ResponseEntity.ok(new AuthResponse(token));
     }

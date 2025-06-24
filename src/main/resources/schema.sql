@@ -10,7 +10,6 @@
      password_hash            VARCHAR(255) NOT NULL CHECK (password_hash <> ''),
      full_name                VARCHAR(255) NOT NULL CHECK (full_name <> ''),
      timezone                 VARCHAR(255) NOT NULL DEFAULT 'UTC',
-     role                     VARCHAR(20) NOT NULL DEFAULT 'USER',
      created_at               TIMESTAMP NOT NULL DEFAULT now(),
      updated_at               TIMESTAMP NOT NULL DEFAULT now()
      );
