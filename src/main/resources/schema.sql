@@ -92,3 +92,13 @@
      updated_at               TIMESTAMP NOT NULL DEFAULT now()
      );
 
+     CREATE TABLE IF NOT EXISTS profiles (
+     user_id     UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+     description TEXT,
+     is_active   BOOLEAN NOT NULL DEFAULT TRUE,
+     logo        TEXT,
+     created_at  TIMESTAMP NOT NULL DEFAULT now(),
+     updated_at  TIMESTAMP NOT NULL DEFAULT now()
+     );
+
+     CREATE INDEX IF NOT EXISTS idx_profiles_active ON profiles(is_active);
