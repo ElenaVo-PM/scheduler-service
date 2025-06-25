@@ -56,8 +56,6 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(String username, String password, String email) {
 
-        //Тут мы вроде как должны фулл наме добавить, но черт его знает зачем
-
         String query = """
                 INSERT INTO users (id, email, password_hash, created_at, full_name, user_login, role)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
