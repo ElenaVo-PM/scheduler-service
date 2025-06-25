@@ -2,6 +2,7 @@
 
 server:
   port: ${SCHEDULER_EXTERNAL_PORT}
+
 spring:
   application:
     name: scheduler
@@ -9,3 +10,11 @@ spring:
     url: jdbc:postgresql://${SCHEDULER_DATABASE_URL}/${SCHEDULER_DATABASE_NAME}
     username: ${SCHEDULER_DATABASE_USERNAME}
     password: ${SCHEDULER_DATABASE_PASSWORD}
+
+jwt:
+  access:
+    secret: ${SCHEDULER_JWT_ACCESS_SECRET}
+    ttl: ${SCHEDULER_JWT_ACCESS_TOKEN_TTL}
+  refresh:
+    secret: ${SCHEDULER_JWT_REFRESH_SECRET}
+    ttl: ${SCHEDULER_JWT_REFRESH_TOKEN_TTL}
