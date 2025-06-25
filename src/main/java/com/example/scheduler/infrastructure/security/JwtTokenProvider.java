@@ -1,21 +1,54 @@
 package com.example.scheduler.infrastructure.security;
 
-import com.example.scheduler.domain.model.User;
+import com.example.scheduler.infrastructure.util.JwtUtil;
+import com.example.scheduler.infrastructure.util.SecretUtil;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
+import javax.crypto.SecretKey;
 
 @Component
 public class JwtTokenProvider {
+    private final SecretKey accessSecretKey;
+    private final long accessTokenValidityMillis;
+    private final SecretKey refreshSecretKey;
+    private final long refreshTokenValidityMillis;
+    private final JwtUtil jwtUtil;
 
-    private final String secretKey = "very_secret_key"; // Лучше вынести в application.yml
-    private final long validityInMillis = 3600000; // 1 час
-
-    public String generateToken(User user) {
-        return null;
+    public JwtTokenProvider(@Value("${jwt.access.secret}") String accessSecretKey,
+                            @Value("${jwt.access.ttl}") String accessTokenValidityMillis,
+                            @Value("${jwt.refresh.secret}") String refreshSecretKey,
+                            @Value("${jwt.refresh.ttl}") String refreshTokenValidityMillis,
+                            JwtUtil jwtUtil) {
+        this.accessSecretKey = SecretUtil.hmacShaKeyFor(accessSecretKey);
+        this.accessTokenValidityMillis = Long.parseLong(accessTokenValidityMillis);
+        this.refreshSecretKey = SecretUtil.hmacShaKeyFor(refreshSecretKey);
+        this.refreshTokenValidityMillis = Long.parseLong(refreshTokenValidityMillis);
+        this.jwtUtil = jwtUtil;
     }
 
-    public String getUsername(String token) {
-        return null;
+    public String generateAccessToken(UserDetails user) {
+        return jwtUtil.generateToken(user, accessTokenValidityMillis, accessSecretKey);
+    }
+
+    public String generateRefreshToken(UserDetails user) {
+        return jwtUtil.generateToken(user, refreshTokenValidityMillis, refreshSecretKey);
+    }
+
+    public String getUsernameFromAccessToken(String accessToken) {
+        return jwtUtil.extractUserName(accessToken, accessSecretKey);
+    }
+
+    public String getUsernameFromRefreshToken(String refreshToken) {
+        return jwtUtil.extractUserName(refreshToken, refreshSecretKey);
+    }
+
+    public boolean isAccessTokenValid(String accessToken) {
+        return jwtUtil.isTokenValid(accessToken, accessSecretKey);
+    }
+
+    public boolean isRefreshTokenValid(String refreshToken) {
+        return jwtUtil.isTokenValid(refreshToken, refreshSecretKey);
     }
 }

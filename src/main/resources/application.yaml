@@ -10,4 +10,14 @@ spring:
     url: jdbc:postgresql://${SCHEDULER_DATABASE_URL}/${SCHEDULER_DATABASE_NAME}
     username: ${SCHEDULER_DATABASE_USERNAME}
     password: ${SCHEDULER_DATABASE_PASSWORD}
-    driver: org.postgresql.Driver
+
+jwt:
+  # значения секретов сгенерированы в SecretUtil.main()
+  access:
+    secret: jxkXo59n1fqL6VQUNeqkdNtaI6J+dB3RMMUne6sEVSbWRIj1HVPV+uv8ry0EGrFjLle8bILu+/gccf4xmMaLAQ==
+    # 1 час
+    ttl: 3600000
+  refresh:
+    secret: v/kE19nwZcuQcozQJdpmHS0U5zR1oBlS8uD45N09r0Cx95qWm8T8WWKmZ4EKfINqesrqP/JjjRtgRAhB5d6lAQ==
+    # 1 день
+    ttl: 86400000
