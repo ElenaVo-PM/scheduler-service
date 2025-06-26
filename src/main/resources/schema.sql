@@ -28,11 +28,11 @@
      max_participants         INT DEFAULT 0 CHECK (max_participants >= 0),
      is_active                BOOLEAN NOT NULL DEFAULT TRUE,
      slug                     TEXT UNIQUE NOT NULL,
-     timezone                 VARCHAR(255) NOT NULL DEFAULT 'UTC',
      start_date               TIMESTAMP NOT NULL DEFAULT now(),
      end_date                 TIMESTAMP NULL,
      created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now()
+     updated_at               TIMESTAMP NOT NULL DEFAULT now(),
+     CHECK (end_date - start_date >= INTERVAL '15 minutes')
      );
 
      CREATE TABLE IF NOT EXISTS availability_rules (
@@ -43,7 +43,6 @@
      end_time                 TIME NOT NULL,
      created_at               TIMESTAMP NOT NULL DEFAULT now(),
      updated_at               TIMESTAMP NOT NULL DEFAULT now(),
-     CHECK (start_time < end_time),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
 
@@ -56,7 +55,6 @@
      created_at               TIMESTAMP NOT NULL DEFAULT now(),
      updated_at               TIMESTAMP NOT NULL DEFAULT now(),
      UNIQUE(event_template_id, start_time),
-     CHECK (start_time < end_time),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
 
@@ -78,7 +76,6 @@
      is_canceled              BOOLEAN NOT NULL DEFAULT FALSE,
      created_at               TIMESTAMP NOT NULL DEFAULT now(),
      updated_at               TIMESTAMP NOT NULL DEFAULT now(),
-     CHECK (start_time < end_time),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
 
