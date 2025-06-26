@@ -1,11 +1,12 @@
 package com.example.scheduler.domain.dto;
 
-import java.time.Instant;
+import java.util.UUID;
 
-public record ShortEventDto() {
-    Long id,
-    String title,
-    boolean isActive,
+public record ShortEventDto(
+        UUID id,
+        String title,
+        boolean isActive,
+        String link,
+        boolean isGroupEvent
+) {
 }
-
-ID, title, active, shareLink, groupEvent

@@ -1,3 +1,11 @@
 spring:
   application:
     name: scheduler
+  main:
+    allow-bean-definition-overriding: true
+
+  sql.init:
+    mode: always
+    schema-locations: classpath:schema.sql
+
+

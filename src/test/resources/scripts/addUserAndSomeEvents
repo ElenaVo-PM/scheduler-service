@@ -1,0 +1,10 @@
+INSERT INTO users(id, email,password_hash,full_name,timezone)
+VALUES ('be3cc829-d8b4-43af-985a-b5a282c88723','anna@user.ru', '1234', 'Anna', 'UTC'),
+       ('83d756a8-d819-4ae1-976f-b5feb5b6f378','boris@user.ru', '654533', 'Boris', 'UTC');
+
+INSERT INTO event_templates(user_id,title,description,duration_minutes,slug)
+VALUES ('be3cc829-d8b4-43af-985a-b5a282c88723', 'title1','description1',35,'слаг1'),
+       ('be3cc829-d8b4-43af-985a-b5a282c88723', 'title2','description2',37,'слаг2'),
+       ('83d756a8-d819-4ae1-976f-b5feb5b6f378', 'title3','description3',333,'слаг3'),
+       ('83d756a8-d819-4ae1-976f-b5feb5b6f378', 'title4','description4',3227,'слаг4'),
+       ('83d756a8-d819-4ae1-976f-b5feb5b6f378', 'title5','description5',32327,'слаг6');

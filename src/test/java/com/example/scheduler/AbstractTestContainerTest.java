@@ -1,9 +1,14 @@
 package com.example.scheduler;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import java.security.Principal;
 
 /**
  * Для использования в тестах приложений, запущенных в контейнере, унаследуйтесь от данного класса

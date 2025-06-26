@@ -9,9 +9,9 @@
      email                    VARCHAR(255) NOT NULL CHECK (email <> ''),
      password_hash            VARCHAR(255) NOT NULL CHECK (password_hash <> ''),
      full_name                VARCHAR(255) NOT NULL CHECK (full_name <> ''),
-     timezone                 VARCHAR(255) NOT NULL DEFAULT 'UTC',
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now()
+     timezone                 VARCHAR(255) DEFAULT 'UTC',
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now()
      );
 
      CREATE UNIQUE INDEX IF NOT EXISTS email_unique_idx ON users (UPPER(email));
@@ -24,14 +24,14 @@
      duration_minutes         INT NOT NULL CHECK (duration_minutes > 0),
      buffer_before_minutes    INT DEFAULT 0 CHECK (buffer_before_minutes >= 0),
      buffer_after_minutes     INT DEFAULT 0 CHECK (buffer_after_minutes >= 0),
-     is_group_event           BOOLEAN NOT NULL DEFAULT FALSE,
+     is_group_event           BOOLEAN DEFAULT FALSE,
      max_participants         INT DEFAULT 0 CHECK (max_participants >= 0),
-     is_active                BOOLEAN NOT NULL DEFAULT TRUE,
+     is_active                BOOLEAN DEFAULT TRUE,
      slug                     TEXT UNIQUE NOT NULL,
-     start_date               TIMESTAMP NOT NULL DEFAULT now(),
+     start_date               TIMESTAMP DEFAULT now(),
      end_date                 TIMESTAMP NULL,
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now(),
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now(),
      CHECK (end_date - start_date >= INTERVAL '15 minutes')
      );
 
@@ -41,8 +41,8 @@
      weekday                  INT NOT NULL CHECK (weekday BETWEEN 1 AND 7),
      start_time               TIME NOT NULL,
      end_time                 TIME NOT NULL,
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now(),
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now(),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
 
@@ -51,9 +51,9 @@
      event_template_id        UUID NOT NULL REFERENCES event_templates(id) ON DELETE CASCADE,
      start_time               TIMESTAMP NOT NULL,
      end_time                 TIMESTAMP NOT NULL,
-     is_available             BOOLEAN NOT NULL DEFAULT TRUE,
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now(),
+     is_available             BOOLEAN DEFAULT TRUE,
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now(),
      UNIQUE(event_template_id, start_time),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
@@ -73,9 +73,9 @@
      invitee_email            VARCHAR(255) NOT NULL CHECK (invitee_email <> ''),
      start_time               TIMESTAMP NOT NULL,
      end_time                 TIMESTAMP NOT NULL,
-     is_canceled              BOOLEAN NOT NULL DEFAULT FALSE,
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now(),
+     is_canceled              BOOLEAN DEFAULT FALSE,
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now(),
      CHECK (end_time - start_time >= INTERVAL '15 minutes')
      );
 
@@ -85,7 +85,7 @@
      email                    VARCHAR(255) NOT NULL CHECK (email <> ''),
      name                     VARCHAR(255) NOT NULL CHECK (name <> ''),
      status                   booking_status DEFAULT 'PENDING', -- 'CONFIRMED', 'CANCELED'
-     created_at               TIMESTAMP NOT NULL DEFAULT now(),
-     updated_at               TIMESTAMP NOT NULL DEFAULT now()
+     created_at               TIMESTAMP DEFAULT now(),
+     updated_at               TIMESTAMP DEFAULT now()
      );
 
