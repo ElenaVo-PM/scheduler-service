@@ -1,5 +1,6 @@
 package com.example.scheduler.infrastructure.security;
 
+import com.example.scheduler.domain.model.Credential;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -8,7 +9,7 @@ public class JwtTokenProvider {
     private final String secretKey = "very_secret_key"; // Лучше вынести в application.yml
     private final long validityInMillis = 3600000; // 1 час
 
-    public String generateToken(String username) {
+    public String generateToken(Credential username) {
         return null;
     }
 
