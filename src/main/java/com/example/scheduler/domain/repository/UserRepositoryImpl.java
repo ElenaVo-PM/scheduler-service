@@ -28,11 +28,11 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByUsername(String username) {
 
-        String query = "SELECT * FROM users WHERE user_login = ?";
+        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
 
         try {
             Optional<User> dbUser = Optional.ofNullable(
-                    jdbc.queryForObject(query,
+                    jdbc.queryForObject(QUERY,
                             (res, _) -> new User(res.getObject("id", UUID.class),
                                     res.getString("user_login"),
                                     res.getString("full_name"),
@@ -56,12 +56,12 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(String username, String password, String email) {
 
-        String query = """
+        final String QUERY = """
                 INSERT INTO users (id, email, password_hash, created_at, full_name, user_login, role)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        jdbc.update(query, UUID.randomUUID(), email, password, LocalDateTime.now(), "unknown", username, "USER");
+        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), "unknown", username, "USER");
 
         return findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -70,7 +70,8 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<Credential> getCredential(String username) {
 
-        String query = "SELECT * FROM users WHERE user_login = ?";
+        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
+
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd HH:mm:ss")
                 .optionalStart()
@@ -79,8 +80,8 @@ public class UserRepositoryImpl implements UserRepository {
                 .toFormatter();
 
         try {
-            Optional<Credential> creditsDb = Optional.ofNullable(
-                    jdbc.queryForObject(query,
+            return Optional.ofNullable(
+                    jdbc.queryForObject(QUERY,
                             (res, _) -> new Credential(res.getObject("id", UUID.class),
                                     res.getString("user_login"),
                                     res.getString("password_hash"),
@@ -88,8 +89,6 @@ public class UserRepositoryImpl implements UserRepository {
                                     true,
                                     LocalDateTime.parse(res.getString("created_at"), formatter),
                                     LocalDateTime.parse(res.getString("updated_at"), formatter)), username));
-
-            return creditsDb;
 
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
