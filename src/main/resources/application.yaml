@@ -10,7 +10,6 @@ spring:
     url: jdbc:postgresql://${SCHEDULER_DATABASE_URL}/${SCHEDULER_DATABASE_NAME}
     username: ${SCHEDULER_DATABASE_USERNAME}
     password: ${SCHEDULER_DATABASE_PASSWORD}
-
 jwt:
   # значения секретов сгенерированы в SecretUtil.main()
   access:
