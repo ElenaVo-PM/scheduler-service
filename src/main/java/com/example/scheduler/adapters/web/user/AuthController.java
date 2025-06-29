@@ -28,7 +28,7 @@ public class AuthController {
     public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
 
         try {
-            userService.registerUser(request.username(), request.password(), request.email());
+            userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
