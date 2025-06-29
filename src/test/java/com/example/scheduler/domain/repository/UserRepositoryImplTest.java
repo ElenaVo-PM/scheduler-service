@@ -1,0 +1,75 @@
+package com.example.scheduler.domain.repository;
+
+import com.example.scheduler.AbstractTestContainerTest;
+import com.example.scheduler.domain.model.Credential;
+import com.example.scheduler.domain.model.User;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@SpringBootTest(properties = {
+        "SCHEDULER_EXTERNAL_PORT=8081"
+})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+class UserRepositoryImplTest extends AbstractTestContainerTest {
+
+    @Autowired
+    private UserRepository repository;
+    @Autowired
+    private DataSource dataSource;
+
+    @Test
+    @DisplayName("Checking USERS exists")
+    void usersTableShouldExist() throws SQLException {
+        try (Connection connection = dataSource.getConnection();
+             ResultSet resultSet = connection.getMetaData()
+                     .getTables(null, null, "users", new String[]{"TABLE"})) {
+
+            boolean tableExists = resultSet.next();
+            assertTrue(tableExists, "Таблица 'users' должна существовать в БД");
+        }
+    }
+
+    @Test
+    @DisplayName("Add new user and get the same from DB")
+    void userSaveAndFind() {
+
+        String username = "username00";
+        String password = "password";
+        String email = "email@ex.com";
+
+        User newUser = repository.save(username, password, email);
+
+        Optional<User> dbUser = repository.findByUsername(username);
+        Optional<Credential> usersCredits = repository.getCredential(username);
+
+        assertTrue(dbUser.isPresent());
+        assertTrue(usersCredits.isPresent());
+
+        assertAll("All fields matches",
+                () -> assertEquals(dbUser.get().id(), newUser.id(), "ID match"),
+                () -> assertEquals(dbUser.get().username(), newUser.username(), "LOGIN match"),
+                () -> assertEquals(dbUser.get().email(), newUser.email(), "EMAIL match"),
+                () -> assertEquals(usersCredits.get().getPassword(), password, "PASSWORD match")
+        );
+    }
+
+    @Test
+    @DisplayName("Get null on unknown user")
+    void shouldThrowUserNotFound() {
+
+        String username = "anyUser";
+
+        assertTrue(repository.getCredential(username).isEmpty());
+    }
+}
