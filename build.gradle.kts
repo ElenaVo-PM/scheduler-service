@@ -2,7 +2,6 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.flywaydb.flyway") version "11.9.1"
 }
 
 group = "com.example"
@@ -35,7 +34,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
     implementation("org.postgresql:postgresql")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation("org.springframework.boot:spring-boot-starter-security")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -49,10 +47,4 @@ dependencies {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-flyway {
-    url = "jdbc:postgresql://database_url"
-    user = "postgres"
-    password = "password"
 }
