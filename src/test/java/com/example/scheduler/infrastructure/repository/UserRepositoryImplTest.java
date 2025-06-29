@@ -87,7 +87,7 @@ class UserRepositoryImplTest {
     }
 
     @Test
-    void givenUserExist_WhenSaveNewUserWithSameUsername_DuplicateKeyException() {
+    void givenUserExist_WhenSaveNewUserWithSameUsername_ThenThrowDuplicateKeyException() {
         String usernameA = "username00";
         String passwordA = "password";
         String emailA = "email@ex.com";
