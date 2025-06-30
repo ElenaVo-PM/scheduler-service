@@ -3,8 +3,6 @@ package com.example.scheduler.adapters.web.user;
 import com.example.scheduler.adapters.dto.AuthRequest;
 import com.example.scheduler.adapters.dto.AuthResponse;
 import com.example.scheduler.adapters.dto.RegisterRequest;
-import com.example.scheduler.application.service.UserService;
-import com.example.scheduler.infrastructure.security.JwtTokenProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

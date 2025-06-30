@@ -1,7 +1,12 @@
 package com.example.scheduler.domain.model;
 
 
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
 

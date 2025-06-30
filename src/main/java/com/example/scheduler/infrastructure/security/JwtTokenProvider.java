@@ -3,8 +3,6 @@ package com.example.scheduler.infrastructure.security;
 import com.example.scheduler.domain.model.User;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-
 @Component
 public class JwtTokenProvider {
 
