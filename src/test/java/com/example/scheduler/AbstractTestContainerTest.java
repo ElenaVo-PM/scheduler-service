@@ -1,9 +1,16 @@
 package com.example.scheduler;
 
+import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Для использования в тестах приложений, запущенных в контейнере, унаследуйтесь от данного класса

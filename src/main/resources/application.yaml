@@ -2,7 +2,6 @@
 
 server:
   port: ${SCHEDULER_EXTERNAL_PORT}
-
 spring:
   application:
     name: scheduler
