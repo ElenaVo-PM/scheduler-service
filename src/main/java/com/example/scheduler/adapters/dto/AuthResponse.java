@@ -1,5 +1,6 @@
 package com.example.scheduler.adapters.dto;
 
 public record AuthResponse(
-    String token
+        String accessToken,
+        String refreshToken
 ) {}
