@@ -2,24 +2,22 @@ package com.example.scheduler.domain.model;
 
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 public class Credential implements UserDetails {
-    private UUID userId;
-    private String username;
-    private String password;
-    private String role;
-    private boolean enabled;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private final UUID userId;
+    private final String username;
+    private final String password;
+    private final UserRole role;
+    private final boolean enabled;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
     public Credential(UUID userId,
                       String username,
@@ -31,15 +29,19 @@ public class Credential implements UserDetails {
         this.userId = userId;
         this.username = username;
         this.password = password;
-        this.role = role;
+        this.role = UserRole.valueOf(role);
         this.enabled = enabled;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
+    public UUID getId() {
+        return userId;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Stream.of(new SimpleGrantedAuthority(role)).toList();
+        return List.of(role);
     }
 
     @Override
@@ -50,21 +52,6 @@ public class Credential implements UserDetails {
     @Override
     public String getUsername() {
         return username;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
     }
 
     @Override
@@ -82,6 +69,4 @@ public class Credential implements UserDetails {
     public int hashCode() {
         return Objects.hashCode(username);
     }
-
-
 }
