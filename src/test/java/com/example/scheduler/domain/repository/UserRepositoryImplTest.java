@@ -1,6 +1,5 @@
 package com.example.scheduler.domain.repository;
 
-import com.example.scheduler.AbstractTestContainerTest;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
 import org.junit.jupiter.api.DisplayName;
@@ -17,11 +16,9 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest(properties = {
-        "SCHEDULER_EXTERNAL_PORT=8081"
-})
+@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class UserRepositoryImplTest extends AbstractTestContainerTest {
+class UserRepositoryImplTest {
 
     @Autowired
     private UserRepository repository;
@@ -60,7 +57,7 @@ class UserRepositoryImplTest extends AbstractTestContainerTest {
                 () -> assertEquals(dbUser.get().id(), newUser.id(), "ID match"),
                 () -> assertEquals(dbUser.get().username(), newUser.username(), "LOGIN match"),
                 () -> assertEquals(dbUser.get().email(), newUser.email(), "EMAIL match"),
-                () -> assertEquals(usersCredits.get().getPassword(), password, "PASSWORD match")
+                () -> assertEquals(password, usersCredits.get().getPassword(), "PASSWORD match")
         );
     }
 
