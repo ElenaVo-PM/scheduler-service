@@ -1,7 +1,8 @@
-package com.example.scheduler.domain.repository;
+package com.example.scheduler.infrastructure.repository;
 
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
+import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -28,13 +29,13 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByUsername(String username) {
 
-        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
+        final String QUERY = "SELECT * FROM users WHERE UPPER(username) = UPPER(?)";
 
         try {
             Optional<User> dbUser = Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
                             (res, _) -> new User(res.getObject("id", UUID.class),
-                                    res.getString("user_login"),
+                                    res.getString("username"),
                                     res.getString("full_name"),
                                     res.getString("email"),
                                     TimeZone.getTimeZone(res.getString("timezone"))),
@@ -57,7 +58,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(String username, String password, String email) {
 
         final String QUERY = """
-                INSERT INTO users (id, email, password_hash, created_at, full_name, user_login, role)
+                INSERT INTO users (id, email, password_hash, created_at, full_name, username, role)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
@@ -70,7 +71,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<Credential> getCredential(String username) {
 
-        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
+        final String QUERY = "SELECT * FROM users WHERE UPPER(username) = UPPER(?)";
 
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd HH:mm:ss")
@@ -83,7 +84,7 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
                             (res, _) -> new Credential(res.getObject("id", UUID.class),
-                                    res.getString("user_login"),
+                                    res.getString("username"),
                                     res.getString("password_hash"),
                                     res.getString("role"),
                                     true,
