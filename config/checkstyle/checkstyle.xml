@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+
+    <module name="FileLength">
+        <property name="max" value="2000"/> <!-- Макс. строк в файле (2000) -->
+    </module>
+
+    <module name="TreeWalker">
+        <!-- Импорты -->
+        <module name="IllegalImport"/> <!-- Запрещает конкретные нежелательные импорты -->
+        <module name="RedundantImport"/> <!-- Находит дублирующиеся импорты -->
+        <module name="UnusedImports"/> <!-- Находит неиспользуемые импорты -->
+
+        <!-- Форматирование -->
+        <module name="EmptyBlock"/> <!-- Проверяет пустые блоки {} -->
+        <module name="LeftCurly"/> <!-- Проверяет положение { -->
+        <module name="RightCurly"/> <!-- Проверяет положение } -->
+    </module>
+
+    <module name="LineLength">
+        <property name="max" value="120"/> <!-- Макс. символов в строке (120) -->
+    </module>
+</module>
