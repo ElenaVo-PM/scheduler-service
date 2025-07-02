@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface EventRepository {
 
+    Optional<Event> getEventBySharedLink(UUID sharedLink);
     Event save(Event event);
 
     void update(Event event);
