@@ -5,3 +5,11 @@ spring:
     url: jdbc:tc:postgresql:17.5:///test
     username: test
     password: test
+
+jwt:
+  access:
+    secret: jxkXo59n1fqL6VQUNeqkdNtaI6J+dB3RMMUne6sEVSbWRIj1HVPV+uv8ry0EGrFjLle8bILu+/gccf4xmMaLAQ==
+    ttl: 6000
+  refresh:
+    secret: v/kE19nwZcuQcozQJdpmHS0U5zR1oBlS8uD45N09r0Cx95qWm8T8WWKmZ4EKfINqesrqP/JjjRtgRAhB5d6lAQ==
+    ttl: 70000
