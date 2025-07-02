@@ -7,9 +7,12 @@ import com.example.scheduler.adapters.dto.EventResponse;
 import java.util.UUID;
 
 public interface EventService {
+
     EventResponse createEvent(CreateEventRequest request, UUID ownerId);
 
     EventResponse refreshSlug(UUID eventId);
 
     EventFullDto getEventById(String email, UUID eventId);
+
+    void updateEvent(UUID id, CreateEventRequest request);
 }

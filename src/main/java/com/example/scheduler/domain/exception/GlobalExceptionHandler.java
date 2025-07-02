@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -46,7 +47,7 @@ public class GlobalExceptionHandler {
             MethodArgumentTypeMismatchException.class
     })
     public ResponseEntity<ApiError> handleBadRequestExceptions(Exception exception,
-                                                                  ServletWebRequest request) {
+                                                               ServletWebRequest request) {
         logger.warn("Message is not readable: {}", exception.getMessage());
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
@@ -84,7 +85,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ApiError> handleBadCredentialsException(BadCredentialsException exception,
-            ServletWebRequest request) {
+                                                                  ServletWebRequest request) {
         logger.warn("Authorization failed: {}", exception.getMessage());
 
         HttpStatus status = HttpStatus.UNAUTHORIZED;
@@ -101,9 +102,28 @@ public class GlobalExceptionHandler {
                 .body(apiError);
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> accessDeniedExceptionExceptionHandler(AccessDeniedException exception,
+                                                                          ServletWebRequest request) {
+        logger.warn(exception.getMessage());
+
+        HttpStatus status = HttpStatus.FORBIDDEN;
+        String path = request.getRequest().getRequestURI();
+
+        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getMessage(),
+                path);
+
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(apiError);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> unexpectedExceptionHandler(Exception exception,
-                                                                ServletWebRequest request) {
+                                                               ServletWebRequest request) {
         logger.warn("Unexpected exception occurred: {}", exception.getMessage(), exception);
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
