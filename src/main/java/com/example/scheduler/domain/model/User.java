@@ -1,6 +1,5 @@
 package com.example.scheduler.domain.model;
 
-import java.time.LocalDateTime;
 import java.util.TimeZone;
 import java.util.UUID;
 

@@ -6,14 +6,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 /**
  * Для использования в тестах приложений, запущенных в контейнере, унаследуйтесь от данного класса
+ *
+ * Обновление от 29.06.2025: Указал нужную версию PostgreSQL в application.yaml, тесты с доступом
+ * к БД должны работать и без использования этого класса.
  */
 public abstract class AbstractTestContainerTest {
 

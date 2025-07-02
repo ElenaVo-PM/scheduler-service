@@ -2,33 +2,33 @@ package com.example.scheduler.adapters.web.user;
 
 import com.example.scheduler.adapters.dto.AuthRequest;
 import com.example.scheduler.adapters.dto.AuthResponse;
+import com.example.scheduler.adapters.dto.RefreshTokenRequest;
 import com.example.scheduler.adapters.dto.RegisterRequest;
+import com.example.scheduler.application.service.AuthService;
 import com.example.scheduler.application.service.UserService;
-import com.example.scheduler.domain.model.Credential;
-import com.example.scheduler.infrastructure.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+    private final UserService userService;
+    private final AuthService authService;
+
+    public AuthController(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<Void> register(@RequestBody RegisterRequest request) {
 
         try {
-            userService.registerUser(request.username(), request.password(), request.email());
+            userService.registerUser(request);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
@@ -38,18 +38,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+        return ResponseEntity.ok(userService.loginUser(request.username(), request.password()));
+    }
 
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.username(),
-                        request.password()
-                )
-        );
-
-        Credential user = (Credential) auth.getPrincipal();
-
-        String token = tokenProvider.generateToken(user);
-
-        return ResponseEntity.ok(new AuthResponse(token));
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshTokens(@RequestBody RefreshTokenRequest request) {
+        return  ResponseEntity.ok(authService.refreshTokens(request.token()));
     }
 }
