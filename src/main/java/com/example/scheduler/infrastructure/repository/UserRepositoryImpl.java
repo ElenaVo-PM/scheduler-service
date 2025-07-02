@@ -1,4 +1,4 @@
-package com.example.scheduler.infrastructure.repository;
+package com.example.scheduler.domain.repository;
 
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
@@ -29,14 +29,16 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<User> findByUsername(String username) {
 
-        final String QUERY = "SELECT * FROM users WHERE UPPER(username) = UPPER(?)";
+        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
 
         try {
             Optional<User> dbUser = Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
-                            (res, num) -> new User(res.getObject("id", UUID.class),
-                                    res.getString("username"),
-                                    res.getString("email")),
+                            (res, _) -> new User(res.getObject("id", UUID.class),
+                                    res.getString("user_login"),
+                                    res.getString("full_name"),
+                                    res.getString("email"),
+                                    TimeZone.getTimeZone(res.getString("timezone"))),
                             username)
             );
 
@@ -56,11 +58,11 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(String username, String password, String email) {
 
         final String QUERY = """
-                INSERT INTO users (id, email, password_hash, created_at, username, role)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO users (id, email, password_hash, created_at, full_name, user_login, role)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
 
-        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), username, "USER");
+        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), "unknown", username, "USER");
 
         return findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -69,7 +71,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<Credential> getCredential(String username) {
 
-        final String QUERY = "SELECT * FROM users WHERE UPPER(username) = UPPER(?)";
+        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
 
         DateTimeFormatter formatter = new DateTimeFormatterBuilder()
                 .appendPattern("yyyy-MM-dd HH:mm:ss")
@@ -81,8 +83,8 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             return Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
-                            (res, num) -> new Credential(res.getObject("id", UUID.class),
-                                    res.getString("username"),
+                            (res, _) -> new Credential(res.getObject("id", UUID.class),
+                                    res.getString("user_login"),
                                     res.getString("password_hash"),
                                     res.getString("role"),
                                     true,
@@ -92,6 +94,18 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<User> findById (UUID id) {
+        final String QUERY = "SELECT * FROM users WHERE id = ?";
+        Optional<User> requiredUser = Optional.ofNullable(jdbc.queryForObject(QUERY,
+                (res, _) -> new User(res.getObject("id", UUID.class),
+                res.getString("user_login"),
+                res.getString("full_name"),
+                res.getString("email"),
+                TimeZone.getTimeZone(res.getString("timezone"))), id));
+        return requiredUser;
     }
 
     @Override

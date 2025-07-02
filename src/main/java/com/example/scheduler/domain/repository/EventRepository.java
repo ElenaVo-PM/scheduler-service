@@ -6,6 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EventRepository {
+    Optional<Event> getEventBySharedLink(UUID sharedLink);
     Event save(Event event);
 
     Event regenerateSlug(UUID id);
