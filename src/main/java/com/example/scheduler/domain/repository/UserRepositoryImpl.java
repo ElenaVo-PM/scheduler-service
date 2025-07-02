@@ -94,4 +94,16 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.empty();
         }
     }
+
+    @Override
+    public Optional<User> findById (UUID id) {
+        final String QUERY = "SELECT * FROM users WHERE id = ?";
+        Optional<User> requiredUser = Optional.ofNullable(jdbc.queryForObject(QUERY,
+                (res, _) -> new User(res.getObject("id", UUID.class),
+                res.getString("user_login"),
+                res.getString("full_name"),
+                res.getString("email"),
+                TimeZone.getTimeZone(res.getString("timezone"))), id));
+        return requiredUser;
+    }
 }

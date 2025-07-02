@@ -1,16 +1,18 @@
 package com.example.scheduler.domain.model;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record Event(
-    Long id,
-    Long ownerId,
+    UUID id,
+    UUID ownerId,
     String title,
     String description,
+    int duration,
     boolean isActive,
     int maxParticipants,
-    String eventType,
-    String link,
+    EventType eventType,
+    UUID link,
     Instant createdAt,
     Instant updatedAt
 ) {}
