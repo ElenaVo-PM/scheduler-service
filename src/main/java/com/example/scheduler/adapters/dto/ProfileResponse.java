@@ -8,7 +8,5 @@ public record ProfileResponse(
         String username,
         String description,
         boolean isActive,
-        String logo,
-        Instant createdAt,
-        Instant updatedAt
+        String logo
 ) {}
