@@ -1,6 +1,5 @@
 package com.example.scheduler;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -14,7 +13,7 @@ import org.testcontainers.utility.DockerImageName;
  */
 public abstract class AbstractTestContainerTest {
 
-    public final static PostgreSQLContainer postgres =
+    public static final PostgreSQLContainer postgres =
             new PostgreSQLContainer<>(DockerImageName.parse("postgres:17.5"));
 
     static {
