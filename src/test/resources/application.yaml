@@ -5,3 +5,10 @@ spring:
     url: jdbc:tc:postgresql:17.5:///test
     username: test
     password: test
+jwt:
+  access:
+    secret: zdovrMzwYb1fxaRjQKKze0a32u9+bWWT1I7aKMx89SQuFPQVCQmGgasx956HYJ66RDnJ+RlPePs7J8MFtR5yjw==
+    ttl: 3600000
+  refresh:
+    secret: OMEI/yB1SKWIRyYY2WQTE2mlzQ+fMZU09l9pnzje28ehlqql4mFR/nBdz98M8WaUfRe7wILytPBmWtPl1m7H/w==
+    ttl: 86400000
