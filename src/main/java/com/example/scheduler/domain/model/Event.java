@@ -1,7 +1,6 @@
 package com.example.scheduler.domain.model;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record Event(

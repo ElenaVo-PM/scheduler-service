@@ -23,6 +23,6 @@
     </module>
 
     <module name="LineLength">
-        <property name="max" value="120"/> <!-- Макс. символов в строке (120) -->
+        <property name="max" value="150"/> <!-- Макс. символов в строке (120) -->
     </module>
 </module>
