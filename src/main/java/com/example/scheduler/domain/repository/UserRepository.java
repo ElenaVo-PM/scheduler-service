@@ -12,4 +12,6 @@ public interface UserRepository {
     User save(String username, String password, String email);
 
     Optional<Credential> getCredential(String username);
+
+    Optional<User> findByEmail(String email);
 }

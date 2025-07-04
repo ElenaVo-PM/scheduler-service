@@ -12,4 +12,6 @@ public interface EventRepository {
     Event save(Event event);
 
     Event regenerateSlug(UUID id);
+
+    Optional<Event> getEventById(UUID id);
 }
