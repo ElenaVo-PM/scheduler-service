@@ -88,7 +88,7 @@ public class EventRepositoryImpl implements EventRepository {
                                     res.getInt("durationMinutes"),
                                     res.getInt("bufferBeforeMinutes"),
                                     res.getInt("bufferAfterMinutes"),
-                                    res.getObject("eventType", EventType.class),
+                                    res.getBoolean("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
                                     res.getString("slug"),
                                     res.getTimestamp("startDate").toInstant(),
                                     res.getTimestamp("endDate").toInstant(),

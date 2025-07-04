@@ -47,7 +47,7 @@ class EventControllerTest extends AbstractTestContainerTest {
     @Test
     @Sql(scripts = "classpath:scripts/data-test.sql")
     void getEventById_Success() throws Exception {
-        Mockito.when(principal.getName()).thenReturn("anna@user.ru");
+        Mockito.when(principal.getName()).thenReturn("user1@user.ru");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/events/{id}", "550e8400-e29b-41d4-a716-446655440000")
                         .principal(principal))
@@ -60,7 +60,7 @@ class EventControllerTest extends AbstractTestContainerTest {
     @Test
     @Sql("classpath:scripts/data-test.sql")
     void getEventById_NotFound() throws Exception {
-        Mockito.when(principal.getName()).thenReturn("anna@user.ru");
+        Mockito.when(principal.getName()).thenReturn("user1@user.ru");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/events/{id}", "550e8400-e29b-41d4-a716-446655440010")
                         .principal(principal))

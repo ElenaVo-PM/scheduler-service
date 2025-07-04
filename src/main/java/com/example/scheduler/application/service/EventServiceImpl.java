@@ -1,6 +1,8 @@
 package com.example.scheduler.application.service;
 
+import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
+import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.User;
@@ -18,10 +20,19 @@ import java.util.UUID;
 public class EventServiceImpl implements EventService {
     private final UserService userService;
     private final EventRepository eventRepository;
+    private final EventMapper eventMapper;
 
-    public EventServiceImpl(UserService userService, EventRepository eventRepository) {
+    public EventServiceImpl(UserService userService, EventRepository eventRepository, EventMapper eventMapper) {
         this.userService = userService;
         this.eventRepository = eventRepository;
+        this.eventMapper = eventMapper;
+    }
+
+    @Override
+    public EventResponse createEvent(CreateEventRequest request, UUID ownerId) {
+        Event requestEvent = eventMapper.toEntity(request, ownerId);
+        Event savedEvent = eventRepository.save(requestEvent);
+        return eventMapper.toResponse(savedEvent);
     }
 
     @Override
@@ -37,7 +48,7 @@ public class EventServiceImpl implements EventService {
             throw new AccessDeniedException("Доступ запрещён!");
         }
 
-        return EventMapper.toEventFullDto(event, user);
+        return eventMapper.toEventFullDto(event, user);
     }
 }
 

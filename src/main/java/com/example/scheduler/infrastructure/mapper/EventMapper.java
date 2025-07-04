@@ -31,23 +31,20 @@ public interface EventMapper {
         return String.format(EVENT_SHARE_LINK_PATTERN, slug);
     }
 
-    public static EventFullDto toEventFullDto(Event event, User user) {
-        return new EventFullDto(
-                event.id(),
-                event.ownerId(),
-                event.title(),
-                event.description(),
-                event.durationMinutes(),
-                event.bufferBeforeMinutes(),
-                event.bufferAfterMinutes(),
-                event.maxParticipants(),
-                event.isActive(),
-                event.eventType(),
-                event.slug(),
-                event.startDate(),
-                event.endDate(),
-                event.createdAt(),
-                event.updatedAt()
-        );
-    }
+    @Mapping(target = "id", source = "event.id")
+    @Mapping(target = "ownerId", source = "event.ownerId")
+    @Mapping(target = "title", source = "event.title")
+    @Mapping(target = "description", source = "event.description")
+    @Mapping(target = "durationMinutes", source = "event.durationMinutes")
+    @Mapping(target = "bufferBeforeMinutes", source = "event.bufferBeforeMinutes")
+    @Mapping(target = "bufferAfterMinutes", source = "event.bufferAfterMinutes")
+    @Mapping(target = "maxParticipants", source = "event.maxParticipants")
+    @Mapping(target = "isActive", source = "event.isActive")
+    @Mapping(target = "eventType", source = "event.eventType")
+    @Mapping(target = "slug", source = "event.slug")
+    @Mapping(target = "startDate", source = "event.startDate")
+    @Mapping(target = "endDate", source = "event.endDate")
+    @Mapping(target = "createdAt", source = "event.createdAt")
+    @Mapping(target = "updatedAt", source = "event.updatedAt")
+    EventFullDto toEventFullDto(Event event, User user);
 }
