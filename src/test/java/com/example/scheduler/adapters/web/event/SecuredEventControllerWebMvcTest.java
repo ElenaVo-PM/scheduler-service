@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.application.service.EventService;
 import com.example.scheduler.domain.model.EventType;
+import com.example.scheduler.infrastructure.config.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -27,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ContextConfiguration(classes = {TestSecurityConfig.class})
 class SecuredEventControllerWebMvcTest {
 
     private final CreateEventRequest request = new CreateEventRequest("title", "description",
