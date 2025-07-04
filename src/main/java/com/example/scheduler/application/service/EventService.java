@@ -5,6 +5,7 @@ import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.infrastructure.mapper.EventMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -25,5 +26,10 @@ public class EventService {
         Event requestEvent = eventMapper.toEntity(request, ownerId);
         Event savedEvent = eventRepository.save(requestEvent);
         return eventMapper.toResponse(savedEvent);
+    }
+
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public String refreshSlug(UUID eventId) {
+        return eventRepository.regenerateSlug(eventId);
     }
 }

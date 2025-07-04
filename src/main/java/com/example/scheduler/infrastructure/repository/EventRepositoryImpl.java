@@ -19,6 +19,11 @@ public class EventRepositoryImpl implements EventRepository {
             is_group_event, max_participants, is_active, slug)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
+    private static final String UPDATE_SLUG_QUERY = """
+            UPDATE event_templates
+            SET slug = ?
+            WHERE id = ?
+            """;
 
     private final JdbcTemplate jdbc;
 
@@ -56,5 +61,13 @@ public class EventRepositoryImpl implements EventRepository {
                 EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(), UUID.randomUUID());
 
         return findById(id).orElseThrow();
+    }
+
+    @Override
+    public String regenerateSlug(UUID id) {
+        UUID newSlug = UUID.randomUUID();
+        jdbc.update(UPDATE_SLUG_QUERY, newSlug, id);
+
+        return newSlug.toString();
     }
 }
