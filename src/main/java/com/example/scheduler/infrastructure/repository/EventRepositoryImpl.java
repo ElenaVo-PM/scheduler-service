@@ -64,10 +64,10 @@ public class EventRepositoryImpl implements EventRepository {
     }
 
     @Override
-    public String regenerateSlug(UUID id) {
+    public Event regenerateSlug(UUID id) {
         UUID newSlug = UUID.randomUUID();
         jdbc.update(UPDATE_SLUG_QUERY, newSlug, id);
 
-        return newSlug.toString();
+        return findById(id).orElseThrow();
     }
 }

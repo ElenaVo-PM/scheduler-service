@@ -29,7 +29,10 @@ public class EventService {
     }
 
     @PreAuthorize("@security.isOwner(#eventId)")
-    public String refreshSlug(UUID eventId) {
-        return eventRepository.regenerateSlug(eventId);
+    public EventResponse refreshSlug(UUID eventId) {
+
+        Event updatedEvent = eventRepository.regenerateSlug(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
     }
 }

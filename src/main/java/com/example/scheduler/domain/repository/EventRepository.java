@@ -11,5 +11,5 @@ public interface EventRepository {
 
     Event save(Event event);
 
-    String regenerateSlug(UUID id);
+    Event regenerateSlug(UUID id);
 }

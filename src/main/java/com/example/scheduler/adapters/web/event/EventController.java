@@ -31,7 +31,7 @@ public class EventController {
     }
 
     @PostMapping("/{id}/regenerate-link")
-    public ResponseEntity<String> refreshSlug(@PathVariable UUID eventId) {
+    public ResponseEntity<EventResponse> refreshSlug(@PathVariable UUID eventId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)

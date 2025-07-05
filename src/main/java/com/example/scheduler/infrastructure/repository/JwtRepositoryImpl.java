@@ -9,7 +9,9 @@ import java.util.UUID;
 
 @Repository
 public class JwtRepositoryImpl implements JwtRepository {
-    private static final String SELECT_COUNT_BY_USER_ID_AND_TOKEN_QUERY = "SELECT COUNT(*) FROM tokens WHERE user_id = ? AND token = ?";
+    private static final String SELECT_COUNT_BY_USER_ID_AND_TOKEN_QUERY = """
+    SELECT COUNT(*) FROM tokens WHERE user_id = ? AND token = ?
+    """;
     private static final String SAVE_QUERY = "INSERT INTO tokens (user_id, token) VALUES (?, ?)";
     private static final String DELETE_BY_USER_ID_QUERY = "DELETE FROM tokens WHERE user_id=?";
 
