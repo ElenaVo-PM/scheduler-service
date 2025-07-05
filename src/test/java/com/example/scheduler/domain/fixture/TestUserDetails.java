@@ -1,4 +1,4 @@
-package com.example.scheduler.infrastructure.config;
+package com.example.scheduler.domain.fixture;
 
 
 import com.example.scheduler.domain.model.Credential;
