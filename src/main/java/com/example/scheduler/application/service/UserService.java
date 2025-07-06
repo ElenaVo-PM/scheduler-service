@@ -22,8 +22,8 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final AuthService authService;
 
-    public UserService(UserRepository userRepo, PasswordEncoder encoder, AuthenticationManager authenticationManager,
-            AuthService authService) {
+    public UserService(UserRepository userRepo, PasswordEncoder encoder,
+                       AuthenticationManager authenticationManager, AuthService authService) {
         this.userRepo = userRepo;
         this.encoder = encoder;
         this.authenticationManager = authenticationManager;

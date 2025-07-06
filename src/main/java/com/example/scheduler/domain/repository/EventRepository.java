@@ -10,4 +10,6 @@ public interface EventRepository {
     Optional<Event> findById(UUID id);
 
     Event save(Event event);
+
+    Event regenerateSlug(UUID id);
 }
