@@ -18,8 +18,9 @@ public record EventFullDto(
         boolean isActive,
         EventType eventType,
         String slug,
-        LocalDateTime startDate,
-        LocalDateTime endDate,
+        Instant startDate,
+        Instant endDate,
         Instant createdAt,
         Instant updatedAt
-) {}
+) {
+}

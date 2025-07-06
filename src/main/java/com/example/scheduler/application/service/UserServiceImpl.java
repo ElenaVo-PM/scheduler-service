@@ -30,15 +30,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User registerUser(RegisterRequest request) throws IllegalArgumentException {
-
         Optional<User> dbUser = userRepo.findByUsername(request.username());
-
         if (dbUser.isPresent()) {
             throw new IllegalArgumentException("User already exists");
         }
 
         String encodedPassword = encoder.encode(request.password());
-
         return userRepo.save(request.username(), encodedPassword, request.email());
     }
 
