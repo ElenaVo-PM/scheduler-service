@@ -19,7 +19,6 @@ public class SecurityService {
     }
 
     public boolean isOwner(UUID eventId) {
-
         UUID authUUID = ((Credential) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId();
 
         return repository.findById(eventId)
