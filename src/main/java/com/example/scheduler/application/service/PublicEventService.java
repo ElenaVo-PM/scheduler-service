@@ -14,11 +14,10 @@ import java.util.UUID;
 
 @Service
 public class PublicEventService {
-    @Autowired
     private final EventRepository eventRepository;
-    @Autowired
     private final UserRepository userRepository;
 
+    @Autowired
     public PublicEventService(EventRepository eventRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
