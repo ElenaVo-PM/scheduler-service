@@ -36,9 +36,7 @@ public class UserRepositoryImpl implements UserRepository {
                     jdbc.queryForObject(QUERY,
                             (res, num) -> new User(res.getObject("id", UUID.class),
                                     res.getString("username"),
-                                    res.getString("full_name"),
-                                    res.getString("email"),
-                                    TimeZone.getTimeZone(res.getString("timezone"))),
+                                    res.getString("email")),
                             username)
             );
 
@@ -58,11 +56,11 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(String username, String password, String email) {
 
         final String QUERY = """
-                INSERT INTO users (id, email, password_hash, created_at, full_name, username, role)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO users (id, email, password_hash, created_at, username, role)
+                VALUES (?, ?, ?, ?, ?, ?)
                 """;
 
-        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), "unknown", username, "USER");
+        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), username, "USER");
 
         return findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -106,9 +104,7 @@ public class UserRepositoryImpl implements UserRepository {
                             (res, num) -> new User(
                                     res.getObject("id", UUID.class),
                                     res.getString("username"),
-                                    res.getString("full_name"),
-                                    res.getString("email"),
-                                    TimeZone.getTimeZone(res.getString("timezone"))
+                                    res.getString("email")
                             ),
                             email)
             );
