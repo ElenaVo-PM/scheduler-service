@@ -9,5 +9,7 @@ import java.util.UUID;
 public interface EventService {
     EventResponse createEvent(CreateEventRequest request, UUID ownerId);
 
+    EventResponse refreshSlug(UUID eventId);
+
     EventFullDto getEventById(String email, UUID eventId);
 }

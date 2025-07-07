@@ -9,6 +9,7 @@ import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.infrastructure.mapper.EventMapper;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,14 @@ public class EventServiceImpl implements EventService {
         Event requestEvent = eventMapper.toEntity(request, ownerId);
         Event savedEvent = eventRepository.save(requestEvent);
         return eventMapper.toResponse(savedEvent);
+    }
+
+    @Override
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public EventResponse refreshSlug(UUID eventId) {
+        Event updatedEvent = eventRepository.regenerateSlug(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
     }
 
     @Override
