@@ -10,12 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.UUID;
@@ -57,5 +52,14 @@ public class EventController {
     public ResponseEntity<EventFullDto> getEventById(Principal principal, @PathVariable UUID eventId) {
         EventFullDto event = eventService.getEventById(principal.getName(), eventId);
         return ResponseEntity.ok(event);
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID eventId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.toggleActiveEvent(eventId));
+
     }
 }
