@@ -85,7 +85,7 @@ public class EventRepositoryImpl implements EventRepository {
     @Override
     public Optional<Event> getEventById(UUID id) {
         try {
-            return Optional.of(
+            return Optional.ofNullable(
                     jdbc.queryForObject(FIND_BY_ID_QUERY,
                             (res, num) -> new Event(
                                     res.getObject("id", UUID.class),
@@ -114,7 +114,7 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public Event toggleActiveEvent(UUID id) {
-        Event event = findById(id).orElseThrow();
+        Event event = getEventById(id).orElseThrow();
         boolean toggle = true;
 
         if (event.isActive()) {
@@ -123,7 +123,7 @@ public class EventRepositoryImpl implements EventRepository {
             jdbc.update(TOGGLE_EVENT_QUERY, toggle, id);
         }
 
-        return findById(id).orElseThrow();
+        return getEventById(id).orElseThrow();
 
     }
 }

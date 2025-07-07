@@ -59,5 +59,12 @@ public class EventServiceImpl implements EventService {
 
         return eventMapper.toEventFullDto(event, user);
     }
+
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public EventResponse toggleActiveEvent(UUID eventId) {
+        Event updatedEvent = eventRepository.toggleActiveEvent(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
+    }
 }
 
