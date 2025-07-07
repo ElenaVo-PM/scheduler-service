@@ -28,6 +28,11 @@ public class EventRepositoryImpl implements EventRepository {
             SET slug = ?
             WHERE id = ?
             """;
+    private static final String TOGGLE_EVENT_QUERY = """
+            UPDATE event_templates
+            SET is_active = ?
+            WHERE id = ?
+            """;
 
     private static final String FIND_BY_ID_QUERY = """
                 SELECT
@@ -112,6 +117,21 @@ public class EventRepositoryImpl implements EventRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Event toggleActiveEvent(UUID id) {
+        Event event = findById(id).orElseThrow();
+        boolean toggle = true;
+
+        if (event.isActive()) {
+            jdbc.update(TOGGLE_EVENT_QUERY, !toggle, id);
+        } else {
+            jdbc.update(TOGGLE_EVENT_QUERY, toggle, id);
+        }
+
+        return findById(id).orElseThrow();
+
     }
 
     @Override

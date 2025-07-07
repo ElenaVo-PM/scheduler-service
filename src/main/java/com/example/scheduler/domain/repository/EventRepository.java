@@ -14,4 +14,6 @@ public interface EventRepository {
     Event regenerateSlug(UUID id);
 
     Optional<Event> getEventById(UUID id);
+
+    Event toggleActiveEvent(UUID id);
 }
