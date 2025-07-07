@@ -12,6 +12,6 @@ public class TestSecurityConfig {
     @Bean("MockUserDetailsService")
     public UserDetailsService userDetailsService() {
         TestUserDetails user = new TestUserDetails();
-        return _ -> user;
+        return num -> user;
     }
 }

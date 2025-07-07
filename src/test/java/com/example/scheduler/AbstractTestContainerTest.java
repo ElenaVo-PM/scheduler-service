@@ -8,7 +8,7 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Для использования в тестах приложений, запущенных в контейнере, унаследуйтесь от данного класса
  *
- * Обновление от 29.06.2025: Указал нужную версию PostgreSQL в application.yaml, тесты с доступом
+ * Обновление от 29.06.2025: Указал нужную версию PostgreSQL в application-test.yaml, тесты с доступом
  * к БД должны работать и без использования этого класса.
  */
 public abstract class AbstractTestContainerTest {

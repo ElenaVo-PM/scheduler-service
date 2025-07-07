@@ -6,10 +6,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface EventRepository {
-
-    Optional<Event> findById(UUID id);
-
     Event save(Event event);
 
     Event regenerateSlug(UUID id);
+
+    Optional<Event> getEventById(UUID id);
 }

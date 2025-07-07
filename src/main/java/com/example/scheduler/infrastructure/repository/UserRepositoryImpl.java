@@ -34,7 +34,7 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             Optional<User> dbUser = Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
-                            (res, _) -> new User(res.getObject("id", UUID.class),
+                            (res, num) -> new User(res.getObject("id", UUID.class),
                                     res.getString("username"),
                                     res.getString("full_name"),
                                     res.getString("email"),
@@ -83,7 +83,7 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             return Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
-                            (res, _) -> new Credential(res.getObject("id", UUID.class),
+                            (res, num) -> new Credential(res.getObject("id", UUID.class),
                                     res.getString("username"),
                                     res.getString("password_hash"),
                                     res.getString("role"),
@@ -94,5 +94,33 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email) {
+        final String QUERY = "SELECT * FROM users WHERE UPPER(email) = UPPER(?)";
+
+        try {
+            Optional<User> dbUser = Optional.ofNullable(
+                    jdbc.queryForObject(QUERY,
+                            (res, num) -> new User(
+                                    res.getObject("id", UUID.class),
+                                    res.getString("username"),
+                                    res.getString("full_name"),
+                                    res.getString("email"),
+                                    TimeZone.getTimeZone(res.getString("timezone"))
+                            ),
+                            email)
+            );
+
+            if (dbUser.isPresent()) {
+                return dbUser;
+            }
+
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+
+        return Optional.empty();
     }
 }
