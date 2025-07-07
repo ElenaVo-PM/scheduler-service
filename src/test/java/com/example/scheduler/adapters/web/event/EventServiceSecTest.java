@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+
 import static org.mockito.Mockito.verify;
+
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -59,10 +61,12 @@ class EventServiceSecTest {
                 30,
                 5,
                 5,
+                5,
                 EventType.ONE2ONE,
-                2,
                 slug,
                 Instant.now().minus(Duration.ofMinutes(30)),
+                Instant.now(),
+                Instant.now().minus(Duration.ofHours(1)),
                 Instant.now()
         );
 

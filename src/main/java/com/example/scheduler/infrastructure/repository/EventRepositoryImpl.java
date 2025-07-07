@@ -8,6 +8,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,8 +18,9 @@ public class EventRepositoryImpl implements EventRepository {
     private static final String SAVE_QUERY = """
             INSERT INTO event_templates (id, user_id, title, description,
             duration_minutes, buffer_before_minutes, buffer_after_minutes,
-            is_group_event, max_participants, is_active, slug)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            is_group_event, max_participants, is_active, slug, start_date,
+            end_date, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
 
     private static final String UPDATE_SLUG_QUERY = """
@@ -60,7 +62,9 @@ public class EventRepositoryImpl implements EventRepository {
         UUID id = UUID.randomUUID();
         jdbc.update(SAVE_QUERY, id, e.ownerId(), e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
-                EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(), UUID.randomUUID());
+                EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
+                Timestamp.from(e.startDate()), Timestamp.from(e.endDate()), Timestamp.from(e.createdAt()),
+                Timestamp.from(e.updatedAt()));
 
         return getEventById(id).orElseThrow();
     }
