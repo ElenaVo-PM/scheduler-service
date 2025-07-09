@@ -24,10 +24,84 @@ components:
         email:
           type: string
           format: email
-        full_name:
+    Profile:
+      type: object
+      required:
+        - userId
+        - fullName
+        - timezone
+        - isActive
+        - createdAt
+        - updatedAt
+      properties:
+        userId:
+          type: string
+          format: UUID
+        fullName:
           type: string
         timezone:
           type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+          default: true
+        logo:
+          type: string
+        createdAt:
+          type: string
+          format: timestamp
+        updatedAt:
+          type: string
+          format: timestamp
+    CreateProfileRequest:
+      type: object
+      required:
+        - fullName
+        - timezone
+      properties:
+        fullName:
+          type: string
+        timezone:
+          type: string
+        description:
+          type: string
+        logo:
+          type: string
+      example:
+        fullName: Alice Arno
+        timezone: Europe/Paris
+        description: Test description
+        logo: Logo
+    ProfileResponse:
+      type: object
+      required:
+        - userId
+        - fullName
+        - timezone
+        - isActive
+      properties:
+        userId:
+          type: string
+          format: UUID
+        fullName:
+          type: string
+        timezone:
+          type: string
+        description:
+          type: string
+        isActive:
+          type: boolean
+        logo:
+          type: string
+      example:
+        userId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        username: alice
+        fullName: Alice Arno
+        timezone: Europe/Paris
+        description: Test description
+        isActive: true
+        logo: Logo
     EventTemplate:
       type: object
       properties:
@@ -137,6 +211,71 @@ paths:
       responses:
         '200':
           description: Login successful, returns JWT
+
+  /profiles:
+    get:
+      summary: Get current user profile
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: x-user-id
+          description: Current user id
+          in: header
+          schema:
+            type: string
+            format: UUID
+            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+          required: true
+      responses:
+        '200':
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: No user id in request or user id of wrong format
+        '401':
+          description: User not authorized
+        '403':
+          description: User not allowed to get profile (profile belongs to another user)
+        '404':
+          description: Profile for current user not found
+    post:
+      summary: Create profile for current user
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: x-user-id
+          description: Current user id
+          in: header
+          schema:
+            type: string
+            format: UUID
+            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+          required: true
+      requestBody:
+        description: User profile parameters
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateProfileRequest'
+        required: true
+      responses:
+        '201':
+          description: Created profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: No user id in request or user id of wrong format or errors in user profile parameters
+        '401':
+          description: User not authorized
+        '403':
+          description: User not allowed to create profile (profile belongs to another user)
+        '409':
+          description: Profile for current user already exist
 
   /me:
     get:
