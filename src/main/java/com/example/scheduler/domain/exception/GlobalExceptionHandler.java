@@ -8,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,8 +40,12 @@ public class GlobalExceptionHandler {
                 .body(apiError);
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiError> httpMessageNotReadableHandler(HttpMessageNotReadableException exception,
+    @ExceptionHandler({
+            HttpMessageNotReadableException.class,
+            MissingRequestHeaderException.class,
+            MethodArgumentTypeMismatchException.class
+    })
+    public ResponseEntity<ApiError> handleBadRequestExceptions(Exception exception,
                                                                   ServletWebRequest request) {
         logger.warn("Message is not readable: {}", exception.getMessage());
 
@@ -98,7 +104,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> unexpectedExceptionHandler(Exception exception,
                                                                 ServletWebRequest request) {
-        logger.warn("Unexpected exception occurred: {}", exception.getMessage());
+        logger.warn("Unexpected exception occurred: {}", exception.getMessage(), exception);
 
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         String path = request.getRequest().getRequestURI();
