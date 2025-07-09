@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -18,8 +19,8 @@ import java.time.temporal.ChronoUnit;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ApiError> entityNotFoundHandler(EntityNotFoundException exception,
+    @ExceptionHandler({EntityNotFoundException.class, NotFoundException.class})
+    public ResponseEntity<ApiError> entityNotFoundHandler(RuntimeException exception,
                                                           ServletWebRequest request) {
         logger.warn("Entity not found: {}", exception.getMessage());
 
@@ -62,6 +63,25 @@ public class GlobalExceptionHandler {
         logger.warn("Validation failed: {}", exception.getMessage());
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        String path = request.getRequest().getRequestURI();
+
+        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getMessage(),
+                path);
+
+        return ResponseEntity.status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(apiError);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleBadCredentialsException(BadCredentialsException exception,
+            ServletWebRequest request) {
+        logger.warn("Authorization failed: {}", exception.getMessage());
+
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
         String path = request.getRequest().getRequestURI();
 
         ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
