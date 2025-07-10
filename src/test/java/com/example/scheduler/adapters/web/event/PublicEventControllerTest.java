@@ -34,7 +34,7 @@ public class PublicEventControllerTest {
     @Test
     public void getEventBySharedLinkTest() throws Exception {
         PublicEventResponse testResponse = new PublicEventResponse("abc", 10, EventType.GROUP, TimeZone.getTimeZone("GMT+3:00"));
-        when(publicEventService.getEventBySharedLink(Mockito.anyString())).thenReturn(testResponse);
+        when(publicEventService.getEventBySlug(Mockito.anyString())).thenReturn(testResponse);
 
         mockMvc.perform(get("/api/public/events/{sharedLink}", UUID.randomUUID().toString())
                         .characterEncoding(StandardCharsets.UTF_8)
