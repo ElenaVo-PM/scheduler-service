@@ -1,6 +1,7 @@
 package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.PublicEventResponse;
+import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.UserGeneralInfo;
 import com.example.scheduler.domain.repository.EventRepository;
@@ -28,7 +29,7 @@ public class PublicEventService {
     public PublicEventResponse getEventBySlug (String sharedLink) {
         UUID slugUUID = UUID.fromString(sharedLink);
         Optional<Event> requiredEvent = eventRepository.getEventBySlug(slugUUID);
-        if (requiredEvent.isEmpty() || !requiredEvent.get().isActive()) throw new RuntimeException();
+        if (requiredEvent.isEmpty() || !requiredEvent.get().isActive()) throw new NotFoundException("Событие не найдено");
         UserGeneralInfo eventOwner = userRepository.findUserGeneralInfoById(requiredEvent.get().ownerId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return convertToPublicResponse(requiredEvent.get(),  eventOwner);
     }
