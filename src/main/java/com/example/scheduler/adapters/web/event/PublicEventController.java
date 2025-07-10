@@ -21,7 +21,7 @@ public class PublicEventController {
 
     @GetMapping("/events/{sharedLink}")
     public ResponseEntity<PublicEventResponse> getEventBySharedLink(@PathVariable String sharedLink) {
-    PublicEventResponse requiredEvent = publicEventService.getEventBySlug(sharedLink);
-    return ResponseEntity.ok(requiredEvent);
- }
+        PublicEventResponse requiredEvent = publicEventService.getEventBySlug(sharedLink);
+        return ResponseEntity.ok(requiredEvent);
+    }
 }
