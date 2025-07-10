@@ -2,12 +2,13 @@ package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.PublicEventResponse;
 import com.example.scheduler.domain.model.Event;
-import com.example.scheduler.domain.model.User;
+import com.example.scheduler.domain.model.UserGeneralInfo;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -23,15 +24,16 @@ public class PublicEventService {
         this.userRepository = userRepository;
     }
 
-    public PublicEventResponse getEventBySharedLink (String sharedLink) {
-        UUID sharedLinkUUID = UUID.fromString(sharedLink);
-        Optional<Event> requiredEvent = eventRepository.getEventBySharedLink(sharedLinkUUID);
+    @Transactional
+    public PublicEventResponse getEventBySlug (String sharedLink) {
+        UUID slugUUID = UUID.fromString(sharedLink);
+        Optional<Event> requiredEvent = eventRepository.getEventBySlug(slugUUID);
         if (requiredEvent.isEmpty() || !requiredEvent.get().isActive()) throw new RuntimeException();
-        User eventOwner = userRepository.findById(requiredEvent.get().ownerId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        UserGeneralInfo eventOwner = userRepository.findUserGeneralInfoById(requiredEvent.get().ownerId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return convertToPublicResponse(requiredEvent.get(),  eventOwner);
     }
 
-    private PublicEventResponse convertToPublicResponse (Event event, User eventOwner) {
-                return new PublicEventResponse(event.title(), event.duration(), event.eventType(), eventOwner.userTimeZone());
+    private PublicEventResponse convertToPublicResponse (Event event, UserGeneralInfo eventOwner) {
+                return new PublicEventResponse(event.title(), event.durationMinutes(), event.eventType(), eventOwner.timezone());
     }
 }

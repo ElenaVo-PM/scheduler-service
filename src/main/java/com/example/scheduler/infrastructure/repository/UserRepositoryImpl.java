@@ -1,7 +1,8 @@
-package com.example.scheduler.domain.repository;
+package com.example.scheduler.infrastructure.repository;
 
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
+import com.example.scheduler.domain.model.UserGeneralInfo;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -35,13 +36,9 @@ public class UserRepositoryImpl implements UserRepository {
             Optional<User> dbUser = Optional.ofNullable(
                     jdbc.queryForObject(QUERY,
                             (res, _) -> new User(res.getObject("id", UUID.class),
-                                    res.getString("user_login"),
-                                    res.getString("full_name"),
-                                    res.getString("email"),
-                                    TimeZone.getTimeZone(res.getString("timezone"))),
-                            username)
-            );
-
+                                    username,
+                                    res.getString("email"))
+                    ));
             if (dbUser.isPresent()) {
                 return dbUser;
             }
@@ -97,15 +94,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public Optional<User> findById (UUID id) {
+    public Optional<UserGeneralInfo> findUserGeneralInfoById(UUID id) {
         final String QUERY = "SELECT * FROM users WHERE id = ?";
-        Optional<User> requiredUser = Optional.ofNullable(jdbc.queryForObject(QUERY,
-                (res, _) -> new User(res.getObject("id", UUID.class),
-                res.getString("user_login"),
-                res.getString("full_name"),
-                res.getString("email"),
-                TimeZone.getTimeZone(res.getString("timezone"))), id));
-        return requiredUser;
+        return Optional.ofNullable(jdbc.queryForObject(QUERY,
+                (res, _) -> new UserGeneralInfo(res.getObject("id", UUID.class),
+                        res.getString("user_login"),
+                        res.getString("full_name"),
+                        res.getString("email"),
+                        TimeZone.getTimeZone(res.getString("timezone"))), id));
     }
 
     @Override
