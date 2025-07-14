@@ -5,7 +5,6 @@ import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.EventType;
-import com.example.scheduler.domain.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
@@ -53,7 +52,7 @@ public interface EventMapper {
     @Mapping(target = "endDate", source = "event.endDate")
     @Mapping(target = "createdAt", source = "event.createdAt")
     @Mapping(target = "updatedAt", source = "event.updatedAt")
-    EventFullDto toEventFullDto(Event event, User user);
+    EventFullDto toEventFullDto(Event event);
 
     default Event updateEntityFromDto(Event event, CreateEventRequest dto) {
         if (event == null && dto == null) {
