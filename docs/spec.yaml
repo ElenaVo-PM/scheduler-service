@@ -15,6 +15,28 @@ components:
       bearerFormat: JWT
 
   schemas:
+
+    ApiError:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: timestamp
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+      example:
+        timestamp: 2024-07-01T02:03:04Z
+        status: 404
+        error: Not Found
+        message: event [8840ddd5-e176-46d8-8f1b-babb00d989cd] not found
+        path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+
     User:
       type: object
       properties:
@@ -102,31 +124,78 @@ components:
         description: Test description
         isActive: true
         logo: Logo
-    EventTemplate:
+
+    EventFullDto:
       type: object
       properties:
         id:
           type: string
+          format: UUID
+        ownerId:
+          type: string
+          format: UUID
         title:
           type: string
         description:
           type: string
-        duration_minutes:
+        durationMinutes:
           type: integer
-        buffer_before_minutes:
+        bufferBeforeMinutes:
           type: integer
-        buffer_after_minutes:
+        bufferAfterMinutes:
           type: integer
-        group_event:
+        maxParticipants:
+          type: integer
+        isActive:
           type: boolean
-        max_participants:
-          type: integer
-        active:
-          type: boolean
+        eventType:
+          type: string
+          enum:
+            - ONE2ONE
+            - GROUP
         slug:
           type: string
-        timezone:
+        startDate:
           type: string
+          format: timestamp
+        endDate:
+          type: string
+          format: timestamp
+        createdAt:
+          type: string
+          format: timestamp
+        updatedAt:
+          type: string
+          format: timestamp
+      example:
+        id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        ownerId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        title: Demo
+        description: 'Sprint #42 demo'
+        durationMinutes: 60
+        bufferBeforeMinutes: 10
+        bufferAfterMinutes: 15
+        maxParticipants: 1
+        isActive: true
+        eventType: ONE2ONE
+        slug: b452644a-dba8-427a-8e44-d5c1bc528231
+        startDate: 2024-07-01T10:00:00Z
+        endDate: 2024-07-04T17:00:00Z
+        createdAt: 2001-02-03T04:05:06.789012Z
+        updatedAt: 2001-03-04T05:06:07.890123Z
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: UUID
+        shareLink:
+          type: string
+      example:
+        id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        slug: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
+
     AvailabilityRule:
       type: object
       properties:
@@ -286,8 +355,10 @@ paths:
         '200':
           description: Current user
 
-  /event-templates:
+  /api/events:
     get:
+      tags:
+        - Events
       summary: List event templates
       security:
         - BearerAuth: []
@@ -295,6 +366,8 @@ paths:
         '200':
           description: OK
     post:
+      tags:
+        - Events
       summary: Create event template
       security:
         - BearerAuth: []
@@ -303,26 +376,93 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventTemplate'
+              $ref: '#/components/schemas/EventResponse'
       responses:
         '201':
           description: Created
 
-  /event-templates/{id}:
+  /api/events/{id}:
     get:
-      summary: Get event template
+      tags:
+        - Events
+      summary: Get event
       security:
         - BearerAuth: []
       parameters:
-        - in: path
-          name: id
-          required: true
+        - name: x-user-id
+          description: Current user id
+          in: header
           schema:
             type: string
+            format: UUID
+            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+          required: true
+        - name: id
+          description: Event id
+          in: path
+          schema:
+            type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
       responses:
         '200':
-          description: OK
+          description: Event requested
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventFullDto'
+        '400':
+          description: No user id in request or user id of wrong format or event id of wrong format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 400
+                error: Bad Request
+                message: Required request header 'X-USER-ID' for method parameter type UUID is not present
+                path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+        '401':
+          description: User not authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 401
+                error: Unauthorized
+                message: User [d3e68c3b-2d6d-48a1-a037-99a390e9433e] is not authorized
+                path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+        '403':
+          description: User not allowed to get event (event belongs to another user)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 403
+                error: Forbidden
+                message: User can get own events only
+                path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 404
+                error: Not Found
+                message: Event [8840ddd5-e176-46d8-8f1b-babb00d989cd] not found
+                path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
     put:
+      tags:
+        - Events
       summary: Update event template
       security:
         - BearerAuth: []
@@ -337,11 +477,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventTemplate'
+              $ref: '#/components/schemas/EventFullDto'
       responses:
         '200':
           description: Updated
     delete:
+      tags:
+        - Events
       summary: Delete event template
       security:
         - BearerAuth: []
