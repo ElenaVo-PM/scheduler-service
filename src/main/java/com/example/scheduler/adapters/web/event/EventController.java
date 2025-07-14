@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.EventFullDto;
 
 import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.infrastructure.util.EntityAction;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.UUID;
 
 @RestController
@@ -71,4 +73,17 @@ public class EventController {
         eventService.updateEvent(id, request);
         return ResponseEntity.ok().build();
     }
+
+
+    /**
+     * GET /events - Получение всех событий
+     */
+    @GetMapping("")
+    public ResponseEntity<Collection<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.getAllEvents(userDetails.getId()));
+    }
+
+
 }

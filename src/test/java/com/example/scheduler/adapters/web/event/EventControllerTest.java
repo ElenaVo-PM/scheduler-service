@@ -1,7 +1,11 @@
 package com.example.scheduler.adapters.web.event;
 
 import com.example.scheduler.AbstractTestContainerTest;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
+import com.example.scheduler.domain.model.Event;
+import com.example.scheduler.domain.model.EventType;
+import com.example.scheduler.infrastructure.mapper.EventMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +20,11 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -29,12 +38,15 @@ class EventControllerTest extends AbstractTestContainerTest {
     private final EventService eventService;
     private final WebApplicationContext webApplicationContext;
     private final MockMvc mockMvc;
+    private final EventMapper eventMapper;
+
 
     @Autowired
-    public EventControllerTest(EventService eventService, WebApplicationContext webApplicationContext) {
+    public EventControllerTest(EventService eventService, WebApplicationContext webApplicationContext, EventMapper eventMapper) {
         this.eventService = eventService;
         this.webApplicationContext = webApplicationContext;
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        this.eventMapper = eventMapper;
     }
 
     @MockitoBean
@@ -65,4 +77,5 @@ class EventControllerTest extends AbstractTestContainerTest {
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof RuntimeException))
                 .andExpect(result -> assertEquals("Событие не найдено.", result.getResolvedException().getMessage()));
     }
+
 }

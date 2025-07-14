@@ -3,6 +3,7 @@ package com.example.scheduler.application.service;
 import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.User;
@@ -13,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -68,5 +71,9 @@ public class EventServiceImpl implements EventService {
         Event updatedEvent = eventMapper.updateEntityFromDto(preUpdatedEvent, request);
         eventRepository.update(updatedEvent);
     }
-}
 
+    @Override
+    public List<EventShortDto> getAllEvents(UUID ownerId) {
+        return eventMapper.toEventShortDtoList(eventRepository.getAllEvents(ownerId));
+    }
+}
