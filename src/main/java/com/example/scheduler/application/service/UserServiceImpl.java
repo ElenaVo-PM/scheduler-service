@@ -49,9 +49,4 @@ public class UserServiceImpl implements UserService {
         Credential userDetails = (Credential) authentication.getPrincipal();
         return authService.creteTokens(userDetails);
     }
-
-    @Override
-    public Optional<User> getUser(String email) {
-        return userRepo.findByEmail(email);
-    }
 }
