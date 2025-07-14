@@ -6,13 +6,16 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.application.service.EventService;
 import com.example.scheduler.domain.model.Credential;
+import com.example.scheduler.infrastructure.util.EntityAction;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,8 +37,11 @@ public class EventController {
      * POST /events - Добавление события
      */
     @PostMapping
-    public ResponseEntity<EventResponse> createEvent(@RequestBody @Valid CreateEventRequest request,
-                                                     @AuthenticationPrincipal Credential userDetails) {
+    public ResponseEntity<EventResponse> createEvent(@RequestBody
+                                                     @Validated(EntityAction.OnCreate.class)
+                                                     CreateEventRequest request,
+                                                     @AuthenticationPrincipal
+                                                     Credential userDetails) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(eventService.createEvent(request, userDetails.getId()));
@@ -57,5 +63,12 @@ public class EventController {
     public ResponseEntity<EventFullDto> getEventById(Principal principal, @PathVariable UUID eventId) {
         EventFullDto event = eventService.getEventById(principal.getName(), eventId);
         return ResponseEntity.ok(event);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateEvent(@PathVariable UUID id,
+                                            @RequestBody @Valid CreateEventRequest request) {
+        eventService.updateEvent(id, request);
+        return ResponseEntity.ok().build();
     }
 }

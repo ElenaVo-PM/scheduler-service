@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 import java.util.UUID;
 
 @Service
@@ -58,6 +57,16 @@ public class EventServiceImpl implements EventService {
         }
 
         return eventMapper.toEventFullDto(event, user);
+    }
+
+    @Override
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public void updateEvent(UUID eventId, CreateEventRequest request) {
+        Event preUpdatedEvent = eventRepository.getEventById(eventId)
+                .orElseThrow(() -> new NotFoundException("Событие не найдено."));
+
+        Event updatedEvent = eventMapper.updateEntityFromDto(preUpdatedEvent, request);
+        eventRepository.update(updatedEvent);
     }
 }
 

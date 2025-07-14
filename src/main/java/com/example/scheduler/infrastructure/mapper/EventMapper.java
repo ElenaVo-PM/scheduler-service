@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.domain.model.Event;
+import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,6 +12,8 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.Named;
 import org.mapstruct.ReportingPolicy;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
@@ -51,4 +54,50 @@ public interface EventMapper {
     @Mapping(target = "createdAt", source = "event.createdAt")
     @Mapping(target = "updatedAt", source = "event.updatedAt")
     EventFullDto toEventFullDto(Event event, User user);
+
+    default Event updateEntityFromDto(Event event, CreateEventRequest dto) {
+        if (event == null && dto == null) {
+            return null;
+        }
+
+        UUID id = null;
+        UUID ownerId = null;
+        String title = null;
+        String description = null;
+        int durationMinutes = 0;
+        int bufferBeforeMinutes = 0;
+        int bufferAfterMinutes = 0;
+        int maxParticipants = 0;
+        boolean isActive = false;
+        EventType eventType = null;
+        String slug = null;
+        Instant startDate = null;
+        Instant endDate = null;
+        Instant createdAt = null;
+        Instant updatedAt = null;
+        if (event != null) {
+            id = event.id();
+            ownerId = event.ownerId();
+            title = dto.title() == null ? event.title() : dto.title();
+            description = dto.description() == null ? event.description() : dto.description();
+            isActive = event.isActive();
+            durationMinutes = dto.durationMinutes() == null ? event.durationMinutes()
+                    : dto.durationMinutes();
+            bufferBeforeMinutes = dto.bufferBeforeMinutes() == null ? event.bufferBeforeMinutes()
+                    : dto.bufferBeforeMinutes();
+            bufferAfterMinutes = dto.bufferAfterMinutes() == null ? event.bufferAfterMinutes()
+                    : dto.bufferAfterMinutes();
+            maxParticipants = dto.maxParticipants() == null ? event.maxParticipants() : dto.maxParticipants();
+            eventType = dto.eventType() == null ? event.eventType() : dto.eventType();
+            slug = event.slug();
+            startDate = event.startDate();
+            endDate = startDate.plus(durationMinutes, ChronoUnit.MINUTES);
+            createdAt = event.createdAt();
+            updatedAt = Instant.now();
+        }
+
+        return new Event(id, ownerId, title, description, isActive,
+                maxParticipants, durationMinutes, bufferBeforeMinutes, bufferAfterMinutes,
+                eventType, slug, startDate, endDate, createdAt, updatedAt);
+    }
 }

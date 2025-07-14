@@ -49,6 +49,13 @@ public class EventRepositoryImpl implements EventRepository {
                 FROM event_templates
                 WHERE id = ?
             """;
+    private static final String UPDATE_QUERY = """
+            UPDATE event_templates SET title = ?, description = ?,
+            duration_minutes = ?, buffer_before_minutes = ?, buffer_after_minutes = ?,
+            is_group_event = ?, max_participants = ?, is_active = ?,
+            start_date = ?, end_date = ?, updated_at = now()
+            WHERE id = ?
+            """;
 
     private final JdbcTemplate jdbc;
 
@@ -105,5 +112,16 @@ public class EventRepositoryImpl implements EventRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public void update(Event e) {
+        jdbc.update(UPDATE_QUERY, e.title(), e.description(),
+                e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
+                EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(),
+                Timestamp.from(e.startDate()), Timestamp.from(e.endDate()),
+                e.id());
+
+        getEventById(e.id()).orElseThrow();
     }
 }
