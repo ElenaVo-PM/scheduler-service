@@ -15,13 +15,18 @@ import com.example.scheduler.infrastructure.config.WithSecurityStubs;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
@@ -38,22 +43,6 @@ import java.util.UUID;
 class EventControllerTest {
 
     private static final String BASE_URL = "/api/events";
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("test")
-class EventControllerTest extends AbstractTestContainerTest {
-    private final EventService eventService;
-    private final WebApplicationContext webApplicationContext;
-    private final MockMvc mockMvc;
-    private final EventMapper eventMapper;
-
-
-    @Autowired
-    public EventControllerTest(EventService eventService, WebApplicationContext webApplicationContext, EventMapper eventMapper) {
-        this.eventService = eventService;
-        this.webApplicationContext = webApplicationContext;
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-        this.eventMapper = eventMapper;
-    }
 
     @MockitoBean
     private EventService mockEventService;
@@ -180,5 +169,4 @@ class EventControllerTest extends AbstractTestContainerTest {
     private Authentication toAuthentication(Credential credential) {
         return new UsernamePasswordAuthenticationToken(credential, null, credential.getAuthorities());
     }
-
 }

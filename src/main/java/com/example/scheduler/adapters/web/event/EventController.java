@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.scheduler.adapters.web.Headers.AUTH_HEADER;
@@ -101,7 +102,7 @@ public class EventController {
      * GET /events - Получение всех событий
      */
     @GetMapping("")
-    public ResponseEntity<Collection<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
+    public ResponseEntity<List<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.getAllEvents(userDetails.getId()));
