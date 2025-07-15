@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -22,23 +23,26 @@ import java.time.temporal.ChronoUnit;
 public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler({EntityNotFoundException.class, NotFoundException.class})
-    public ResponseEntity<ApiError> entityNotFoundHandler(RuntimeException exception,
-                                                          ServletWebRequest request) {
+    private final Clock clock;
+
+    public GlobalExceptionHandler(Clock clock) {
+        this.clock = clock;
+    }
+
+    @ExceptionHandler({
+            EntityNotFoundException.class,
+            NotFoundException.class
+    })
+    public ResponseEntity<ApiError> entityNotFoundHandler(
+            RuntimeException exception,
+            ServletWebRequest request
+    ) {
         logger.warn("Entity not found: {}", exception.getMessage());
-
-        HttpStatus status = HttpStatus.NOT_FOUND;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                status.value(),
-                status.getReasonPhrase(),
+        return toResponse(
+                HttpStatus.NOT_FOUND,
                 exception.getMessage(),
-                path);
-
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+                request.getRequest().getRequestURI()
+        );
     }
 
     @ExceptionHandler({
@@ -46,97 +50,97 @@ public class GlobalExceptionHandler {
             MissingRequestHeaderException.class,
             MethodArgumentTypeMismatchException.class
     })
-    public ResponseEntity<ApiError> handleBadRequestExceptions(Exception exception,
-                                                               ServletWebRequest request) {
+    public ResponseEntity<ApiError> handleBadRequestExceptions(
+            Exception exception,
+            ServletWebRequest request
+    ) {
         logger.warn("Message is not readable: {}", exception.getMessage());
-
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                status.value(),
-                status.getReasonPhrase(),
+        return toResponse(
+                HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
-                path);
-
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+                request.getRequest().getRequestURI()
+        );
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> methodArgumentNotValidException(MethodArgumentNotValidException exception,
-                                                                    ServletWebRequest request) {
+    public ResponseEntity<ApiError> methodArgumentNotValidException(
+            MethodArgumentNotValidException exception,
+            ServletWebRequest request
+    ) {
         logger.warn("Validation failed: {}", exception.getMessage());
-
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                status.value(),
-                status.getReasonPhrase(),
+        return toResponse(
+                HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
-                path);
-
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+                request.getRequest().getRequestURI()
+        );
     }
 
-    @ExceptionHandler
-    public ResponseEntity<ApiError> handleBadCredentialsException(BadCredentialsException exception,
-                                                                  ServletWebRequest request) {
+    @ExceptionHandler({
+            BadCredentialsException.class,
+            UserNotAuthorizedException.class
+    })
+    public ResponseEntity<ApiError> handleUnauthorizedExceptions(
+            RuntimeException exception,
+            ServletWebRequest request
+    ) {
         logger.warn("Authorization failed: {}", exception.getMessage());
-
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                status.value(),
-                status.getReasonPhrase(),
+        return toResponse(
+                HttpStatus.UNAUTHORIZED,
                 exception.getMessage(),
-                path);
-
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+                request.getRequest().getRequestURI()
+        );
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> accessDeniedExceptionExceptionHandler(AccessDeniedException exception,
-                                                                          ServletWebRequest request) {
+    public ResponseEntity<ApiError> accessDeniedExceptionExceptionHandler(
+            AccessDeniedException exception,
+            ServletWebRequest request
+    ) {
         logger.warn(exception.getMessage());
 
-        HttpStatus status = HttpStatus.FORBIDDEN;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
-                status.value(),
-                status.getReasonPhrase(),
+        return toResponse(
+                HttpStatus.FORBIDDEN,
                 exception.getMessage(),
-                path);
+                request.getRequest().getRequestURI()
+        );
+    }
 
-        return ResponseEntity.status(status)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+    @ExceptionHandler
+    public ResponseEntity<ApiError> handleNotEnoughAuthorityException(
+            NotEnoughAuthorityException exception,
+            ServletWebRequest request
+    ) {
+        logger.warn("Operation blocked: {}", exception.getMessage());
+        return toResponse(
+                HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> unexpectedExceptionHandler(Exception exception,
-                                                               ServletWebRequest request) {
+    public ResponseEntity<ApiError> unexpectedExceptionHandler(
+            Exception exception,
+            ServletWebRequest request
+    ) {
         logger.warn("Unexpected exception occurred: {}", exception.getMessage(), exception);
+        return toResponse(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
 
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
-        String path = request.getRequest().getRequestURI();
-
-        ApiError apiError = new ApiError(Instant.now().truncatedTo(ChronoUnit.SECONDS),
+    private ResponseEntity<ApiError> toResponse(HttpStatus status, String message, String path) {
+        ApiError error = new ApiError(
+                Instant.now(clock).truncatedTo(ChronoUnit.SECONDS),
                 status.value(),
                 status.getReasonPhrase(),
-                exception.getMessage(),
-                path);
-
+                message,
+                path
+        );
         return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(apiError);
+                .body(error);
     }
 }

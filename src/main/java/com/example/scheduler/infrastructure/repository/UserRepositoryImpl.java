@@ -93,30 +93,4 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.empty();
         }
     }
-
-    @Override
-    public Optional<User> findByEmail(String email) {
-        final String QUERY = "SELECT * FROM users WHERE UPPER(email) = UPPER(?)";
-
-        try {
-            Optional<User> dbUser = Optional.ofNullable(
-                    jdbc.queryForObject(QUERY,
-                            (res, num) -> new User(
-                                    res.getObject("id", UUID.class),
-                                    res.getString("username"),
-                                    res.getString("email")
-                            ),
-                            email)
-            );
-
-            if (dbUser.isPresent()) {
-                return dbUser;
-            }
-
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-
-        return Optional.empty();
-    }
 }

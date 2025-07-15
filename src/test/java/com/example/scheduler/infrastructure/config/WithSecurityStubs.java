@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import({SecurityConfig.class, JwtTokenProvider.class, JwtUtil.class, UserDetailsServiceStub.class})
+@Import({SecurityConfig.class, JwtTokenProvider.class, JwtUtil.class, UserDetailsServiceStub.class,
+        TestClockConfig.class})
 public @interface WithSecurityStubs {
 
 }

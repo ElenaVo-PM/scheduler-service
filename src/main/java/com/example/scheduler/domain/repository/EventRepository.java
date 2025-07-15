@@ -17,5 +17,7 @@ public interface EventRepository {
 
     Optional<Event> getEventById(UUID id);
 
+    Event toggleActiveEvent(UUID id);
+
     List<Event> getAllEvents(UUID ownerId);
 }

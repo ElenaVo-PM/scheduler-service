@@ -4,29 +4,28 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.adapters.dto.EventShortDto;
+import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.NotFoundException;
+import com.example.scheduler.domain.exception.UserNotAuthorizedException;
+import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.Event;
-import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.infrastructure.mapper.EventMapper;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@Transactional
 public class EventServiceImpl implements EventService {
-    private final UserService userService;
+
     private final EventRepository eventRepository;
     private final EventMapper eventMapper;
 
-    public EventServiceImpl(UserService userService, EventRepository eventRepository, EventMapper eventMapper) {
-        this.userService = userService;
+    public EventServiceImpl(EventRepository eventRepository, EventMapper eventMapper) {
         this.eventRepository = eventRepository;
         this.eventMapper = eventMapper;
     }
@@ -47,19 +46,15 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public EventFullDto getEventById(String email, UUID eventId) {
-        User user = userService.getUser(email)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден."));
-
-        Event event = eventRepository.getEventById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие не найдено."));
-
-        if (!event.ownerId().equals(user.id())) {
-            throw new AccessDeniedException("Доступ запрещён!");
-        }
-
-        return eventMapper.toEventFullDto(event, user);
+    public EventFullDto getEventById(UUID userId, UUID eventId, Credential currentUser) {
+        Objects.requireNonNull(userId, "userId cannot be null");
+        Objects.requireNonNull(eventId, "eventId cannot be null");
+        requireUserIdMatchCurrentUser(userId, currentUser);
+        Event event = eventRepository.getEventById(eventId).orElseThrow(
+                () -> new NotFoundException("Event [%s] not found".formatted(eventId))
+        );
+        requireUserIsEventOwner(userId, event);
+        return eventMapper.toEventFullDto(event);
     }
 
     @Override
@@ -70,6 +65,27 @@ public class EventServiceImpl implements EventService {
 
         Event updatedEvent = eventMapper.updateEntityFromDto(preUpdatedEvent, request);
         eventRepository.update(updatedEvent);
+    }
+
+    private void requireUserIdMatchCurrentUser(UUID userId, Credential currentUser) {
+        if (currentUser == null) {
+            throw new UserNotAuthorizedException("User [%s] is not authorized".formatted(userId));
+        } else if (!userId.equals(currentUser.getId())) {
+            throw new NotEnoughAuthorityException("User can get own events only");
+        }
+    }
+
+    private void requireUserIsEventOwner(UUID userId, Event event) {
+        if (!userId.equals(event.ownerId())) {
+            throw new NotEnoughAuthorityException("User can get own events only");
+        }
+    }
+
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public EventResponse toggleActiveEvent(UUID eventId) {
+        Event updatedEvent = eventRepository.toggleActiveEvent(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
     }
 
     @Override
