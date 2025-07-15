@@ -13,6 +13,10 @@ public interface EventService {
 
     EventResponse refreshSlug(UUID eventId);
 
+    EventFullDto getEventById(String email, UUID eventId);
+
+    EventResponse toggleActiveEvent(UUID id);
+
     EventFullDto getEventById(UUID userId, UUID eventId, Credential currentUser);
 
     void updateEvent(UUID id, CreateEventRequest request);

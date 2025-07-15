@@ -77,5 +77,19 @@ public class EventServiceImpl implements EventService {
             throw new NotEnoughAuthorityException("User can get own events only");
         }
     }
+
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public EventResponse toggleActiveEvent(UUID eventId) {
+        Event updatedEvent = eventRepository.toggleActiveEvent(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
+    }
+
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public EventResponse toggleActiveEvent(UUID eventId) {
+        Event updatedEvent = eventRepository.toggleActiveEvent(eventId);
+
+        return eventMapper.toResponse(updatedEvent);
+    }
 }
 

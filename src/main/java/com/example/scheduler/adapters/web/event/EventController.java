@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -83,5 +85,23 @@ public class EventController {
                                             @RequestBody @Valid CreateEventRequest request) {
         eventService.updateEvent(id, request);
         return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID eventId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.toggleActiveEvent(eventId));
+
+    }
+
+    @PatchMapping("/{id}/activate")
+    public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID eventId) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(eventService.toggleActiveEvent(eventId));
+
     }
 }
