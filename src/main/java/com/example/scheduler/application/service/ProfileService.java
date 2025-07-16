@@ -2,6 +2,7 @@ package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.CreateProfileRequest;
 import com.example.scheduler.adapters.dto.ProfileResponse;
+import com.example.scheduler.adapters.dto.UpdateProfileRequest;
 import com.example.scheduler.adapters.mapper.ProfileMapper;
 import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.ProfileNotFoundException;
@@ -68,5 +69,28 @@ public class ProfileService {
         } else if (!userId.equals(credential.getId())) {
             throw new NotEnoughAuthorityException(noAuthorityMessage);
         }
+    }
+
+    public ProfileResponse updateProfile(UUID userId, UpdateProfileRequest request, Credential credential) {
+        Objects.requireNonNull(userId, "userId cannot be null");
+        Objects.requireNonNull(request, "request cannot be null");
+        requireOwnerAuthority(userId, credential, "user can update profile for themselves only");
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ProfileNotFoundException("profile not found for user " + userId)
+        );
+        Profile updateProfile = new Profile(
+                userId,
+                request.fullName() == null ? profile.fullName() : request.fullName(),
+                request.timezone() == null ? profile.timezone() : request.timezone(),
+                request.description() == null ? profile.description() : request.description(),
+                true,
+                request.logo() == null ? profile.logo() : request.logo(),
+                profile.createdAt(),
+                Instant.now(clock)
+        );
+        Profile updated = profileRepository.update(updateProfile);
+        log.info("Updated profile for user {}", userId);
+        log.debug("Profile updated = {}", updated);
+        return profileMapper.toDto(updated, credential.getUsername());
     }
 }

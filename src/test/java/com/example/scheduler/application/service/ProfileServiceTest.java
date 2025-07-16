@@ -1,5 +1,7 @@
 package com.example.scheduler.application.service;
 
+import com.example.scheduler.adapters.fixture.TestUpdateProfileRequest;
+import com.example.scheduler.domain.model.Profile;
 import com.example.scheduler.infrastructure.config.TestClockConfig;
 import com.example.scheduler.adapters.dto.ProfileResponse;
 import com.example.scheduler.adapters.fixture.TestCreateProfileRequests;
@@ -11,10 +13,14 @@ import com.example.scheduler.domain.exception.UserNotAuthorizedException;
 import com.example.scheduler.domain.fixture.TestCredentials;
 import com.example.scheduler.domain.fixture.TestProfiles;
 import com.example.scheduler.domain.repository.ProfileRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.ZoneId;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.catchThrowable;
@@ -26,6 +32,8 @@ class ProfileServiceTest {
     private ProfileRepository mockRepository;
 
     private ProfileService service;
+
+    private final ArgumentCaptor<Profile> profileCaptor = ArgumentCaptor.forClass(Profile.class);
 
     @BeforeEach
     void setUp() {
@@ -168,5 +176,41 @@ class ProfileServiceTest {
         );
 
         then(response).isEqualTo(TestProfileResponses.alice());
+    }
+
+    @Test
+    void updateAllPossibleFieldsTest() {
+        given(mockRepository.findByUserId(TestCredentials.alice().getId()))
+                .willReturn(Optional.of(TestProfiles.alice()));
+        given(mockRepository.update(Mockito.any()))
+                .willReturn(TestProfiles.aliceUpdated());
+
+        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateEveryField(), TestCredentials.alice());
+
+        Mockito.verify(mockRepository).update(profileCaptor.capture());
+        Profile capturedProfile = profileCaptor.getValue();
+
+        Assertions.assertEquals("Alice Arnold", capturedProfile.fullName());
+        Assertions.assertEquals(ZoneId.of("UTC"), capturedProfile.timezone());
+        Assertions.assertEquals("Test description updated", capturedProfile.description());
+        Assertions.assertEquals("Logo updated", capturedProfile.logo());
+    }
+
+    @Test
+    void updateOnlyNameTest() {
+        given(mockRepository.findByUserId(TestCredentials.alice().getId()))
+                .willReturn(Optional.of(TestProfiles.alice()));
+        given(mockRepository.update(Mockito.any()))
+                .willReturn(TestProfiles.aliceUpdated());
+
+        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateOnlyName(), TestCredentials.alice());
+
+        Mockito.verify(mockRepository).update(profileCaptor.capture());
+        Profile capturedProfile = profileCaptor.getValue();
+
+        Assertions.assertEquals("Alice Arne", capturedProfile.fullName());
+        Assertions.assertEquals(ZoneId.of("Europe/Paris"), capturedProfile.timezone());
+        Assertions.assertEquals("Test description", capturedProfile.description());
+        Assertions.assertEquals("Logo", capturedProfile.logo());
     }
 }
