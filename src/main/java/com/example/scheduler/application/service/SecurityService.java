@@ -1,5 +1,6 @@
 package com.example.scheduler.application.service;
 
+import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,6 @@ public class SecurityService {
 
         return repository.getEventById(eventId)
                 .map(event -> event.ownerId().equals(authUUID))
-                .orElse(false);
+                .orElseThrow(() -> new NotFoundException("Event [%s] not found".formatted(eventId)));
     }
 }

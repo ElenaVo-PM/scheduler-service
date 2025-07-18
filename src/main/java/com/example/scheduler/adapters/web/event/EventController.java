@@ -57,11 +57,11 @@ public class EventController {
     }
 
     @PostMapping("/{id}/regenerate-link")
-    public ResponseEntity<EventResponse> refreshSlug(@PathVariable UUID eventId) {
+    public ResponseEntity<EventResponse> refreshSlug(@PathVariable UUID id) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventService.refreshSlug(eventId));
+                .body(eventService.refreshSlug(id));
 
     }
 
@@ -89,14 +89,13 @@ public class EventController {
     }
 
     @PatchMapping("/{id}/activate")
-    public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID eventId) {
+    public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID id) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventService.toggleActiveEvent(eventId));
+                .body(eventService.toggleActiveEvent(id));
 
     }
-
 
     /**
      * GET qpi/events - Получение всех событий
@@ -107,5 +106,11 @@ public class EventController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(events);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
+        eventService.deleteEvent(id);
+        return ResponseEntity.noContent().build();
     }
 }

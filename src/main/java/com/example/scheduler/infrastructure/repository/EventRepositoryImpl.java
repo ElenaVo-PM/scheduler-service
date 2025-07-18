@@ -9,7 +9,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +86,11 @@ public class EventRepositoryImpl implements EventRepository {
                 WHERE user_id = ? AND is_active=true
             """;
 
+
+    private static final String DELETE_QUERY = """
+            DELETE FROM event_templates
+            WHERE id = ?
+            """;
 
     private final JdbcTemplate jdbc;
 
@@ -195,5 +199,10 @@ public class EventRepositoryImpl implements EventRepository {
             events.add(event);
         }
         return events;
+    }
+
+    @Override
+    public void delete(UUID id) {
+        jdbc.update(DELETE_QUERY, id);
     }
 }
