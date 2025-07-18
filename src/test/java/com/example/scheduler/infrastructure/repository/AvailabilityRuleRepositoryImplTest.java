@@ -3,8 +3,6 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.domain.model.AvailabilityRule;
 import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.AvailabilityRuleRepository;
-import org.junit.Assert;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,8 @@ import java.time.Instant;
 import java.time.LocalTime;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @JdbcTest
 @ContextConfiguration(classes = {AvailabilityRuleRepositoryImpl.class, UserRepositoryImpl.class})
