@@ -75,6 +75,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler({DataConflictException.class})
+    public ResponseEntity<ApiError> handleDataConflictExceptions(
+            Exception exception,
+            ServletWebRequest request
+    ) {
+        logger.warn("Data conflict: {}", exception.getMessage());
+        return toResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
     @ExceptionHandler({
             BadCredentialsException.class,
             UserNotAuthorizedException.class
