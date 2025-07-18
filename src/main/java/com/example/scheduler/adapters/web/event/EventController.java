@@ -99,14 +99,13 @@ public class EventController {
 
 
     /**
-     * GET /events - Получение всех событий
+     * GET qpi/events - Получение всех событий
      */
-    @GetMapping("")
+    @GetMapping()
     public ResponseEntity<List<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
+        var events = eventService.getAllEvents(userDetails.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(eventService.getAllEvents(userDetails.getId()));
+                .body(events);
     }
-
-
 }
