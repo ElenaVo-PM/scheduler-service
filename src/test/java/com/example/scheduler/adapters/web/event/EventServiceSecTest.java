@@ -1,7 +1,6 @@
 package com.example.scheduler.adapters.web.event;
 
 import com.example.scheduler.adapters.dto.EventResponse;
-import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
 import com.example.scheduler.application.service.SecurityService;
 import com.example.scheduler.domain.model.Event;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 
 import org.springframework.security.access.AccessDeniedException;
@@ -24,10 +22,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

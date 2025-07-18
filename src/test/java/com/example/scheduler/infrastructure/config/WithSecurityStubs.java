@@ -1,8 +1,8 @@
 package com.example.scheduler.infrastructure.config;
 
 import com.example.scheduler.infrastructure.security.JwtTokenProvider;
-import com.example.scheduler.infrastructure.util.JwtUtil;
 import com.example.scheduler.infrastructure.stub.UserDetailsServiceStub;
+import com.example.scheduler.infrastructure.util.JwtUtil;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.ElementType;
