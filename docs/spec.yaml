@@ -22,30 +22,62 @@ components:
         timestamp:
           type: string
           format: timestamp
+          example: 2001-02-03T04:05:06Z
         status:
           type: integer
+          example: 404
         error:
           type: string
+          example: Not Found
         message:
           type: string
+          example: Event [8840ddd5-e176-46d8-8f1b-babb00d989cd] not found
         path:
           type: string
-      example:
-        timestamp: 2024-07-01T02:03:04Z
-        status: 404
-        error: Not Found
-        message: event [8840ddd5-e176-46d8-8f1b-babb00d989cd] not found
-        path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+          example: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
 
-    User:
+    RegisterRequest:
       type: object
+      required:
+        - username
+        - password
+        - email
+      properties:
+        username:
+          type: string
+          nullable: false
+          maxLength: 255
+          example: alice
+        password:
+          type: string
+          nullable: false
+          example: 12345
+        email:
+          type: string
+          format: email
+          nullable: false
+          maxLength: 255
+          example: alice@mail.com
+
+    UserDto:
+      type: object
+      required:
+        - id
+        - username
+        - email
       properties:
         id:
           type: string
           format: uuid
+          example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        username:
+          type: string
+          example: alice
         email:
           type: string
           format: email
+          example: alice@mail.com
+
     Profile:
       type: object
       required:
@@ -246,25 +278,60 @@ security:
 paths:
   /auth/register:
     post:
+      tags:
+        - Authentication
       summary: Register new user
       requestBody:
         required: true
+        description: New user credentials
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                email:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              username: alice
+              password: 12345
+              email: alice@mail.com
       responses:
         '201':
           description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+              example:
+                id: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+                username: alice
+                email: alice@mail.com
+        '400':
+          description: User credentials do not match constraints set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2001-02-03T04:05:06Z
+                status: 400
+                error: Bad Request
+                message: username must not be null
+                path: /auth/register
+        '409':
+          description: User with same username or email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2001-02-03T04:05:06Z
+                status: 409
+                error: Conflict
+                message: 'Username already exists: alice'
+                path: /auth/register
+
   /auth/login:
     post:
+      tags:
+        - Authentication
       summary: Login user
       requestBody:
         required: true
