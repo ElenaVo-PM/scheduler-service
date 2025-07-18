@@ -2,6 +2,7 @@ package com.example.scheduler.adapters.web.profile;
 
 import com.example.scheduler.adapters.dto.CreateProfileRequest;
 import com.example.scheduler.adapters.dto.ProfileResponse;
+import com.example.scheduler.adapters.dto.UpdateProfileRequest;
 import com.example.scheduler.application.service.ProfileService;
 import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.ProfileAlreadyExistException;
@@ -16,6 +17,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -63,6 +65,19 @@ public class ProfileController {
         ProfileResponse response = service.getProfile(userId, credential);
         log.info("Responded with requested user profile: userId = {}", userId);
         log.debug("Profile requested = {}", response);
+        return response;
+    }
+
+    @PatchMapping
+    public ProfileResponse updateProfile(
+            @RequestBody UpdateProfileRequest request,
+            @RequestHeader(AUTH_HEADER) UUID userId,
+            @AuthenticationPrincipal Credential credential) {
+        log.info("Received request to update profile for user {}", userId);
+        log.debug("Update profile request = {}", request);
+        ProfileResponse response = service.updateProfile(userId, request, credential);
+        log.info("Responded with profile updated for user {}", userId);
+        log.debug("Profile updated = {}", response);
         return response;
     }
 
