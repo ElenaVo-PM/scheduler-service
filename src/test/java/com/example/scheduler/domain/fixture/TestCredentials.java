@@ -46,4 +46,17 @@ public final class TestCredentials {
                 LocalDateTime.parse("2003-04-05T06:07:08.901234")
         );
     }
-}
+
+    public static Credential vasiliy() {
+        return new Credential(
+                UUID.fromString("8c91e5d4-72e4-4921-bc40-c917711f2e65"),
+                "Vasiliy",
+                "weakPassword",
+                "USER",
+                true,
+                LocalDateTime.parse("2025-07-19T15:21:38.233204"),
+                LocalDateTime.parse("2025-07-19T15:21:38.233204")
+        );
+        }
+    }
+

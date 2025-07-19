@@ -26,4 +26,13 @@ public class TestUpdateProfileRequest {
                 null
         );
     }
+
+    public static UpdateProfileRequest emptyRequest() {
+        return new UpdateProfileRequest(
+                null,
+                null,
+                null,
+                null
+        );
+    }
 }

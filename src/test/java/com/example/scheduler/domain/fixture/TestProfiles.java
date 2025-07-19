@@ -63,4 +63,30 @@ public final class TestProfiles {
                 Instant.parse("2002-03-06T07:08:09.012345Z")
         );
     }
+
+    public static Profile inactiveProfile() {
+        return new Profile(
+                UUID.fromString("9e7f7e33-4574-43b6-83d8-ded7f169c03f"),
+                "Vasiliy",
+                ZoneId.of("UTC"),
+                "Test description",
+                false,
+                "Logo updated",
+                Instant.parse("2002-03-05T06:07:08.901234Z"),
+                Instant.parse("2002-03-06T07:08:09.012345Z")
+        );
+    }
+
+    public static Profile activeProfile() {
+        return new Profile(
+                UUID.fromString("9e7f7e33-4574-43b6-83d8-ded7f169c03f"),
+                "Vasiliy",
+                ZoneId.of("UTC"),
+                "Test description",
+                true,
+                "Logo updated",
+                Instant.parse("2002-03-05T06:07:08.901234Z"),
+                Instant.parse("2002-03-06T07:08:09.012345Z")
+        );
+    }
 }

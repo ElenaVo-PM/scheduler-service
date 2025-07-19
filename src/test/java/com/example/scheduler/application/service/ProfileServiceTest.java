@@ -18,7 +18,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.ZoneId;
 import java.util.Optional;
@@ -212,5 +211,20 @@ class ProfileServiceTest {
         Assertions.assertEquals(ZoneId.of("Europe/Paris"), capturedProfile.timezone());
         Assertions.assertEquals("Test description", capturedProfile.description());
         Assertions.assertEquals("Logo", capturedProfile.logo());
+    }
+
+    @Test
+    void activateProfileAfterUpdateTest() {
+        given(mockRepository.findByUserId(TestCredentials.vasiliy().getId()))
+                .willReturn(Optional.of(TestProfiles.inactiveProfile()));
+        given(mockRepository.update(Mockito.any()))
+                .willReturn(TestProfiles.activeProfile());
+
+        service.updateProfile(TestCredentials.vasiliy().getId(), TestUpdateProfileRequest.emptyRequest(), TestCredentials.vasiliy());
+
+        Mockito.verify(mockRepository).update(profileCaptor.capture());
+        Profile capturedProfile = profileCaptor.getValue();
+
+        Assertions.assertTrue(capturedProfile.isActive());
     }
 }
