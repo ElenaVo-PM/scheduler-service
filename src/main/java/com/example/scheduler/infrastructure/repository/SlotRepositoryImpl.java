@@ -5,8 +5,6 @@ import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.*;
 import com.example.scheduler.domain.repository.SlotRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,7 +19,6 @@ import java.util.UUID;
 @Repository
 public class SlotRepositoryImpl implements SlotRepository {
 
-    private static final Logger log = LoggerFactory.getLogger(SlotRepositoryImpl.class);
     private final JdbcTemplate jdbc;
 
     @Autowired

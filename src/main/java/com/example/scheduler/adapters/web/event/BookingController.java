@@ -5,8 +5,6 @@ import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.application.usecase.BookSlotUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
