@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +19,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -63,14 +66,23 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> methodArgumentNotValidException(
+    public ResponseEntity<ApiError> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException exception,
             ServletWebRequest request
     ) {
         logger.warn("Validation failed: {}", exception.getMessage());
+        List<FieldError> errors = exception.getFieldErrors();
+        // Fail fast if we cannot present a meaningful message for every error to user
+        if (errors.stream().anyMatch(error -> error.getDefaultMessage() == null)) {
+            return unexpectedExceptionHandler(exception, request);
+        }
+        String message = errors.stream()
+                .map(error -> error.getField() + " " + error.getDefaultMessage())
+                .sorted()
+                .collect(Collectors.joining(", "));
         return toResponse(
                 HttpStatus.BAD_REQUEST,
-                exception.getMessage(),
+                message,
                 request.getRequest().getRequestURI()
         );
     }
@@ -126,6 +138,22 @@ public class GlobalExceptionHandler {
         logger.warn("Operation blocked: {}", exception.getMessage());
         return toResponse(
                 HttpStatus.FORBIDDEN,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
+    @ExceptionHandler({
+            UsernameAlreadyExistException.class,
+            EmailAlreadyExistException.class
+    })
+    public ResponseEntity<ApiError> handleConflictExceptions(
+            RuntimeException exception,
+            ServletWebRequest request
+    ) {
+        logger.warn(exception.getMessage());
+        return toResponse(
+                HttpStatus.CONFLICT,
                 exception.getMessage(),
                 request.getRequest().getRequestURI()
         );

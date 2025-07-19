@@ -1,10 +1,14 @@
 package com.example.scheduler.infrastructure.security;
 
 import com.example.scheduler.domain.model.Credential;
+import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -16,7 +20,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public Credential loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.getCredential(username)
+        return userRepository.findByUsername(username)
+                .map(this::toCredential)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+    }
+
+    private Credential toCredential(User user) {
+        return new Credential(
+                user.id(),
+                user.username(),
+                user.passwordHash(),
+                user.role(),
+                true,
+                LocalDateTime.ofInstant(user.createdAt(), ZoneId.systemDefault()),
+                LocalDateTime.ofInstant(user.updatedAt(), ZoneId.systemDefault())
+        );
     }
 }

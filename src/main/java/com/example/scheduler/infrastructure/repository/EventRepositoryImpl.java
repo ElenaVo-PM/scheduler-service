@@ -137,7 +137,9 @@ public class EventRepositoryImpl implements EventRepository {
                                     res.getBoolean("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
                                     res.getString("slug"),
                                     res.getTimestamp("startDate").toInstant(),
-                                    res.getTimestamp("endDate").toInstant(),
+                                    res.getTimestamp("endDate") == null
+                                            ? null
+                                            : res.getTimestamp("endDate").toInstant(),
                                     res.getTimestamp("createdAt").toInstant(),
                                     res.getTimestamp("updatedAt").toInstant()
                             ),
@@ -190,10 +192,10 @@ public class EventRepositoryImpl implements EventRepository {
                     (int) row.get("durationMinutes"),
                     (int) row.get("bufferBeforeMinutes"),
                     (int) row.get("bufferAfterMinutes"),
-                    (EventType) row.get("eventType"),
+                    (boolean) row.get("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
                     (String) row.get("slug"),
                     ((Timestamp) row.get("startDate")).toInstant(),
-                    ((Timestamp) row.get("endDate")).toInstant(),
+                    row.get("endDate") == null ? null : ((Timestamp) row.get("endDate")).toInstant(),
                     ((Timestamp) row.get("createdAt")).toInstant(),
                     ((Timestamp) row.get("updatedAt")).toInstant());
             events.add(event);
