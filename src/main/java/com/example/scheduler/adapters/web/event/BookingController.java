@@ -1,9 +1,12 @@
 package com.example.scheduler.adapters.web.event;
 
+import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.application.usecase.BookSlotUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +26,8 @@ public class BookingController {
      * POST /booking - Создание брони
      */
     @PostMapping
-    public ResponseEntity<BookingResponse> bookSlot(@RequestBody BookingResponse request) {
+    public ResponseEntity<BookingResponse> bookSlot(@RequestBody BookingRequest request) throws IllegalAccessException {
+
         return ResponseEntity.ok(bookSlotUseCase.execute(request));
     }
 
