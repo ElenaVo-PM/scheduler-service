@@ -57,6 +57,7 @@ public class EventRepositoryImpl implements EventRepository {
                 FROM event_templates
                 WHERE id = ?
             """;
+
     private static final String UPDATE_QUERY = """
             UPDATE event_templates SET title = ?, description = ?,
             duration_minutes = ?, buffer_before_minutes = ?, buffer_after_minutes = ?,
@@ -85,7 +86,6 @@ public class EventRepositoryImpl implements EventRepository {
                 FROM event_templates
                 WHERE user_id = ? AND is_active=true
             """;
-
 
     private static final String DELETE_QUERY = """
             DELETE FROM event_templates
@@ -163,7 +163,6 @@ public class EventRepositoryImpl implements EventRepository {
         }
 
         return getEventById(id).orElseThrow();
-
     }
 
     @Override

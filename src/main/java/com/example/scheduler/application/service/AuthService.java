@@ -22,7 +22,7 @@ public class AuthService {
         this.userDetailsService = userDetailsService;
     }
 
-    public AuthResponse creteTokens(Credential userDetails) {
+    public AuthResponse createTokens(Credential userDetails) {
         return createPair(userDetails);
     }
 

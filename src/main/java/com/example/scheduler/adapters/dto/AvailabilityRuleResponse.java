@@ -14,5 +14,6 @@ public record AvailabilityRuleResponse(
         LocalTime startTime,
         @JsonFormat(pattern = "HH:mm")
         LocalTime endTime,
-        Instant createdAt) {
+        Instant createdAt
+) {
 }

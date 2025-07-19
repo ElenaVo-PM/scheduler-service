@@ -11,4 +11,5 @@ public record ProfileResponse(
         String description,
         boolean isActive,
         String logo
-) {}
+) {
+}

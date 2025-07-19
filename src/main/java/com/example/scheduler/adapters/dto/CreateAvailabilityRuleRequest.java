@@ -19,5 +19,6 @@ public record CreateAvailabilityRuleRequest(
         LocalTime startTime,
         @NotNull
         @JsonFormat(pattern = "HH:mm")
-        LocalTime endTime) {
+        LocalTime endTime
+) {
 }
