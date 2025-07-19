@@ -9,6 +9,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,6 +65,28 @@ public class EventRepositoryImpl implements EventRepository {
             start_date = ?, end_date = ?, updated_at = now()
             WHERE id = ?
             """;
+
+    private static final String GET_ALL_ACTIVE_EVENTS = """
+                SELECT
+                    id,
+                    user_id AS ownerId,
+                    title,
+                    description,
+                    is_active AS isActive,
+                    max_participants AS maxParticipants,
+                    duration_minutes AS durationMinutes,
+                    buffer_before_minutes AS bufferBeforeMinutes,
+                    buffer_after_minutes AS bufferAfterMinutes,
+                    is_group_event,
+                    slug,
+                    start_date AS startDate,
+                    end_date AS endDate,
+                    created_at AS createdAt,
+                    updated_at AS updatedAt
+                FROM event_templates
+                WHERE user_id = ? AND is_active=true
+            """;
+
 
     private final JdbcTemplate jdbc;
 
@@ -143,5 +169,31 @@ public class EventRepositoryImpl implements EventRepository {
                 e.id());
 
         getEventById(e.id()).orElseThrow();
+    }
+
+    @Override
+    public List<Event> getAllEvents(UUID ownerId) {
+        List<Map<String, Object>> rows = jdbc.queryForList(GET_ALL_ACTIVE_EVENTS, ownerId);
+        List<Event> events = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Event event = new Event(
+                    (UUID) row.get("id"),
+                    (UUID) row.get("ownerId"),
+                    (String) row.get("title"),
+                    (String) row.get("description"),
+                    (boolean) row.get("isActive"),
+                    (int) row.get("maxParticipants"),
+                    (int) row.get("durationMinutes"),
+                    (int) row.get("bufferBeforeMinutes"),
+                    (int) row.get("bufferAfterMinutes"),
+                    (EventType) row.get("eventType"),
+                    (String) row.get("slug"),
+                    ((Timestamp) row.get("startDate")).toInstant(),
+                    ((Timestamp) row.get("endDate")).toInstant(),
+                    ((Timestamp) row.get("createdAt")).toInstant(),
+                    ((Timestamp) row.get("updatedAt")).toInstant());
+            events.add(event);
+        }
+        return events;
     }
 }

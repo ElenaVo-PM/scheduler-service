@@ -3,6 +3,7 @@ package com.example.scheduler.infrastructure.mapper;
 import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.EventType;
 import org.mapstruct.Mapper;
@@ -13,6 +14,7 @@ import org.mapstruct.ReportingPolicy;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
@@ -54,6 +56,8 @@ public interface EventMapper {
     @Mapping(target = "createdAt", source = "event.createdAt")
     @Mapping(target = "updatedAt", source = "event.updatedAt")
     EventFullDto toEventFullDto(Event event);
+
+    List<EventShortDto> toEventShortDtoList(List<Event> events);
 
     default Event updateEntityFromDto(Event event, CreateEventRequest dto) {
         if (event == null && dto == null) {

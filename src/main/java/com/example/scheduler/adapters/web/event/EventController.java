@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.EventFullDto;
 
 import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.infrastructure.util.EntityAction;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static com.example.scheduler.adapters.web.Headers.AUTH_HEADER;
@@ -93,5 +95,17 @@ public class EventController {
                 .status(HttpStatus.OK)
                 .body(eventService.toggleActiveEvent(eventId));
 
+    }
+
+
+    /**
+     * GET qpi/events - Получение всех событий
+     */
+    @GetMapping()
+    public ResponseEntity<List<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
+        var events = eventService.getAllEvents(userDetails.getId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(events);
     }
 }

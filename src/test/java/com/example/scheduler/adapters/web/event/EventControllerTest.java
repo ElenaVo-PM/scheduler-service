@@ -1,8 +1,13 @@
 package com.example.scheduler.adapters.web.event;
 
+import com.example.scheduler.AbstractTestContainerTest;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.adapters.fixture.TestEventFullDtos;
 import com.example.scheduler.adapters.web.Headers;
 import com.example.scheduler.application.service.EventService;
+import com.example.scheduler.domain.model.Event;
+import com.example.scheduler.domain.model.EventType;
+import com.example.scheduler.infrastructure.mapper.EventMapper;
 import com.example.scheduler.domain.fixture.TestCredentials;
 import com.example.scheduler.domain.fixture.TestEvents;
 import com.example.scheduler.domain.model.Credential;
@@ -10,17 +15,28 @@ import com.example.scheduler.infrastructure.config.WithSecurityStubs;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
+import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.UUID;
 
 @WebMvcTest(EventController.class)
 @WithSecurityStubs
