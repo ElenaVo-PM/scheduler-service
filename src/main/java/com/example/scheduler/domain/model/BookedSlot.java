@@ -9,7 +9,6 @@ public record BookedSlot(
         UUID slotId,
         String inviteeName,
         String inviteeEmail,
-        UUID userId,
         Instant startTime,
         Instant endTime,
         boolean isCanceled

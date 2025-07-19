@@ -3,10 +3,10 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.domain.exception.NotFoundException;
-import com.example.scheduler.domain.model.BookedSlot;
-import com.example.scheduler.domain.model.Slot;
-import com.example.scheduler.domain.model.User;
+import com.example.scheduler.domain.model.*;
 import com.example.scheduler.domain.repository.SlotRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +21,7 @@ import java.util.UUID;
 @Repository
 public class SlotRepositoryImpl implements SlotRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(SlotRepositoryImpl.class);
     private final JdbcTemplate jdbc;
 
     @Autowired
@@ -30,14 +31,14 @@ public class SlotRepositoryImpl implements SlotRepository {
 
     @Transactional
     @Override
-    public BookingResponse bookSlot(User user, BookingRequest request) throws IllegalAccessException {
-        return privateBookSlot(user, request);
+    public BookingResponse bookSlot(Event event, User user, BookingRequest request) throws IllegalAccessException {
+        return privateBookSlot(event, user, request);
     }
 
     @Transactional
     @Override
-    public BookingResponse bookSlot(BookingRequest request) throws IllegalAccessException {
-        return privateBookSlot(null, request);
+    public BookingResponse bookSlot(Event event, BookingRequest request) throws IllegalAccessException {
+        return privateBookSlot(event, null, request);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class SlotRepositoryImpl implements SlotRepository {
         final String GET_SLOT_QUERY = """
                 SELECT *
                 FROM time_slots
-                WHERE time_slots.id = ?
+                WHERE id = ?
                 """;
 
         try {
@@ -68,24 +69,26 @@ public class SlotRepositoryImpl implements SlotRepository {
         final String GET_BOOKED_SLOT_QUERY = """
                 SELECT *
                 FROM bookings
-                WHERE booking.id = ?
+                WHERE bookings.id = ?
                 """;
 
-        Optional<BookedSlot> bookedSlot = Optional.ofNullable(
-                jdbc.queryForObject(GET_BOOKED_SLOT_QUERY,
-                        (res, _) -> new BookedSlot(res.getObject("id", UUID.class),
-                                res.getObject("event_template_id", UUID.class),
-                                res.getObject("slot_id", UUID.class),
-                                res.getString("invitee_name"),
-                                res.getString("invitee_email"),
-                                res.getObject("user_id", UUID.class),
-                                res.getTimestamp("created_at").toInstant(),
-                                res.getTimestamp("updated_at").toInstant(),
-                                res.getBoolean("is_canceled")),
-                        id)
-        );
+        try {
+            return Optional.ofNullable(
+                    jdbc.queryForObject(GET_BOOKED_SLOT_QUERY,
+                            (res, _) -> new BookedSlot(res.getObject("id", UUID.class),
+                                    res.getObject("event_template_id", UUID.class),
+                                    res.getObject("slot_id", UUID.class),
+                                    res.getString("invitee_name"),
+                                    res.getString("invitee_email"),
+                                    res.getTimestamp("created_at").toInstant(),
+                                    res.getTimestamp("updated_at").toInstant(),
+                                    res.getBoolean("is_canceled")),
+                            id)
+            );
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
 
-        return bookedSlot;
     }
 
     private void addParticipants(User user,
@@ -94,15 +97,8 @@ public class SlotRepositoryImpl implements SlotRepository {
                                  String anonymousUsername,
                                  String anonymousEmail) {
         final String ADD_PARTICIPANTS = """
-                INSERT INTO booking_participants (id,
-                booking_id,
-                user_id,
-                email,
-                name,
-                status,
-                created_at,
-                updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO booking_participants (id, booking_id, user_id, email, name, status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?::booking_status, ?, ?)
                 """;
 
         UUID id = UUID.randomUUID();
@@ -114,15 +110,15 @@ public class SlotRepositoryImpl implements SlotRepository {
                 id,
                 bookedSlotId,
                 userId,
-                username,
                 email,
+                username,
                 "PENDING",
                 now,
                 now
         );
     }
 
-    private BookingResponse privateBookSlot(User user, BookingRequest request) throws IllegalAccessException {
+    private BookingResponse privateBookSlot(Event event, User user, BookingRequest request) throws IllegalAccessException {
         final String ADD_NEW_BOOKING_QUERY = """
                 INSERT INTO bookings (id,
                 event_template_id,
@@ -143,7 +139,7 @@ public class SlotRepositoryImpl implements SlotRepository {
         Slot slot = getSlotById(request.slotId())
                 .orElseThrow(() -> new NotFoundException("Slot not found"));
 
-        if (slot.isBooked()) {
+        if (!slot.isAvailable()) {
             throw new IllegalAccessException("Slot already have booked");
         }
 
@@ -161,6 +157,7 @@ public class SlotRepositoryImpl implements SlotRepository {
                 .orElseThrow(() -> new IllegalArgumentException("An error occurred during booked slot search"));
 
         try {
+            toggleSlotAvailability(event, slot.id(), now);
             addParticipants(user, bookedSlot.id(), now, username, email);
             return new BookingResponse(bookedSlot.id(),
                     bookedSlot.eventId(),
@@ -169,8 +166,54 @@ public class SlotRepositoryImpl implements SlotRepository {
                     slot.endTime(),
                     bookedSlot.isCanceled());
         } catch (DataAccessException e) {
+            System.err.println("Failed to insert participant: " + e.getMessage());
             throw new IllegalStateException("Failed to add participants");
         }
+    }
 
+    private void toggleSlotAvailability(Event event,
+                                        UUID slotId,
+                                        LocalDateTime now) {
+        final String UPDATE_SLOT_QUERY = """
+                UPDATE time_slots
+                SET is_available = ?, updated_at = ?
+                WHERE id = ?
+                """;
+        int currParticipants = countParticipants(event.id());
+
+        boolean isAvailableAfter = false;
+
+        if (event.eventType().equals(EventType.GROUP)) {
+            if (event.maxParticipants() < currParticipants) {
+                throw new IllegalStateException("Limit of participants has reached");
+            }
+        } else {
+            if (countParticipants(event.id()) >= 1) {
+                throw new IllegalStateException("Limit of participants has reached");
+            }
+        }
+
+        if (event.eventType().equals(EventType.GROUP) && (event.maxParticipants() >= currParticipants + 1)) {
+            isAvailableAfter = true;
+        }
+
+        jdbc.update(UPDATE_SLOT_QUERY, isAvailableAfter, now, slotId);
+
+    }
+
+    private int countParticipants(UUID eventId) {
+        final String COUNT_PARTICIPANTS_QUERY = """
+                SELECT COUNT(id) AS participants_count
+                FROM bookings
+                WHERE is_canceled = false AND event_template_id = ?
+                """;
+
+        Integer count = jdbc.queryForObject(
+                COUNT_PARTICIPANTS_QUERY,
+                Integer.class,
+                eventId
+        );
+
+        return count != null ? count : 0;
     }
 }

@@ -8,6 +8,6 @@ public record Slot(
         UUID eventId,
         Instant startTime,
         Instant endTime,
-        boolean isBooked
+        boolean isAvailable
 ) {
 }

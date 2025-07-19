@@ -9,6 +9,6 @@ public record BookingResponse(
         UUID slotId,
         Instant startTime,
         Instant endTime,
-        boolean isCancelled
+        boolean isCanceled
 ) {
 }
