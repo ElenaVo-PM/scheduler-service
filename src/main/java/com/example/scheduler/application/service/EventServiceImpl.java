@@ -14,9 +14,8 @@ import com.example.scheduler.infrastructure.mapper.EventMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -61,7 +60,7 @@ public class EventServiceImpl implements EventService {
     @PreAuthorize("@security.isOwner(#eventId)")
     public void updateEvent(UUID eventId, CreateEventRequest request) {
         Event preUpdatedEvent = eventRepository.getEventById(eventId)
-                .orElseThrow(() -> new NotFoundException("Событие не найдено."));
+                .orElseThrow(() -> new NotFoundException("Event [%s] not found".formatted(eventId)));
 
         Event updatedEvent = eventMapper.updateEntityFromDto(preUpdatedEvent, request);
         eventRepository.update(updatedEvent);
@@ -91,5 +90,14 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<EventShortDto> getAllEvents(UUID ownerId) {
         return eventMapper.toEventShortDtoList(eventRepository.getAllEvents(ownerId));
+    }
+
+    @Override
+    @PreAuthorize("@security.isOwner(#eventId)")
+    public void deleteEvent(UUID eventId) {
+        eventRepository.getEventById(eventId)
+                .orElseThrow(() -> new NotFoundException("Event [%s] not found".formatted(eventId)));
+
+        eventRepository.delete(eventId);
     }
 }
