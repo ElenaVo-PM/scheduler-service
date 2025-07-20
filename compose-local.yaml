@@ -1,0 +1,24 @@
+services:
+
+  scheduler-database:
+    image: postgres:17.5
+    container_name: scheduler-database
+    env_file:
+      - path: ./local.env
+        required: false
+    ports:
+      - "${SCHEDULER_DATABASE_EXTERNAL_PORT}:5432"
+    environment:
+      - POSTGRES_DB=${SCHEDULER_DATABASE_NAME}
+      - POSTGRES_USER=${SCHEDULER_DATABASE_USERNAME}
+      - POSTGRES_PASSWORD=${SCHEDULER_DATABASE_PASSWORD}
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 5s
+      retries: 10
+    networks:
+      - backend
+
+networks:
+  backend:
