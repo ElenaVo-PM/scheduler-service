@@ -2,7 +2,6 @@ package com.example.scheduler.application.usecase;
 
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
-import com.example.scheduler.application.service.UserService;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.Event;
@@ -15,9 +14,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class BookSlotUseCase {
@@ -35,6 +32,10 @@ public class BookSlotUseCase {
         this.eventRepository = eventRepository;
     }
 
+    @Transactional(rollbackFor = {
+            IllegalArgumentException.class,
+            IllegalAccessException.class
+    })
     public BookingResponse execute(BookingRequest request) throws IllegalAccessException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Event event = eventRepository.getEventById(request.eventId())
