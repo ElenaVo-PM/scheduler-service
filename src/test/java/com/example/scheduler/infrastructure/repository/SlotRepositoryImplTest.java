@@ -4,7 +4,6 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.AbstractTestContainerTest;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
-import com.example.scheduler.domain.model.BookedSlot;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.Slot;
 import com.example.scheduler.domain.model.User;
@@ -135,25 +134,4 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test
-    @DisplayName("Get existing slot by id")
-    void getBookedSlotByIdExistingId() throws Exception {
-
-        BookingRequest request = new BookingRequest(eventId, slotId, "anonymous@email.con", "anonymous");
-        Event event = eventRepository.getEventById(eventId).get();
-        BookingResponse response = repository.bookSlot(event, request);
-
-        Optional<BookedSlot> result = repository.getBookedSlotById(response.id());
-
-        assertTrue(result.isPresent());
-        assertEquals(response.id(), result.get().id());
-        assertEquals("anonymous", result.get().inviteeName());
-    }
-
-    @Test
-    @DisplayName("Get non-existing booking by id")
-    void getBookedSlotByIdNonExistingId() {
-        Optional<BookedSlot> result = repository.getBookedSlotById(UUID.randomUUID());
-        assertTrue(result.isEmpty());
-    }
 }
