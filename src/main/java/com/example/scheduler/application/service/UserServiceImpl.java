@@ -67,7 +67,7 @@ public class UserServiceImpl implements UserService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         Credential userDetails = (Credential) authentication.getPrincipal();
-        return authService.creteTokens(userDetails);
+        return authService.createTokens(userDetails);
     }
 
     private User createUser(RegisterRequest registerRequest, PasswordEncoder passwordEncoder, Clock clock) {

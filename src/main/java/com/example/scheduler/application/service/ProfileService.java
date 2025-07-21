@@ -63,14 +63,6 @@ public class ProfileService {
         return profileMapper.toDto(profile, credential.getUsername());
     }
 
-    private void requireOwnerAuthority(UUID userId, Credential credential, String noAuthorityMessage) {
-        if (credential == null) {
-            throw new UserNotAuthorizedException("user %s is not authorized".formatted(userId));
-        } else if (!userId.equals(credential.getId())) {
-            throw new NotEnoughAuthorityException(noAuthorityMessage);
-        }
-    }
-
     public ProfileResponse updateProfile(UUID userId, UpdateProfileRequest request, Credential credential) {
         Objects.requireNonNull(userId, "userId cannot be null");
         Objects.requireNonNull(request, "request cannot be null");
@@ -92,5 +84,13 @@ public class ProfileService {
         log.info("Updated profile for user {}", userId);
         log.debug("Profile updated = {}", updated);
         return profileMapper.toDto(updated, credential.getUsername());
+    }
+
+    private void requireOwnerAuthority(UUID userId, Credential credential, String noAuthorityMessage) {
+        if (credential == null) {
+            throw new UserNotAuthorizedException("user %s is not authorized".formatted(userId));
+        } else if (!userId.equals(credential.getId())) {
+            throw new NotEnoughAuthorityException(noAuthorityMessage);
+        }
     }
 }

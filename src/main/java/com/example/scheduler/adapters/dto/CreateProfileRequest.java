@@ -11,5 +11,4 @@ public record CreateProfileRequest(
         String description,
         String logo
 ) {
-
 }

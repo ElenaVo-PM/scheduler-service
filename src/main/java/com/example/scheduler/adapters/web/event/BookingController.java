@@ -42,5 +42,4 @@ public class BookingController {
     public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId) {
         return ResponseEntity.noContent().build();
     }
-
 }

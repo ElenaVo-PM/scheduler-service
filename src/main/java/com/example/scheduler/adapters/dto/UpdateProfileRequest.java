@@ -8,5 +8,4 @@ public record UpdateProfileRequest(
         String description,
         String logo
 ) {
-
 }

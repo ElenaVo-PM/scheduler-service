@@ -14,5 +14,4 @@ public record Profile(
         Instant createdAt,
         Instant updatedAt
 ) {
-
 }

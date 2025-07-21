@@ -34,5 +34,4 @@ public class TimeRangeValidator implements ConstraintValidator<TimeRange, Object
             return false;
         }
     }
-
 }

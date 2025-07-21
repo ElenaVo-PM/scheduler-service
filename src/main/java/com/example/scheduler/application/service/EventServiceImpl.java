@@ -66,20 +66,6 @@ public class EventServiceImpl implements EventService {
         eventRepository.update(updatedEvent);
     }
 
-    private void requireUserIdMatchCurrentUser(UUID userId, Credential currentUser) {
-        if (currentUser == null) {
-            throw new UserNotAuthorizedException("User [%s] is not authorized".formatted(userId));
-        } else if (!userId.equals(currentUser.getId())) {
-            throw new NotEnoughAuthorityException("User can get own events only");
-        }
-    }
-
-    private void requireUserIsEventOwner(UUID userId, Event event) {
-        if (!userId.equals(event.ownerId())) {
-            throw new NotEnoughAuthorityException("User can get own events only");
-        }
-    }
-
     @PreAuthorize("@security.isOwner(#eventId)")
     public EventResponse toggleActiveEvent(UUID eventId) {
         Event updatedEvent = eventRepository.toggleActiveEvent(eventId);
@@ -99,5 +85,19 @@ public class EventServiceImpl implements EventService {
                 .orElseThrow(() -> new NotFoundException("Event [%s] not found".formatted(eventId)));
 
         eventRepository.delete(eventId);
+    }
+
+    private void requireUserIdMatchCurrentUser(UUID userId, Credential currentUser) {
+        if (currentUser == null) {
+            throw new UserNotAuthorizedException("User [%s] is not authorized".formatted(userId));
+        } else if (!userId.equals(currentUser.getId())) {
+            throw new NotEnoughAuthorityException("User can get own events only");
+        }
+    }
+
+    private void requireUserIsEventOwner(UUID userId, Event event) {
+        if (!userId.equals(event.ownerId())) {
+            throw new NotEnoughAuthorityException("User can get own events only");
+        }
     }
 }

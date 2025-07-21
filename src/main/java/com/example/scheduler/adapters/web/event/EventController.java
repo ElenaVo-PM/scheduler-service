@@ -43,7 +43,7 @@ public class EventController {
     }
 
     /**
-     * POST /events - Добавление события
+     * POST /api/events - Добавление события
      */
     @PostMapping
     public ResponseEntity<EventResponse> createEvent(@RequestBody
@@ -56,17 +56,19 @@ public class EventController {
                 .body(eventService.createEvent(request, userDetails.getId()));
     }
 
+    /**
+     * POST /api/events/{id}/regenerate-link - Обновление ссылки
+     */
     @PostMapping("/{id}/regenerate-link")
     public ResponseEntity<EventResponse> refreshSlug(@PathVariable UUID id) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.refreshSlug(id));
-
     }
 
     /**
-     * GET /events/{eventId} - Получение конкретного события
+     * GET /api/events/{eventId} - Получение конкретного события
      */
     @GetMapping("/{eventId}")
     public EventFullDto getEventById(
@@ -81,6 +83,9 @@ public class EventController {
         return response;
     }
 
+    /**
+     * PUT /api/events/{id} - Обновление события
+     */
     @PutMapping("/{id}")
     public ResponseEntity<Void> updateEvent(@PathVariable UUID id,
                                             @RequestBody @Valid CreateEventRequest request) {
@@ -88,17 +93,19 @@ public class EventController {
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * PATCH /api/events/{id}/activate - Активация события
+     */
     @PatchMapping("/{id}/activate")
     public ResponseEntity<EventResponse> toggleEvent(@PathVariable UUID id) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(eventService.toggleActiveEvent(id));
-
     }
 
     /**
-     * GET qpi/events - Получение всех событий
+     * GET /api/events - Получение всех событий пользователя
      */
     @GetMapping()
     public ResponseEntity<List<EventShortDto>> getAllEventsByUser(@AuthenticationPrincipal Credential userDetails) {
@@ -108,6 +115,9 @@ public class EventController {
                 .body(events);
     }
 
+    /**
+     * DELETE /api/events/{id} - Удаление события
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvent(@PathVariable UUID id) {
         eventService.deleteEvent(id);

@@ -24,5 +24,6 @@ public record CreateEventRequest(
         @PositiveOrZero
         Integer bufferBeforeMinutes,
         @PositiveOrZero
-        Integer bufferAfterMinutes) {
+        Integer bufferAfterMinutes
+) {
 }
