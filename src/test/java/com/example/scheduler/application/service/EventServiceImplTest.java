@@ -114,7 +114,7 @@ class EventServiceImplTest {
 
         then(throwable)
                 .isInstanceOf(NotFoundException.class)
-                .hasMessage("Event [%s] not found",  TestEvents.demo().id());
+                .hasMessage("Event [%s] not found", TestEvents.demo().id());
     }
 
     @Test

@@ -3,7 +3,6 @@ package com.example.scheduler.domain.model;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -15,23 +14,17 @@ public class Credential implements UserDetails {
     private final String password;
     private final UserRole role;
     private final boolean enabled;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
 
     public Credential(UUID userId,
                       String username,
                       String password,
                       String role,
-                      boolean enabled,
-                      LocalDateTime createdAt,
-                      LocalDateTime updatedAt) {
+                      boolean enabled) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.role = UserRole.valueOf(role);
         this.enabled = enabled;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
     public UUID getId() {

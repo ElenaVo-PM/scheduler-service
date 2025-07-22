@@ -7,9 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-
 @Component
 public class UserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
@@ -31,9 +28,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 user.username(),
                 user.passwordHash(),
                 user.role(),
-                true,
-                LocalDateTime.ofInstant(user.createdAt(), ZoneId.systemDefault()),
-                LocalDateTime.ofInstant(user.updatedAt(), ZoneId.systemDefault())
+                true
         );
     }
 }

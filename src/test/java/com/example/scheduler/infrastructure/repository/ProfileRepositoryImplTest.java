@@ -60,7 +60,7 @@ class ProfileRepositoryImplTest {
 
         then(throwable)
                 .isInstanceOf(ProfileAlreadyExistException.class)
-                .hasMessage("profile already exists for user "  + profile.userId());
+                .hasMessage("profile already exists for user " + profile.userId());
     }
 
     @Test
@@ -81,6 +81,6 @@ class ProfileRepositoryImplTest {
 
         then(throwable)
                 .isInstanceOf(ProfileNotFoundException.class)
-                .hasMessage("profile not found for user "  + profile.userId());
+                .hasMessage("profile not found for user " + profile.userId());
     }
 }

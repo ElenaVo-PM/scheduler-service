@@ -40,7 +40,6 @@ class ProfileServiceTest {
         service = new ProfileService(mockRepository, new ProfileMapperImpl(), TestClockConfig.fixedClock());
     }
 
-
     @Test
     void givenUserIdIsNull_WhenCreateProfile_ThenThrowNullPointerException() {
 
@@ -82,7 +81,6 @@ class ProfileServiceTest {
                 .isInstanceOf(UserNotAuthorizedException.class)
                 .hasMessage("user %s is not authorized", TestCredentials.alice().getId());
     }
-
 
     @Test
     void givenCredentialNotMatchUserId_WhenCreateProfile_ThenThrowNotEnoughAuthorityException() {
