@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -29,15 +30,23 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Credential user) {
-        return jwtUtil.generateToken(user, accessTokenValidityMillis, accessSecretKey);
+        return jwtUtil.generateAccessToken(user, accessTokenValidityMillis, accessSecretKey);
     }
 
     public String generateRefreshToken(Credential user) {
-        return jwtUtil.generateToken(user, refreshTokenValidityMillis, refreshSecretKey);
+        return jwtUtil.generateRefreshToken(user, refreshTokenValidityMillis, refreshSecretKey);
     }
 
     public String getUsernameFromAccessToken(String accessToken) {
         return jwtUtil.extractUserName(accessToken, accessSecretKey);
+    }
+
+    public UUID getUserIdFromAccessToken(String accessToken) {
+        return jwtUtil.extractUserId(accessToken, accessSecretKey);
+    }
+
+    public String getUserRoleFromAccessToken(String accessToken) {
+        return jwtUtil.extractUserRole(accessToken, accessSecretKey);
     }
 
     public String getUsernameFromRefreshToken(String refreshToken) {
