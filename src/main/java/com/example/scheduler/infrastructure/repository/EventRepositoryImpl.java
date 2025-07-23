@@ -214,4 +214,5 @@ public class EventRepositoryImpl implements EventRepository {
     public void delete(UUID id) {
         jdbc.update(DELETE_QUERY, id);
     }
+
 }

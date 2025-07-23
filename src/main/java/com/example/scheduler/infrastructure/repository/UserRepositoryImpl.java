@@ -1,132 +1,82 @@
 package com.example.scheduler.infrastructure.repository;
 
-import com.example.scheduler.domain.model.Credential;
+import com.example.scheduler.domain.exception.EmailAlreadyExistException;
+import com.example.scheduler.domain.exception.UsernameAlreadyExistException;
 import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.model.UserGeneralInfo;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.jdbc.core.DataClassRowMapper;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.*;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.UUID;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
 
-    private final JdbcTemplate jdbc;
+    private static final String INSERT_QUERY = """
+            INSERT INTO users (id, username, email, password_hash, role, created_at, updated_at)
+            VALUES (:id, :username, :email, :passwordHash, :role, :createdAt, :updatedAt)
+            RETURNING *
+            """.stripIndent();
+    private static final String FIND_BY_USERNAME = """
+            SELECT * FROM users WHERE UPPER(username) = UPPER(:username)
+            """.stripIndent();
+
+    private final NamedParameterJdbcTemplate jdbc;
+    private final RowMapper<User> mapper;
 
     @Autowired
-    public UserRepositoryImpl(JdbcTemplate jdbc) {
+    public UserRepositoryImpl(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
+        this.mapper = new DataClassRowMapper<>(User.class);
+    }
+
+    @Override
+    public User insert(User user) throws UsernameAlreadyExistException, EmailAlreadyExistException {
+        SqlParameterSource params = new ExtendedBeanPropertySqlParameterSource(user);
+        try {
+            return jdbc.queryForObject(INSERT_QUERY, params, mapper);
+        } catch (DuplicateKeyException e) {
+            if (e.getMessage().contains("username_unique_idx")) {
+                throw new UsernameAlreadyExistException("Username already exists: " + user.username());
+            } else if (e.getMessage().contains("email_unique_idx")) {
+                throw new EmailAlreadyExistException("Email already exists: " + user.email());
+            } else {
+                throw e;
+            }
+        }
     }
 
     @Override
     public Optional<User> findByUsername(String username) {
-
-        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
-
+        SqlParameterSource params = new MapSqlParameterSource("username", username);
         try {
-            Optional<User> dbUser = Optional.ofNullable(
-                    jdbc.queryForObject(QUERY,
-                            (res, _) -> new User(res.getObject("id", UUID.class),
-                                    username,
-                                    res.getString("email"))
-                    ));
-            if (dbUser.isPresent()) {
-                return dbUser;
-            }
-
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-
-        return Optional.empty();
-    }
-
-    @Transactional
-    @Override
-    public User save(String username, String password, String email) {
-
-        final String QUERY = """
-                INSERT INTO users (id, email, password_hash, created_at, full_name, user_login, role)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                """;
-
-        jdbc.update(QUERY, UUID.randomUUID(), email, password, LocalDateTime.now(), "unknown", username, "USER");
-
-        return findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
-
-    @Override
-    public Optional<Credential> getCredential(String username) {
-
-        final String QUERY = "SELECT * FROM users WHERE user_login = ?";
-
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .appendPattern("yyyy-MM-dd HH:mm:ss")
-                .optionalStart()
-                .appendFraction(ChronoField.MICRO_OF_SECOND, 1, 6, true)
-                .optionalEnd()
-                .toFormatter();
-
-        try {
-            return Optional.ofNullable(
-                    jdbc.queryForObject(QUERY,
-                            (res, _) -> new Credential(res.getObject("id", UUID.class),
-                                    res.getString("user_login"),
-                                    res.getString("password_hash"),
-                                    res.getString("role"),
-                                    true,
-                                    LocalDateTime.parse(res.getString("created_at"), formatter),
-                                    LocalDateTime.parse(res.getString("updated_at"), formatter)), username));
-
-        } catch (EmptyResultDataAccessException e) {
+            return Optional.ofNullable(jdbc.queryForObject(FIND_BY_USERNAME, params, mapper));
+        } catch (EmptyResultDataAccessException _) {
             return Optional.empty();
         }
     }
 
     @Override
     public Optional<UserGeneralInfo> findUserGeneralInfoById(UUID id) {
+        SqlParameterSource params = new MapSqlParameterSource("id", id);
         final String QUERY = "SELECT * FROM users WHERE id = ?";
-        return Optional.ofNullable(jdbc.queryForObject(QUERY,
+        return Optional.ofNullable(jdbc.queryForObject(QUERY, params,
                 (res, _) -> new UserGeneralInfo(res.getObject("id", UUID.class),
                         res.getString("user_login"),
                         res.getString("full_name"),
                         res.getString("email"),
-                        TimeZone.getTimeZone(res.getString("timezone"))), id));
+                        TimeZone.getTimeZone(res.getString("timezone")))));
     }
 
-    @Override
-    public Optional<User> findByEmail(String email) {
-        final String QUERY = "SELECT * FROM users WHERE UPPER(email) = UPPER(?)";
 
-        try {
-            Optional<User> dbUser = Optional.ofNullable(
-                    jdbc.queryForObject(QUERY,
-                            (res, num) -> new User(
-                                    res.getObject("id", UUID.class),
-                                    res.getString("username"),
-                                    res.getString("email")
-                            ),
-                            email)
-            );
-
-            if (dbUser.isPresent()) {
-                return dbUser;
-            }
-
-        } catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-
-        return Optional.empty();
-    }
 }
