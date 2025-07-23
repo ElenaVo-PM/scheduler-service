@@ -8,23 +8,21 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final JwtTokenProvider provider;
-    private final UserDetailsService userDetailsService;
 
-    public JwtFilter(JwtTokenProvider provider, JwtUtil jwtUtil, UserDetailsService userDetailsService) {
+    public JwtFilter(JwtTokenProvider provider, JwtUtil jwtUtil) {
         this.provider = provider;
         this.jwtUtil = jwtUtil;
-        this.userDetailsService = userDetailsService;
     }
 
     @Override
@@ -33,13 +31,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String accessToken = jwtUtil.extractTokenFromRequest(request);
         if (Objects.nonNull(accessToken) && provider.isAccessTokenValid(accessToken)) {
+            UUID userId = provider.getUserIdFromAccessToken(accessToken);
             String username = provider.getUsernameFromAccessToken(accessToken);
-
-            Credential userDetails = (Credential) userDetailsService.loadUserByUsername(username);
+            String userRole = provider.getUserRoleFromAccessToken(accessToken);
+            Credential credential = new Credential(userId, username, null, userRole,
+                    true, null, null);
 
             UsernamePasswordAuthenticationToken authentication =
-                    new UsernamePasswordAuthenticationToken(userDetails, null,
-                            userDetails.getAuthorities());
+                    new UsernamePasswordAuthenticationToken(credential, null,
+                            credential.getAuthorities());
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

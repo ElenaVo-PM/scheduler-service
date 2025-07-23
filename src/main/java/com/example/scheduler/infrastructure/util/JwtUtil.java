@@ -1,5 +1,6 @@
 package com.example.scheduler.infrastructure.util;
 
+import com.example.scheduler.domain.model.Credential;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +11,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -18,10 +18,14 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtUtil {
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
+    private static final String USERNAME_CLAIM_NAME = "username";
+    private static final String ROLE_CLAIM_NAME = "role";
 
     public String extractTokenFromRequest(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
@@ -31,10 +35,29 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateToken(UserDetails user, long validityInMillis, SecretKey secretKey) {
+    public String generateAccessToken(Credential user, long validityInMillis, SecretKey secretKey) {
         Instant accessExpiration = Instant.now().plus(validityInMillis, ChronoUnit.MILLIS);
+        String role = user.getAuthorities().stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
+
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(user.getId().toString())
+                .claims()
+                .add(USERNAME_CLAIM_NAME, user.getUsername())
+                .add(ROLE_CLAIM_NAME, role)
+                .and()
+                .expiration(Date.from(accessExpiration))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public String generateRefreshToken(Credential user, long validityInMillis, SecretKey secretKey) {
+        Instant accessExpiration = Instant.now().plus(validityInMillis, ChronoUnit.MILLIS);
+
+        return Jwts.builder()
+                .subject(user.getId().toString())
+                .claim(USERNAME_CLAIM_NAME, user.getUsername())
                 .expiration(Date.from(accessExpiration))
                 .signWith(secretKey)
                 .compact();
@@ -62,7 +85,15 @@ public class JwtUtil {
     }
 
     public String extractUserName(String token, SecretKey secret) {
-        return extractClaims(token, secret).getSubject();
+        return extractClaims(token, secret).get(USERNAME_CLAIM_NAME, String.class);
+    }
+
+    public UUID extractUserId(String token, SecretKey secret) {
+        return UUID.fromString(extractClaims(token, secret).getSubject());
+    }
+
+    public String extractUserRole(String token, SecretKey secret) {
+        return extractClaims(token, secret).get(ROLE_CLAIM_NAME, String.class);
     }
 
     public Claims extractClaims(String token, SecretKey secret) {
