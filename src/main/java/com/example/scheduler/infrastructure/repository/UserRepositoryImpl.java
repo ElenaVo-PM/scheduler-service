@@ -3,7 +3,6 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.domain.exception.EmailAlreadyExistException;
 import com.example.scheduler.domain.exception.UsernameAlreadyExistException;
 import com.example.scheduler.domain.model.User;
-import com.example.scheduler.domain.model.UserGeneralInfo;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
@@ -16,8 +15,6 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.TimeZone;
-import java.util.UUID;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -65,18 +62,4 @@ public class UserRepositoryImpl implements UserRepository {
             return Optional.empty();
         }
     }
-
-    @Override
-    public Optional<UserGeneralInfo> findUserGeneralInfoById(UUID id) {
-        SqlParameterSource params = new MapSqlParameterSource("id", id);
-        final String QUERY = "SELECT * FROM users WHERE id = ?";
-        return Optional.ofNullable(jdbc.queryForObject(QUERY, params,
-                (res, _) -> new UserGeneralInfo(res.getObject("id", UUID.class),
-                        res.getString("user_login"),
-                        res.getString("full_name"),
-                        res.getString("email"),
-                        TimeZone.getTimeZone(res.getString("timezone")))));
-    }
-
-
 }
