@@ -1,7 +1,6 @@
 package com.example.scheduler.infrastructure.repository;
 
 import com.example.scheduler.domain.model.Event;
-import com.example.scheduler.domain.model.EventRowMapper;
 import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,13 +97,6 @@ public class EventRepositoryImpl implements EventRepository {
     @Autowired
     public EventRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-    }
-
-    @Override
-    public Optional<Event> getEventBySlug(UUID slug) {
-        final String QUERY = "SELECT * FROM event_templates WHERE slug = ?";
-        return Optional.ofNullable(
-                jdbc.queryForObject(QUERY, new EventRowMapper(), slug));
     }
 
     @Override
@@ -214,5 +206,4 @@ public class EventRepositoryImpl implements EventRepository {
     public void delete(UUID id) {
         jdbc.update(DELETE_QUERY, id);
     }
-
 }
