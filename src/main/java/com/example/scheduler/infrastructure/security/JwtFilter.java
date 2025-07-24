@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
             String username = provider.getUsernameFromAccessToken(accessToken);
             String userRole = provider.getUserRoleFromAccessToken(accessToken);
             Credential credential = new Credential(userId, username, null, userRole,
-                    true, null, null);
+                    true);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(credential, null,
