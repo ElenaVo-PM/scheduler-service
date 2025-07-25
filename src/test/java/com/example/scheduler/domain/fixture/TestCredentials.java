@@ -2,7 +2,6 @@ package com.example.scheduler.domain.fixture;
 
 import com.example.scheduler.domain.model.Credential;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public final class TestCredentials {
@@ -17,9 +16,7 @@ public final class TestCredentials {
                 "alice",
                 "{noop}12345",
                 "USER",
-                true,
-                LocalDateTime.parse("2001-02-03T04:05:06.789012"),
-                LocalDateTime.parse("2001-02-03T04:05:06.789012")
+                true
         );
     }
 
@@ -29,9 +26,7 @@ public final class TestCredentials {
                 "bob",
                 "{noop}54321",
                 "USER",
-                true,
-                LocalDateTime.parse("2002-03-04T05:06:07.890123"),
-                LocalDateTime.parse("2002-03-04T05:06:07.890123")
+                true
         );
     }
 
@@ -41,9 +36,7 @@ public final class TestCredentials {
                 "charlie",
                 "{noop}12345",
                 "USER",
-                true,
-                LocalDateTime.parse("2003-04-05T06:07:08.901234"),
-                LocalDateTime.parse("2003-04-05T06:07:08.901234")
+                true
         );
     }
 }

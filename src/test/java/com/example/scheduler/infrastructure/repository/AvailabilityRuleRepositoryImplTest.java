@@ -45,7 +45,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenSavedTimeIsInside_thenIntersected() {
         AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(0,0), LocalTime.of(23,59),
+                LocalTime.of(0, 0), LocalTime.of(23, 59),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
@@ -53,7 +53,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenStartTimeIsBeforeSavedEndTime_thenIntersected() {
         AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(12,30), LocalTime.of(13,0),
+                LocalTime.of(12, 30), LocalTime.of(13, 0),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
@@ -61,7 +61,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenEndTimeIsAfterSavedStartTime_thenIntersected() {
         AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(12,0), LocalTime.of(12,1),
+                LocalTime.of(12, 0), LocalTime.of(12, 1),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
@@ -69,7 +69,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenEndTimeIsBeforeSavedStartTime_thenNonIntersected() {
         AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(11,0), LocalTime.of(11,59),
+                LocalTime.of(11, 0), LocalTime.of(11, 59),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
@@ -77,7 +77,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenStartTimeIsAfterSavedEndTime_thenNonIntersected() {
         AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(13,1), LocalTime.of(14,0),
+                LocalTime.of(13, 1), LocalTime.of(14, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(intersectedRule));
     }
@@ -85,7 +85,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenEndTimeEqualsSavedStartTime_thenNonIntersected() {
         AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(11,0), LocalTime.of(12,0),
+                LocalTime.of(11, 0), LocalTime.of(12, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
@@ -93,7 +93,7 @@ class AvailabilityRuleRepositoryImplTest {
     @Test
     void whenStartTimeEqualsSavedEndTime_thenNonIntersected() {
         AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(13,0), LocalTime.of(14,0),
+                LocalTime.of(13, 0), LocalTime.of(14, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
