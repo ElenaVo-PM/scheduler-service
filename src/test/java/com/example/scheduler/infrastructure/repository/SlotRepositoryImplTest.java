@@ -86,7 +86,11 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
         User user = new User(
                 userId,
                 "TestUser",
-                "user@example.com"
+                "user@example.com",
+                "password",
+                "USER",
+                Instant.now(),
+                Instant.now()
         );
 
         BookingRequest request = new BookingRequest(
