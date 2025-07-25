@@ -1,13 +1,14 @@
 package com.example.scheduler.adapters.dto;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record BookingResponse(
-        Long id,
-        Long eventId,
-        Long slotId,
+        UUID id,
+        UUID eventId,
+        UUID slotId,
         Instant startTime,
         Instant endTime,
-        boolean isCancelled
+        boolean isCanceled
 ) {
 }

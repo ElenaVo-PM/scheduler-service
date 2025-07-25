@@ -1,12 +1,13 @@
 package com.example.scheduler.domain.model;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record Slot(
-        Long id,
-        Long eventId,
+        UUID id,
+        UUID eventId,
         Instant startTime,
         Instant endTime,
-        boolean isBooked
+        boolean isAvailable
 ) {
 }

@@ -41,6 +41,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         auth -> auth
                                 .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/booking").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .userDetailsService(userDetailsService)
