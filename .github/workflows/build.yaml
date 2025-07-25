@@ -1,0 +1,26 @@
+name: CI build
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout pull request
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '24'
+          distribution: 'temurin'
+
+      - name: Check with Gradle
+        run: ./gradlew check
+
+      - name: Build with Gradle
+        run: ./gradlew build
