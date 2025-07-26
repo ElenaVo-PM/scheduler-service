@@ -56,6 +56,11 @@ public class SlotRepositoryImpl implements SlotRepository {
     }
 
     @Override
+    public void saveSlots(List<Slot> slots) {
+
+    }
+
+    @Override
     public BookingResponse bookSlot(Event event, User user, BookingRequest request) throws IllegalAccessException {
         return privateBookSlot(event, user, request);
     }
