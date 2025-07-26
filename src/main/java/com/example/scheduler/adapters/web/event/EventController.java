@@ -127,7 +127,7 @@ public class EventController {
     @PostMapping("/{id}/generate-slots")
     public ResponseEntity<Void> generateSlots(@PathVariable UUID id) {
         generateSlotsUseCase.execute(id);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**

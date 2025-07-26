@@ -1,5 +1,6 @@
 package com.example.scheduler.application.usecase;
 
+import com.example.scheduler.domain.exception.SlotGenerationException;
 import com.example.scheduler.domain.model.*;
 import com.example.scheduler.domain.repository.AvailabilityRuleRepository;
 import com.example.scheduler.domain.repository.EventRepository;
@@ -27,8 +28,11 @@ public class GenerateSlotsUseCase {
 
     public void execute(UUID eventId) {
         Event event = eventRepository.getEventById(eventId)
-                .orElseThrow(() -> new IllegalArgumentException("Event hot found"));
+                .orElseThrow(() -> new SlotGenerationException("Event hot found"));
         List<AvailabilityRule> availabilityRules = availabilityRuleRepository.getAllRulesByUser(event.ownerId());
+        if (availabilityRules.isEmpty()) {
+            throw new SlotGenerationException("No available rules");
+        }
 
         if (event.eventType().equals(EventType.ONE2ONE)) {
             slotRepository.saveSlots(generateForSingle(event, availabilityRules));
@@ -64,6 +68,9 @@ public class GenerateSlotsUseCase {
                 }
             }
             currDate = currDate.plusDays(1L);
+        }
+        if (slots.isEmpty()) {
+            throw new SlotGenerationException("No available slots could be generated for event ID: " + event.id());
         }
         return slots;
     }
