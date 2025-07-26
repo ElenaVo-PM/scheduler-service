@@ -6,12 +6,14 @@ import com.example.scheduler.domain.repository.AvailabilityRuleRepository;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.domain.repository.SlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Service
 public class GenerateSlotsUseCase {
     private final EventRepository eventRepository;
     private final AvailabilityRuleRepository availabilityRuleRepository;

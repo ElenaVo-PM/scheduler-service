@@ -3,6 +3,7 @@ package com.example.scheduler.adapters.web.event;
 import com.example.scheduler.adapters.fixture.TestEventFullDtos;
 import com.example.scheduler.adapters.web.Headers;
 import com.example.scheduler.application.service.EventService;
+import com.example.scheduler.application.usecase.GenerateSlotsUseCase;
 import com.example.scheduler.domain.fixture.TestCredentials;
 import com.example.scheduler.domain.fixture.TestEvents;
 import com.example.scheduler.domain.model.Credential;
@@ -30,6 +31,8 @@ class EventControllerTest {
 
     @MockitoBean
     private EventService mockEventService;
+    @MockitoBean
+    private GenerateSlotsUseCase generateSlotsUseCase;
 
     @Autowired
     private MockMvcTester mockMvcTester;

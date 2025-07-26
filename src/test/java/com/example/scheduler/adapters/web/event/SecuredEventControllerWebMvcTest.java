@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
+import com.example.scheduler.application.usecase.GenerateSlotsUseCase;
 import com.example.scheduler.domain.fixture.TestUserDetails;
 import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.infrastructure.config.WithSecurityStubs;
@@ -42,6 +43,8 @@ class SecuredEventControllerWebMvcTest {
 
     @MockitoBean
     private EventService eventService;
+    @MockitoBean
+    private GenerateSlotsUseCase generateSlotsUseCase;
 
     @Autowired
     private MockMvc mvc;
