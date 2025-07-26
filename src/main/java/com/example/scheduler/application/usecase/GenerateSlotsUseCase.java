@@ -3,14 +3,11 @@ package com.example.scheduler.application.usecase;
 import com.example.scheduler.domain.model.*;
 import com.example.scheduler.domain.repository.AvailabilityRuleRepository;
 import com.example.scheduler.domain.repository.EventRepository;
-import com.example.scheduler.domain.repository.ProfileRepository;
 import com.example.scheduler.domain.repository.SlotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,28 +15,31 @@ public class GenerateSlotsUseCase {
     private final EventRepository eventRepository;
     private final AvailabilityRuleRepository availabilityRuleRepository;
     private final SlotRepository slotRepository;
-    private final ProfileRepository profileRepository;
 
     @Autowired
     public GenerateSlotsUseCase(EventRepository eventRepository,
                                 AvailabilityRuleRepository availabilityRuleRepository,
-                                SlotRepository slotRepository,
-                                ProfileRepository profileRepository) {
+                                SlotRepository slotRepository) {
         this.eventRepository = eventRepository;
         this.availabilityRuleRepository = availabilityRuleRepository;
         this.slotRepository = slotRepository;
-        this.profileRepository = profileRepository;
     }
 
     public void execute(UUID eventId) {
-        List<Slot> slots = new ArrayList<>();
         Event event = eventRepository.getEventById(eventId)
                 .orElseThrow(() -> new IllegalArgumentException("Event hot found"));
         List<AvailabilityRule> availabilityRules = availabilityRuleRepository.getAllRulesByUser(event.ownerId());
-        Profile profile = profileRepository.findByUserId(event.ownerId())
-                .orElseThrow(() -> new IllegalArgumentException("Profile not found"));
 
-        ZoneId zone = profile.timezone();
+        if (event.eventType().equals(EventType.ONE2ONE)) {
+            slotRepository.saveSlots(generateForSingle(event, availabilityRules));
+        } else {
+            slotRepository.saveSlots(generateForGroup(event, availabilityRules));
+        }
+    }
+
+    private List<Slot> generateForGroup(Event event, List<AvailabilityRule> rules) {
+        List<Slot> slots = new ArrayList<>();
+        ZoneId zone = ZoneId.of("UTC");
 
         var currDate = event.startDate().atZone(zone).toLocalDate();
         var endDate = event.endDate() == null ?
@@ -48,7 +48,38 @@ public class GenerateSlotsUseCase {
 
         while (!currDate.isAfter(endDate)) {
             int dayOfWeek = currDate.getDayOfWeek().getValue();
-            for (AvailabilityRule rule : availabilityRules) {
+            for (AvailabilityRule rule : rules) {
+                if (rule.weekday() + 1 == dayOfWeek) {
+
+                    LocalTime slotStartTime = rule.startTime();
+                    LocalTime slotEndTime = slotStartTime.plusMinutes(event.durationMinutes());
+
+                    Slot slot = new Slot(UUID.randomUUID(),
+                            event.id(),
+                            LocalDateTime.of(currDate, slotStartTime).atZone(zone).toInstant(),
+                            LocalDateTime.of(currDate, slotEndTime).atZone(zone).toInstant(),
+                            true);
+
+                    slots.add(slot);
+                }
+            }
+            currDate = currDate.plusDays(1L);
+        }
+        return slots;
+    }
+
+    private List<Slot> generateForSingle(Event event, List<AvailabilityRule> rules) {
+        List<Slot> slots = new ArrayList<>();
+        ZoneId zone = ZoneId.of("UTC");
+
+        var currDate = event.startDate().atZone(zone).toLocalDate();
+        var endDate = event.endDate() == null ?
+                event.startDate().atZone(zone).toLocalDate().plusDays(60L) :
+                event.endDate().atZone(zone).toLocalDate();
+
+        while (!currDate.isAfter(endDate)) {
+            int dayOfWeek = currDate.getDayOfWeek().getValue();
+            for (AvailabilityRule rule : rules) {
                 if (rule.weekday() + 1 == dayOfWeek) {
 
                     LocalTime intervalStart = rule.startTime();
@@ -60,7 +91,7 @@ public class GenerateSlotsUseCase {
                     while (!slotEndTime.isAfter(intervalEnd)) {
 
                         Slot slot = new Slot(UUID.randomUUID(),
-                                eventId,
+                                event.id(),
                                 LocalDateTime.of(currDate, slotStartTime).atZone(zone).toInstant(),
                                 LocalDateTime.of(currDate, slotEndTime).atZone(zone).toInstant(),
                                 true);
@@ -73,7 +104,6 @@ public class GenerateSlotsUseCase {
             }
             currDate = currDate.plusDays(1L);
         }
-
-        slotRepository.saveSlots(slots);
+        return slots;
     }
 }
