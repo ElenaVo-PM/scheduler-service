@@ -24,12 +24,16 @@ public class PublicEventService {
     @Transactional
     public PublicEventResponse getEventBySlug (UUID sharedLink) {
         Optional<Event> requiredEvent = eventRepository.getEventBySlug(sharedLink);
-        if (requiredEvent.isEmpty() || !requiredEvent.get().isActive()) throw new NotFoundException("Событие не найдено");
-        Profile eventOwnerProfile = profileRepository.findByUserId(requiredEvent.get().ownerId()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        if (requiredEvent.isEmpty() || !requiredEvent.get().isActive()) {
+            throw new NotFoundException("Событие не найдено");
+        }
+        Profile eventOwnerProfile = profileRepository.findByUserId(requiredEvent.get().ownerId())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         return convertToPublicResponse(requiredEvent.get(),  eventOwnerProfile);
     }
 
     private PublicEventResponse convertToPublicResponse (Event event, Profile eventOwnerProfile) {
-        return new PublicEventResponse(event.title(), event.durationMinutes(), event.eventType(), eventOwnerProfile.timezone());
+        return new PublicEventResponse(event.title(), event.durationMinutes(), event.eventType(),
+                eventOwnerProfile.timezone());
     }
 }
