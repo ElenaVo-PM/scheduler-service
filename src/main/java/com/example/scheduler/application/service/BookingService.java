@@ -8,7 +8,6 @@ import com.example.scheduler.domain.model.Slot;
 import com.example.scheduler.domain.repository.BookingRepository;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.domain.repository.SlotRepository;
-import com.example.scheduler.infrastructure.repository.SlotRepositoryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
