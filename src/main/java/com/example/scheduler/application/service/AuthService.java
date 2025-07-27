@@ -3,23 +3,25 @@ package com.example.scheduler.application.service;
 import com.example.scheduler.adapters.dto.AuthResponse;
 import com.example.scheduler.domain.exception.InvalidTokenException;
 import com.example.scheduler.domain.model.Credential;
+import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.JwtRepository;
+import com.example.scheduler.domain.repository.UserRepository;
 import com.example.scheduler.infrastructure.security.JwtTokenProvider;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+
+    private final UserRepository userRepository;
     private final JwtRepository tokenRepository;
     private final JwtTokenProvider tokenProvider;
-    private final UserDetailsService userDetailsService;
 
-    public AuthService(JwtRepository tokenRepository,
-                       JwtTokenProvider tokenProvider,
-                       UserDetailsService userDetailsService) {
+    public AuthService(UserRepository userRepository,
+                       JwtRepository tokenRepository,
+                       JwtTokenProvider tokenProvider) {
+        this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
         this.tokenProvider = tokenProvider;
-        this.userDetailsService = userDetailsService;
     }
 
     public AuthResponse createTokens(Credential userDetails) {
@@ -28,14 +30,15 @@ public class AuthService {
 
     public AuthResponse refreshTokens(String refreshToken) {
         String username = tokenProvider.getUsernameFromRefreshToken(refreshToken);
-        Credential userDetails = (Credential) userDetailsService.loadUserByUsername(username);
+        User user = userRepository.findByUsername(username).orElseThrow();
+        Credential credential = Credential.fromUser(user);
 
         if (!tokenProvider.isRefreshTokenValid(refreshToken) ||
-                !tokenRepository.contains(userDetails.getId(), refreshToken)) {
+                !tokenRepository.contains(credential.getId(), refreshToken)) {
             throw new InvalidTokenException(refreshToken);
         }
 
-        return createPair(userDetails);
+        return createPair(credential);
     }
 
     private AuthResponse createPair(Credential userDetails) {
