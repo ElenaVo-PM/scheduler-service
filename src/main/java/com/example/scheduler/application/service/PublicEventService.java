@@ -7,11 +7,13 @@ import com.example.scheduler.domain.model.Profile;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.domain.repository.ProfileRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.UUID;
 
+@Service
 public class PublicEventService {
     private final EventRepository eventRepository;
     private final ProfileRepository profileRepository;
