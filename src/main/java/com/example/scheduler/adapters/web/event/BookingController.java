@@ -3,21 +3,25 @@ package com.example.scheduler.adapters.web.event;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.application.usecase.BookSlotUseCase;
+import com.example.scheduler.application.usecase.CancelBookingUseCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/booking")
 public class BookingController {
 
     private final BookSlotUseCase bookSlotUseCase;
+    private final CancelBookingUseCase cancelBookingUseCase;
 
     @Autowired
-    public BookingController(BookSlotUseCase bookSlotUseCase) {
+    public BookingController(BookSlotUseCase bookSlotUseCase, CancelBookingUseCase cancelBookingUseCase) {
         this.bookSlotUseCase = bookSlotUseCase;
+        this.cancelBookingUseCase = cancelBookingUseCase;
     }
 
     /**
@@ -49,7 +53,8 @@ public class BookingController {
      * DELETE /booking/{bookingId} - Отмена бронирования
      */
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId) {
+    public ResponseEntity<Void> cancelBooking(@PathVariable UUID bookingId) throws IllegalAccessException {
+        cancelBookingUseCase.execute(bookingId);
         return ResponseEntity.noContent().build();
     }
 }

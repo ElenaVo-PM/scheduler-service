@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.domain.model.*;
 
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,4 +16,11 @@ public interface SlotRepository {
 
     Optional<Slot> getSlotById(UUID id);
 
+    Optional<Booking> findBookingById(UUID bookingId);
+
+    void cancelBooking(UUID bookingId, Instant updatedAt);
+
+    void updateSlotAvailability(UUID slotId, boolean isAvailable, Instant updatedAt);
+
+    int countActiveBookingsForEvent(UUID eventId);
 }
