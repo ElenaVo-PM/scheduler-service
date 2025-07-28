@@ -18,6 +18,8 @@ public class GenerateSlotsUseCase {
     private final EventRepository eventRepository;
     private final AvailabilityRuleRepository availabilityRuleRepository;
     private final SlotRepository slotRepository;
+    private final ZoneId zone = ZoneId.of("UTC");
+    private final long DEFAULT_DAYS_TO_ADD = 60L;
 
     @Autowired
     public GenerateSlotsUseCase(EventRepository eventRepository,
@@ -45,11 +47,10 @@ public class GenerateSlotsUseCase {
 
     private List<Slot> generateForGroup(Event event, List<AvailabilityRule> rules) {
         List<Slot> slots = new ArrayList<>();
-        ZoneId zone = ZoneId.of("UTC");
 
         var currDate = event.startDate().atZone(zone).toLocalDate();
         var endDate = event.endDate() == null ?
-                event.startDate().atZone(zone).toLocalDate().plusDays(60L) :
+                event.startDate().atZone(zone).toLocalDate().plusDays(DEFAULT_DAYS_TO_ADD) :
                 event.endDate().atZone(zone).toLocalDate();
 
         while (!currDate.isAfter(endDate)) {
@@ -60,7 +61,7 @@ public class GenerateSlotsUseCase {
                     LocalTime slotStartTime = rule.startTime();
                     LocalTime slotEndTime = slotStartTime.plusMinutes(event.durationMinutes());
 
-                    Slot slot = new Slot(UUID.randomUUID(),
+                    Slot slot = new Slot(null,
                             event.id(),
                             LocalDateTime.of(currDate, slotStartTime).atZone(zone).toInstant(),
                             LocalDateTime.of(currDate, slotEndTime).atZone(zone).toInstant(),
@@ -99,7 +100,7 @@ public class GenerateSlotsUseCase {
 
                     while (!slotEndTime.isAfter(intervalEnd)) {
 
-                        Slot slot = new Slot(UUID.randomUUID(),
+                        Slot slot = new Slot(null,
                                 event.id(),
                                 LocalDateTime.of(currDate, slotStartTime).atZone(zone).toInstant(),
                                 LocalDateTime.of(currDate, slotEndTime).atZone(zone).toInstant(),
