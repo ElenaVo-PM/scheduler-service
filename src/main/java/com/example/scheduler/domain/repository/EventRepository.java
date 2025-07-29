@@ -21,4 +21,6 @@ public interface EventRepository {
     List<Event> getAllEvents(UUID ownerId);
 
     void delete(UUID id);
+
+    Optional<Event> getEventBySlug(UUID slug);
 }
