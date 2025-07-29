@@ -23,9 +23,12 @@ public class BookingRepositoryImpl implements BookingRepository {
         this.rowMapper = new DataClassRowMapper<>(Booking.class);
     }
 
+    private static final String FIND_BOOKING_BY_ID = """
+            SELECT id, event_template_id, slot_id, invitee_name,
+             invitee_email, is_canceled, created_at, updated_at FROM bookings WHERE id = ?
+            """;
 
     public Optional<Booking> getBookingById(UUID bookingId) {
-        final String FIND_BOOKING_BY_ID = "SELECT * FROM bookings WHERE id = ?";
         try {
             return Optional.ofNullable(jdbc.queryForObject(FIND_BOOKING_BY_ID, rowMapper, bookingId));
         } catch (EmptyResultDataAccessException e) {

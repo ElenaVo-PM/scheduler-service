@@ -24,9 +24,7 @@ public class BookingServiceTest {
     private EventRepository mockEventRepository;
     private SlotRepository mockSlotRepository;
     private BookingService bookingService;
-    Booking testBooking;
-    Event testEvent;
-    Slot testSlot;
+
 
     @BeforeEach
     void setUp() {
@@ -34,13 +32,13 @@ public class BookingServiceTest {
         mockEventRepository = Mockito.mock(EventRepository.class);
         mockSlotRepository = Mockito.mock(SlotRepository.class);
         bookingService = new BookingService(mockBookingRepository, mockEventRepository, mockSlotRepository);
-        testBooking = TestBooking.getTestBooking();
-        testEvent = TestEvents.demo();
-        testSlot = TestSlot.getTestSlot();
     }
 
     @Test
     void getBookingByIdTest() {
+        Booking testBooking = TestBooking.getTestBooking();
+        Event testEvent = TestEvents.demo();
+        Slot testSlot = TestSlot.getTestSlot();
         Mockito.when(mockBookingRepository.getBookingById(Mockito.any(UUID.class))).thenReturn(Optional.of(testBooking));
         Mockito.when(mockEventRepository.getEventById(Mockito.any(UUID.class))).thenReturn(Optional.of(testEvent));
         Mockito.when(mockSlotRepository.getSlotById(Mockito.any(UUID.class))).thenReturn(Optional.of(testSlot));
@@ -53,6 +51,8 @@ public class BookingServiceTest {
 
     @Test
     void getUnknownIdBookingTest() {
+        Booking testBooking = TestBooking.getTestBooking();
+        Event testEvent = TestEvents.demo();
         Mockito.when(mockBookingRepository.getBookingById(UUID.randomUUID())).thenReturn(Optional.of(testBooking));
         Mockito.when(mockEventRepository.getEventById(Mockito.any(UUID.class))).thenReturn(Optional.of(testEvent));
 
