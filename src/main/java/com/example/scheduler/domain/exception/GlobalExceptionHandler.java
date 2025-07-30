@@ -159,6 +159,19 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(SlotGenerationException.class)
+    public ResponseEntity<ApiError> slotGenerationException(
+            Exception exception,
+            ServletWebRequest request
+    ) {
+        logger.warn("Failed to generate slots: unexpected exception occurred:>> {}", exception.getMessage(), exception);
+        return toResponse(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleUnexpectedException(
             Exception exception,
