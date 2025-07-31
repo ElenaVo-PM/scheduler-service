@@ -18,6 +18,7 @@ public class TestBooking {
                 "testName",
                 "test@mail.com",
                 false,
+                Instant.now().minusSeconds(3600),
                 Instant.now().minusSeconds(3600));
     }
 }
