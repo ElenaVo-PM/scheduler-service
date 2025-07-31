@@ -37,10 +37,10 @@ public class CancelBookingUseCase {
     }
 
     @Transactional
-    public void execute(UUID bookingId) throws IllegalAccessException {
+    public void execute(UUID bookingId) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated() || auth instanceof AnonymousAuthenticationToken) {
-            throw new IllegalAccessException("User not authenticated");
+            throw new NotEnoughAuthorityException("User not authenticated");
         }
 
         Credential credential = (Credential) auth.getCredentials();
@@ -65,7 +65,7 @@ public class CancelBookingUseCase {
         slotRepository.cancelBooking(bookingId, now);
 
         boolean shouldBeAvailable = event.eventType() == EventType.ONE2ONE ||
-                slotRepository.countActiveBookingsForEvent(event.id()) < event.maxParticipants();
+                slotRepository.hasAvailableSlots(event.id(), event.maxParticipants());
 
         slotRepository.updateSlotAvailability(booking.slotId(), shouldBeAvailable, now);
     }

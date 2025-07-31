@@ -68,10 +68,10 @@ public class SlotRepositoryImpl implements SlotRepository {
             WHERE id = ? AND is_canceled = false
             """;
 
-    private final String COUNT_ACTIVE_BOOKINGS = """
-            SELECT COUNT(*) FROM bookings
+    private final String HAS_AVAILABLE_SLOTS = """
+            SELECT (COUNT(*) < ?) FROM bookings
             WHERE event_template_id = ? AND is_canceled = false
-            """;
+             """;
 
     @Autowired
     public SlotRepositoryImpl(JdbcTemplate jdbc) {
@@ -140,12 +140,13 @@ public class SlotRepositoryImpl implements SlotRepository {
     }
 
     @Override
-    public int countActiveBookingsForEvent(UUID eventId) {
-        Integer count = jdbc.queryForObject(
-                COUNT_ACTIVE_BOOKINGS,
-                Integer.class,
+    public boolean hasAvailableSlots(UUID eventId, int maxParticipants) {
+        Boolean available = jdbc.queryForObject(
+                HAS_AVAILABLE_SLOTS,
+                Boolean.class,
+                maxParticipants,
                 eventId);
-        return count != null ? count : 0;
+        return Boolean.TRUE.equals(available);
     }
 
     private void addParticipants(User user,

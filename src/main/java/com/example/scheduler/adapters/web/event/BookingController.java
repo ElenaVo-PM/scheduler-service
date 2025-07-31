@@ -53,7 +53,7 @@ public class BookingController {
      * DELETE /booking/{bookingId} - Отмена бронирования
      */
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable UUID bookingId) throws IllegalAccessException {
+    public ResponseEntity<Void> cancelBooking(@PathVariable UUID bookingId) {
         cancelBookingUseCase.execute(bookingId);
         return ResponseEntity.noContent().build();
     }

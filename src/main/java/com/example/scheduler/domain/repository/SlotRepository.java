@@ -22,5 +22,5 @@ public interface SlotRepository {
 
     void updateSlotAvailability(UUID slotId, boolean isAvailable, Instant updatedAt);
 
-    int countActiveBookingsForEvent(UUID eventId);
+    boolean hasAvailableSlots(UUID eventId, int maxParticipants);
 }
