@@ -42,7 +42,6 @@ class UserServiceImplTest {
                 mockUserRepository,
                 userMapper,
                 passwordEncoder,
-                mockAuthenticationManager,
                 mockAuthService,
                 TestClockConfig.fixedClock()
         );

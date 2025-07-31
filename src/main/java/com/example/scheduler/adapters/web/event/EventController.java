@@ -6,6 +6,7 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.application.service.EventService;
+import com.example.scheduler.application.usecase.GenerateSlotsUseCase;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.infrastructure.util.EntityAction;
 import jakarta.validation.Valid;
@@ -37,9 +38,11 @@ public class EventController {
     private static final Logger log = LoggerFactory.getLogger(EventController.class);
 
     private final EventService eventService;
+    private final GenerateSlotsUseCase generateSlotsUseCase;
 
-    public EventController(EventService eventService) {
+    public EventController(EventService eventService, GenerateSlotsUseCase generateSlotsUseCase) {
         this.eventService = eventService;
+        this.generateSlotsUseCase = generateSlotsUseCase;
     }
 
     /**
@@ -113,6 +116,18 @@ public class EventController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(events);
+    }
+
+    /**
+     * POST /api/events/{id}/generate-slots - Генерация слотов для события
+     *
+     * @param id UUID события
+     * @return 201 - в случае успешного создания слотов
+     */
+    @PostMapping("/{id}/generate-slots")
+    public ResponseEntity<Void> generateSlots(@PathVariable UUID id) {
+        generateSlotsUseCase.execute(id);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**

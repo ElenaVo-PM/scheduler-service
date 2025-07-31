@@ -5,6 +5,7 @@ import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.domain.model.*;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,4 +24,7 @@ public interface SlotRepository {
     void updateSlotAvailability(UUID slotId, boolean isAvailable, Instant updatedAt);
 
     boolean hasAvailableSlots(UUID eventId, int maxParticipants);
+
+    void saveSlots(List<Slot> slots);
+
 }

@@ -1,24 +1,22 @@
 package com.example.scheduler.application.service;
 
-import com.example.scheduler.adapters.dto.user.RegisterRequest;
 import com.example.scheduler.adapters.dto.AuthResponse;
+import com.example.scheduler.adapters.dto.user.RegisterRequest;
 import com.example.scheduler.adapters.dto.user.UserDto;
 import com.example.scheduler.adapters.mapper.UserMapper;
+import com.example.scheduler.domain.exception.UserNotAuthorizedException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -29,7 +27,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepo;
     private final UserMapper userMapper;
     private final PasswordEncoder encoder;
-    private final AuthenticationManager authenticationManager;
     private final AuthService authService;
     private final Clock clock;
 
@@ -37,14 +34,12 @@ public class UserServiceImpl implements UserService {
             UserRepository userRepo,
             UserMapper userMapper,
             PasswordEncoder encoder,
-            AuthenticationManager authenticationManager,
             AuthService authService,
             Clock clock
     ) {
         this.userRepo = userRepo;
         this.userMapper = userMapper;
         this.encoder = encoder;
-        this.authenticationManager = authenticationManager;
         this.authService = authService;
         this.clock = clock;
     }
@@ -61,13 +56,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthResponse loginUser(String username, String password) {
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(username, password);
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        Optional<User> userOptional = userRepo.findByUsername(username);
+        if (userOptional.isEmpty() || !encoder.matches(password, userOptional.get().passwordHash())) {
+            throw new UserNotAuthorizedException("Username or password does not match");
+        }
 
-        Credential userDetails = (Credential) authentication.getPrincipal();
-        return authService.createTokens(userDetails);
+        Credential credential = Credential.fromUser(userOptional.get());
+        return authService.createTokens(credential);
     }
 
     private User createUser(RegisterRequest registerRequest, PasswordEncoder passwordEncoder, Clock clock) {

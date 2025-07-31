@@ -54,6 +54,10 @@ public class SlotRepositoryImpl implements SlotRepository {
             FROM bookings
             WHERE is_canceled = false AND event_template_id = ?
             """;
+    private final String ADD_NEW_SLOT = """
+            INSERT INTO time_slots (event_template_id, start_time, end_time, is_available)
+            VALUES(?, ?, ?, ?)
+            """;
 
     private final String FIND_BOOKING_BY_ID = """
             SELECT id, event_template_id, slot_id, invitee_name, invitee_email, 
@@ -76,6 +80,13 @@ public class SlotRepositoryImpl implements SlotRepository {
     @Autowired
     public SlotRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+    }
+
+    @Override
+    public void saveSlots(List<Slot> slots) {
+        for (Slot slot : slots) {
+            jdbc.update(ADD_NEW_SLOT, slot.eventId(), slot.startTime(), slot.endTime(), slot.isAvailable());
+        }
     }
 
     @Override
