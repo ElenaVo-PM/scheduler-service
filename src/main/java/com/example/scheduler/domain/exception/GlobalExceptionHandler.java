@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
             EntityNotFoundException.class,
             NotFoundException.class
     })
-    public ResponseEntity<ApiError> entityNotFoundHandler(
+    public ResponseEntity<ApiError> handleEntityNotFound(
             RuntimeException exception,
             ServletWebRequest request
     ) {
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
         List<FieldError> errors = exception.getFieldErrors();
         // Fail fast if we cannot present a meaningful message for every error to user
         if (errors.stream().anyMatch(error -> error.getDefaultMessage() == null)) {
-            return unexpectedExceptionHandler(exception, request);
+            return handleUnexpectedException(exception, request);
         }
         String message = errors.stream()
                 .map(error -> error.getField() + " " + error.getDefaultMessage())
@@ -117,7 +117,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ApiError> accessDeniedExceptionExceptionHandler(
+    public ResponseEntity<ApiError> handleAccessDeniedException(
             AccessDeniedException exception,
             ServletWebRequest request
     ) {
@@ -130,7 +130,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(NotEnoughAuthorityException.class)
     public ResponseEntity<ApiError> handleNotEnoughAuthorityException(
             NotEnoughAuthorityException exception,
             ServletWebRequest request
@@ -159,14 +159,53 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> unexpectedExceptionHandler(
+    @ExceptionHandler(SlotGenerationException.class)
+    public ResponseEntity<ApiError> slotGenerationException(
             Exception exception,
             ServletWebRequest request
     ) {
-        logger.warn("Unexpected exception occurred: {}", exception.getMessage(), exception);
+        logger.warn("Failed to generate slots: unexpected exception occurred:>> {}", exception.getMessage(), exception);
+        return toResponse(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpectedException(
+            Exception exception,
+            ServletWebRequest request
+    ) {
+        logger.error("Unexpected exception occurred: {}", exception.getMessage(), exception);
         return toResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(ProfileAlreadyExistException.class)
+    public ResponseEntity<ApiError> handleProfileAlreadyExistException(
+            ProfileAlreadyExistException exception,
+            ServletWebRequest request
+    ) {
+        logger.warn("Profile already exists: {}", exception.getMessage());
+        return toResponse(
+                HttpStatus.CONFLICT,
+                exception.getMessage(),
+                request.getRequest().getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(ProfileNotFoundException.class)
+    public ResponseEntity<ApiError> handleProfileNotFoundException(
+            ProfileNotFoundException exception,
+            ServletWebRequest request
+    ) {
+        logger.warn("Profile not found: {}", exception.getMessage());
+        return toResponse(
+                HttpStatus.NOT_FOUND,
                 exception.getMessage(),
                 request.getRequest().getRequestURI()
         );

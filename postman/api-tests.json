@@ -1,0 +1,1854 @@
+{
+	"info": {
+		"_postman_id": "9a45c834-dbcd-4683-9659-53c01fdf64c1",
+		"name": "Scheduler Service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27052193"
+	},
+	"item": [
+		{
+			"name": "Register",
+			"item": [
+				{
+					"name": "Validation",
+					"item": [
+						{
+							"name": "Register user without username",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+											"        email: pm.variables.replaceIn('{{$randomEmail}}')",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('username must not be null');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with too long username",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: testData.getRandomText(256),",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+											"        email: pm.variables.replaceIn('{{$randomEmail}}')",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('username size must be between 0 and 255');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user without password",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: pm.variables.replaceIn('{{$randomUsername}}'),",
+											"        email: pm.variables.replaceIn('{{$randomEmail}}')",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('password must not be null');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user without email",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: pm.variables.replaceIn('{{$randomUsername}}'),",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}')",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('email must not be empty');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with empty email",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: pm.variables.replaceIn('{{$randomUsername}}'),",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+											"        email: ''",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('email must not be empty');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with malformed email",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: pm.variables.replaceIn('{{$randomUsername}}'),",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+											"        email: ' '",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('email must be a well-formed email address');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with too long email",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let registerRequest = {",
+											"        username: pm.variables.replaceIn('{{$randomUsername}}'),",
+											"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+											"        email: testData.getTooLongEmail()",
+											"    }",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequest),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 400', () => {",
+											"    pm.response.to.be.badRequest;",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(400);",
+											"    pm.expect(response.error).equal('Bad Request');",
+											"    pm.expect(response.message).equal('email size must be between 0 and 255');",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/auth/register",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Conflict",
+					"item": [
+						{
+							"name": "Register user with existing username",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 409', () => {",
+											"    pm.response.to.have.status(409);",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const request = JSON.parse(pm.request.body.raw);",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(409);",
+											"    pm.expect(response.error).equal('Conflict');",
+											"    pm.expect(response.message).equal('Username already exists: ' + request.username);",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let registerRequestA = testData.getRegisterRequest();",
+											"    await api.registerUser(registerRequestA);",
+											"",
+											"    let registerRequestB = testData.getRegisterRequest();",
+											"    registerRequestB['username'] = registerRequestA.username;",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequestB),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/auth/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with existing username in different case",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 409', () => {",
+											"    pm.response.to.have.status(409);",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const request = JSON.parse(pm.request.body.raw);",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(409);",
+											"    pm.expect(response.error).equal('Conflict');",
+											"    pm.expect(response.message).equal('Username already exists: ' + request.username);",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let username = pm.variables.replaceIn('{{$randomUserName}}');",
+											"    let registerRequestA = testData.getRegisterRequest();",
+											"    registerRequestA['username'] = username + 'a';",
+											"    await api.registerUser(registerRequestA);",
+											"",
+											"    let registerRequestB = testData.getRegisterRequest();",
+											"    registerRequestB['username'] = username + 'A';",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequestB),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/auth/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with existing email",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 409', () => {",
+											"    pm.response.to.have.status(409);",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const request = JSON.parse(pm.request.body.raw);",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(409);",
+											"    pm.expect(response.error).equal('Conflict');",
+											"    pm.expect(response.message).equal('Email already exists: ' + request.email);",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let registerRequestA = testData.getRegisterRequest();",
+											"    await api.registerUser(registerRequestA);",
+											"",
+											"    let registerRequestB = testData.getRegisterRequest();",
+											"    registerRequestB['email'] = registerRequestA.email;",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequestB),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/auth/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Register user with existing email in different case",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.test('Response status should be 409', () => {",
+											"    pm.response.to.have.status(409);",
+											"});",
+											"",
+											"pm.test('Response should have a JSON body', () => {",
+											"    pm.response.to.be.withBody;",
+											"    pm.response.to.be.json;",
+											"});",
+											"",
+											"const request = JSON.parse(pm.request.body.raw);",
+											"const response = pm.response.json();",
+											"",
+											"pm.test('Response should have required properties', () => {",
+											"    pm.expect(response).to.have.property('timestamp');",
+											"    pm.expect(response).to.have.property('status');",
+											"    pm.expect(response).to.have.property('error');",
+											"    pm.expect(response).to.have.property('message');",
+											"    pm.expect(response).to.have.property('path');",
+											"});",
+											"",
+											"pm.test('Response properties should have correct values', () => {",
+											"    pm.expect(response.timestamp).to.be.not.null;",
+											"    pm.expect(Date.parse(response.timestamp)).to.be.not.null;",
+											"    pm.expect(response.status).equal(409);",
+											"    pm.expect(response.error).equal('Conflict');",
+											"    pm.expect(response.message).equal('Email already exists: ' + request.email);",
+											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"});",
+											"",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								},
+								{
+									"listen": "prerequest",
+									"script": {
+										"exec": [
+											"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+											"const testData = new TestData();",
+											"",
+											"const main = async () => {",
+											"    let email = pm.variables.replaceIn('{{$randomEmail}}');",
+											"    let registerRequestA = testData.getRegisterRequest();",
+											"    registerRequestA['email'] = 'a' + email;",
+											"    await api.registerUser(registerRequestA);",
+											"",
+											"    let registerRequestB = testData.getRegisterRequest();",
+											"    registerRequestB['email'] = 'A' + email;",
+											"",
+											"    pm.request.body.update({",
+											"        mode: 'raw',",
+											"        raw: JSON.stringify(registerRequestB),",
+											"        options: { raw: { language: 'json' } }",
+											"    });",
+											"};",
+											"",
+											"const interval = setInterval(() => {}, 1000);",
+											"",
+											"setTimeout(async () => ",
+											"    {",
+											"        try {",
+											"            await main();",
+											"        } catch (e) {",
+											"            console.error(e);",
+											"        } finally {",
+											"            clearInterval(interval);",
+											"        }",
+											"    },  ",
+											"    100 ",
+											");",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"protocolProfileBehavior": {
+								"disabledSystemHeaders": {}
+							},
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://localhost:8080/auth/register",
+									"protocol": "http",
+									"host": [
+										"localhost"
+									],
+									"port": "8080",
+									"path": [
+										"auth",
+										"register"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Register new user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const utils = new Utils();",
+									"",
+									"pm.test('Response status should be 201', () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response should have a JSON body', () => {",
+									"    pm.response.to.be.withBody;",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"const request = JSON.parse(pm.request.body.raw);",
+									"const response = pm.response.json();",
+									"",
+									"pm.test('Response should have required properties', () => {",
+									"    pm.expect(response).to.have.property('id');",
+									"    pm.expect(response).to.have.property('username');",
+									"    pm.expect(response).to.have.property('email');",
+									"});",
+									"",
+									"pm.test('Response properties should have correct values', () => {",
+									"    pm.expect(response.id).to.be.not.null;",
+									"    pm.expect(utils.isUuid(response.id)).to.be.true;",
+									"    pm.expect(response.username).equal(request.username);",
+									"    pm.expect(response.email).equal(request.email);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const main = async () => {",
+									"    let registerRequest = {",
+									"        username: pm.variables.replaceIn('{{$randomUserName}}'),",
+									"        password: pm.variables.replaceIn('{{$randomPassword}}'),",
+									"        email: pm.variables.replaceIn('{{$randomEmail}}')",
+									"    }",
+									"",
+									"    pm.request.body.update({",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify(registerRequest),",
+									"        options: { raw: { language: 'json' } }",
+									"    });",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disabledSystemHeaders": {}
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/register",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "Login not registered user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status should be 401', () => {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+									"const testData = new TestData();",
+									"",
+									"const main = async () => {",
+									"    let registerRequestA = testData.getRegisterRequest();",
+									"    await api.registerUser(registerRequestA);",
+									"    let registerRequestB = testData.getRegisterRequest();",
+									"    let authRequest = {",
+									"        username: registerRequestB.username,",
+									"        password: registerRequestB.password",
+									"    }",
+									"",
+									"    pm.request.body.update({",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify(authRequest),",
+									"        options: { raw: { language: 'json' } }",
+									"    });",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login registered user",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status should be 200', () => {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test('Response should have a JSON body', () => {",
+									"    pm.response.to.be.withBody;",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test('Response should have required properties', () => {",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"    pm.expect(response).to.have.property('refreshToken');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+									"const testData = new TestData();",
+									"",
+									"const main = async () => {",
+									"    let registerRequest = testData.getRegisterRequest();",
+									"    await api.registerUser(registerRequest);",
+									"    let authRequest = {",
+									"        username: registerRequest.username,",
+									"        password: registerRequest.password",
+									"    }",
+									"",
+									"    pm.request.body.update({",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify(authRequest),",
+									"        options: { raw: { language: 'json' } }",
+									"    });",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/login",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Refresh Token",
+			"item": [
+				{
+					"name": "Get new tokens with access token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status should be 403', () => {",
+									"    pm.response.to.have.status(403);",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+									"const testData = new TestData();",
+									"",
+									"const main = async () => {",
+									"    let registerRequest = testData.getRegisterRequest();",
+									"    await api.registerUser(registerRequest);",
+									"    let authRequest = {",
+									"        username: registerRequest.username,",
+									"        password: registerRequest.password",
+									"    }",
+									"    let tokens = await api.login(authRequest);",
+									"    let refreshTokenRequest = {",
+									"        token: tokens.accessToken",
+									"    }",
+									"",
+									"    pm.request.body.update({",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify(refreshTokenRequest),",
+									"        options: { raw: { language: 'json' } }",
+									"    });",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get new tokens with terfresh token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Response status should be 200', () => {",
+									"    pm.response.to.be.ok;",
+									"});",
+									"",
+									"pm.test('Response should have a JSON body', () => {",
+									"    pm.response.to.be.withBody;",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"const response = pm.response.json();",
+									"",
+									"pm.test('Response should have required properties', () => {",
+									"    pm.expect(response).to.have.property('accessToken');",
+									"    pm.expect(response).to.have.property('refreshToken');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"const api = new API(pm, pm.collectionVariables.get(\"baseUrl\"));",
+									"const testData = new TestData();",
+									"",
+									"const main = async () => {",
+									"    let registerRequest = testData.getRegisterRequest();",
+									"    await api.registerUser(registerRequest);",
+									"    let authRequest = {",
+									"        username: registerRequest.username,",
+									"        password: registerRequest.password",
+									"    }",
+									"    let tokens = await api.login(authRequest);",
+									"    let refreshTokenRequest = {",
+									"        token: tokens.refreshToken",
+									"    }",
+									"",
+									"    pm.request.body.update({",
+									"        mode: 'raw',",
+									"        raw: JSON.stringify(refreshTokenRequest),",
+									"        options: { raw: { language: 'json' } }",
+									"    });",
+									"};",
+									"",
+									"const interval = setInterval(() => {}, 1000);",
+									"",
+									"setTimeout(async () => ",
+									"    {",
+									"        try {",
+									"            await main();",
+									"        } catch (e) {",
+									"            console.error(e);",
+									"        } finally {",
+									"            clearInterval(interval);",
+									"        }",
+									"    },  ",
+									"    100 ",
+									");",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8080/auth/refresh",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"API = class {",
+					"    constructor(postman, baseUrl) {",
+					"        this.pm = postman;",
+					"        this.baseUrl = baseUrl;",
+					"    }",
+					"",
+					"    async registerUser(registerRequest) {",
+					"        return this.post('/auth/register', registerRequest);",
+					"    }",
+					"",
+					"    async login(authRequest) {",
+					"        return this.post('/auth/login', authRequest);",
+					"    }",
+					"",
+					"    async createUser(userDetails) {",
+					"        return this.post('/users', userDetails);",
+					"    }",
+					"",
+					"    async deleteUserById(userId) {",
+					"        return this.delete('/users/' + userId);",
+					"    }",
+					"",
+					"    async post(path, body=null) {",
+					"        return this.sendRequest('POST', path, body);",
+					"    }",
+					"",
+					"    async delete(path) {",
+					"        return this.sendRequest('DELETE', path, null);",
+					"    }",
+					"",
+					"    async sendRequest(method, path, body=null) {",
+					"        return new Promise((resolve, reject) => {",
+					"            var request = {",
+					"                url: this.baseUrl + path,",
+					"                method: method,",
+					"                header: {",
+					"                    'Content-Type': 'application/json'",
+					"                },",
+					"                body: body == null ? \"\" : JSON.stringify(body)",
+					"            };",
+					"",
+					"            try {",
+					"                this.pm.sendRequest(request, (error, response) => {",
+					"                    if (error || (response.code >= 400 && response.code <= 599)) {",
+					"                        let err = error ? error : JSON.stringify(response.json());",
+					"                        reject(new Error(err));",
+					"                    } else {",
+					"                        if (response.stream.length === 0) {",
+					"                            reject(new Error(\"Response has no body\"));;",
+					"                        } else {",
+					"                            resolve(response.json());",
+					"                        }",
+					"                    }",
+					"                });",
+					"            } catch (error) {",
+					"                return Promise.reject(error);",
+					"            }",
+					"        });",
+					"    }",
+					"};",
+					"",
+					"TestData = class {",
+					"    constructor() {}",
+					"",
+					"    getRegisterRequest() {",
+					"        return {",
+					"            username: pm.variables.replaceIn('{{$randomUserName}}'),",
+					"            password: pm.variables.replaceIn('{{$randomPassword}}'),",
+					"            email: pm.variables.replaceIn('{{$randomEmail}}')",
+					"        };",
+					"    }",
+					"",
+					"    getRandomText(length=1) {",
+					"        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';",
+					"        const charsCount = chars.length;",
+					"        let randomText = '';",
+					"        let counter = 0;",
+					"        while (counter < length) {",
+					"            randomText += chars.charAt(Math.floor(Math.random() * charsCount));",
+					"            counter += 1;",
+					"        }",
+					"        return randomText;",
+					"    }",
+					"",
+					"    getRandomUUID() {",
+					"        return pm.variables.replaceIn('{{$randomUUID}}');",
+					"    }",
+					"",
+					"    getTooLongEmail() {",
+					"        let tooLongEmail = this.getRandomText(64) + '@' + this.getRandomText(63) + '.' + this.getRandomText(63) + '.' + this.getRandomText(59) + \".com\";",
+					"        return tooLongEmail;",
+					"    }",
+					"};",
+					"",
+					"Utils = class {",
+					"    constructor() {}",
+					"",
+					"    isUuid(str) {",
+					"        return /^[0-9A-F]{8}-[0-9A-F]{4}-[1-7][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i.test(str);",
+					"    }",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

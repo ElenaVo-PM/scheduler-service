@@ -5,7 +5,9 @@ import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -30,6 +32,12 @@ public class EventRepositoryImpl implements EventRepository {
             UPDATE event_templates
             SET slug = ?
             WHERE id = ?
+            """;
+
+    private static final String GET_EVENT_BY_SLUG = """
+            SELECT *
+            FROM event_tamplates
+            WHERE slug = ?
             """;
     private static final String TOGGLE_EVENT_QUERY = """
             UPDATE event_templates
@@ -93,10 +101,12 @@ public class EventRepositoryImpl implements EventRepository {
             """;
 
     private final JdbcTemplate jdbc;
+    private final RowMapper<Event> mapper;
 
     @Autowired
     public EventRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+        this.mapper = new DataClassRowMapper<>(Event.class);
     }
 
     @Override
@@ -205,5 +215,10 @@ public class EventRepositoryImpl implements EventRepository {
     @Override
     public void delete(UUID id) {
         jdbc.update(DELETE_QUERY, id);
+    }
+
+    @Override
+    public Optional<Event> getEventBySlug(UUID slug) {
+        return Optional.ofNullable(jdbc.queryForObject(GET_EVENT_BY_SLUG, mapper, slug));
     }
 }

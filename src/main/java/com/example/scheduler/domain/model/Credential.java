@@ -27,6 +27,16 @@ public class Credential implements UserDetails {
         this.enabled = enabled;
     }
 
+    public static Credential fromUser(User user) {
+        return new Credential(
+                user.id(),
+                user.username(),
+                user.passwordHash(),
+                user.role(),
+                true
+        );
+    }
+
     public UUID getId() {
         return userId;
     }
