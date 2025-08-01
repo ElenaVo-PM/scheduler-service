@@ -58,7 +58,7 @@ public class SlotRepositoryImpl implements SlotRepository {
             VALUES(?, ?, ?, ?)
             """;
     private final String GET_ALL_SLOTS_FOR_EVENT = """
-            SELECT id, event_template_id, start_time, end_time, is_available
+            SELECT id, event_template_id AS event_id, start_time, end_time, is_available
             FROM time_slots WHERE event_template_id = ?
             """;
 

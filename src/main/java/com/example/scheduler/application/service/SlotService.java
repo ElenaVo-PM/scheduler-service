@@ -23,6 +23,6 @@ public class SlotService {
         List<Slot> requiredEventSlots = slotRepository.getAllSlotsForEvent(eventId);
         List<TimeInterval> occupiedTime = bookingRepository.getTimeOfBookingsForUser(userId);
         return requiredEventSlots.stream().filter(slot -> occupiedTime.stream()
-                .anyMatch(timeInterval -> timeInterval.overlapsWithSlot(slot))).toList();
+                .noneMatch(timeInterval -> timeInterval.overlapsWithSlot(slot))).toList();
     }
 }

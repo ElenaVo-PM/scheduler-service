@@ -34,8 +34,9 @@ public class BookingRepositoryImpl implements BookingRepository {
             """;
 
     private final String GET_TIME_OF_BOOKINGS_FOR_USER_BY_ID = """
-            SELECT b.start_time, b.end_time FROM booking_participants AS bp
+            SELECT ts.start_time, ts.end_time FROM booking_participants AS bp
             LEFT JOIN bookings AS b ON b.id = bp.booking_id
+            LEFT JOIN time_slots AS ts ON b.slot_id = ts.id
             WHERE bp.user_id = ?
             """;
 
