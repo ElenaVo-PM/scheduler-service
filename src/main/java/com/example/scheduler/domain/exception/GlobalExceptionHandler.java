@@ -102,7 +102,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler({
             BadCredentialsException.class,
-            UserNotAuthorizedException.class
+            UserNotAuthorizedException.class,
+            InvalidTokenException.class,
+            TokenRefreshException.class
     })
     public ResponseEntity<ApiError> handleUnauthorizedExceptions(
             RuntimeException exception,

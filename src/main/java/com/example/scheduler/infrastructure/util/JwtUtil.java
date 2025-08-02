@@ -1,5 +1,6 @@
 package com.example.scheduler.infrastructure.util;
 
+import com.example.scheduler.domain.exception.InvalidTokenException;
 import com.example.scheduler.domain.model.Credential;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -107,11 +108,15 @@ public class JwtUtil {
     }
 
     public Claims extractClaims(String token, SecretKey secret) {
-        return Jwts.parser()
-                .verifyWith(secret)
-                .clock(jwtClock)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts.parser()
+                    .verifyWith(secret)
+                    .clock(jwtClock)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (Exception e) {
+            throw new InvalidTokenException(e.getMessage());
+        }
     }
 }
