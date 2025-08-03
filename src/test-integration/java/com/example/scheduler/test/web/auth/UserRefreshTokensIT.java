@@ -1,7 +1,6 @@
 package com.example.scheduler.test.web.auth;
 
 import com.example.scheduler.test.config.IntegrationTest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
@@ -18,7 +17,6 @@ class UserRefreshTokensIT {
     private int port;
 
     @Test
-    @Disabled("Wait for issue #155 fix")
     void givenRefreshTokenExpired_WhenRefreshTokens_ThenRespondWithUnauthorized() {
         webClient().post()
                 .accept(MediaType.APPLICATION_JSON)
