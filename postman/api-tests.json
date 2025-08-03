@@ -1533,8 +1533,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test('Response status should be 403', () => {",
-									"    pm.response.to.have.status(403);",
+									"pm.test('Response status should be 401', () => {",
+									"    pm.response.to.be.unauthorized;",
 									"});",
 									""
 								],
