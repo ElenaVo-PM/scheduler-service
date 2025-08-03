@@ -14,6 +14,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -27,6 +28,14 @@ public class JwtUtil {
     private static final String USERNAME_CLAIM_NAME = "username";
     private static final String ROLE_CLAIM_NAME = "role";
 
+    private final Clock clock;
+    private final io.jsonwebtoken.Clock jwtClock;
+
+    public JwtUtil(Clock clock) {
+        this.clock = clock;
+        this.jwtClock = () -> Date.from(Instant.now(clock));
+    }
+
     public String extractTokenFromRequest(HttpServletRequest request) {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (Objects.nonNull(authorizationHeader) && authorizationHeader.startsWith("Bearer ")) {
@@ -36,7 +45,7 @@ public class JwtUtil {
     }
 
     public String generateAccessToken(Credential user, long validityInMillis, SecretKey secretKey) {
-        Instant accessExpiration = Instant.now().plus(validityInMillis, ChronoUnit.MILLIS);
+        Instant accessExpiration = Instant.now(clock).plus(validityInMillis, ChronoUnit.MILLIS);
         String role = user.getAuthorities().stream()
                 .map(Object::toString)
                 .collect(Collectors.joining(","));
@@ -53,12 +62,12 @@ public class JwtUtil {
     }
 
     public String generateRefreshToken(Credential user, long validityInMillis, SecretKey secretKey) {
-        Instant accessExpiration = Instant.now().plus(validityInMillis, ChronoUnit.MILLIS);
+        Instant refreshExpiration = Instant.now(clock).plus(validityInMillis, ChronoUnit.MILLIS);
 
         return Jwts.builder()
                 .subject(user.getId().toString())
                 .claim(USERNAME_CLAIM_NAME, user.getUsername())
-                .expiration(Date.from(accessExpiration))
+                .expiration(Date.from(refreshExpiration))
                 .signWith(secretKey)
                 .compact();
     }
@@ -67,6 +76,7 @@ public class JwtUtil {
         try {
             Jwts.parser()
                     .verifyWith(secret)
+                    .clock(jwtClock)
                     .build()
                     .parseSignedClaims(token);
             return true;
@@ -99,6 +109,7 @@ public class JwtUtil {
     public Claims extractClaims(String token, SecretKey secret) {
         return Jwts.parser()
                 .verifyWith(secret)
+                .clock(jwtClock)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
