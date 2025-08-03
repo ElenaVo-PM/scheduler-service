@@ -1,16 +1,22 @@
 package com.example.scheduler.application.service;
 
-import com.example.scheduler.adapters.dto.*;
+import com.example.scheduler.adapters.dto.CreateEventRequest;
+import com.example.scheduler.adapters.dto.EventFullDto;
+import com.example.scheduler.adapters.dto.EventResponse;
+import com.example.scheduler.adapters.dto.EventShortDto;
 import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.exception.UserNotAuthorizedException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.Event;
+import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.infrastructure.mapper.EventMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -29,6 +35,32 @@ public class EventServiceImpl implements EventService {
     @Override
     public EventResponse createEvent(CreateEventRequest request, UUID ownerId) {
         Event requestEvent = eventMapper.toEntity(request, ownerId);
+
+        if (requestEvent.eventType() == EventType.GROUP) {
+            Instant eventStartDate = requestEvent.startDate();
+            int eventDuration = requestEvent.durationMinutes();
+            Instant eventEndDate = requestEvent.endDate();
+
+            if (!eventEndDate.equals(eventStartDate.plus(eventDuration, ChronoUnit.MINUTES))) {
+                requestEvent = new Event(
+                        requestEvent.id(),
+                        requestEvent.ownerId(),
+                        requestEvent.title(),
+                        requestEvent.description(),
+                        requestEvent.isActive(),
+                        requestEvent.maxParticipants(),
+                        requestEvent.durationMinutes(),
+                        requestEvent.bufferBeforeMinutes(),
+                        requestEvent.bufferAfterMinutes(),
+                        requestEvent.eventType(),
+                        requestEvent.slug(),
+                        requestEvent.startDate(),
+                        eventStartDate.plus(eventDuration, ChronoUnit.MINUTES),
+                        requestEvent.createdAt(),
+                        requestEvent.updatedAt()
+                );
+            }
+        }
         Event savedEvent = eventRepository.save(requestEvent);
         return eventMapper.toResponse(savedEvent);
     }
