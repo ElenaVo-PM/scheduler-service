@@ -16,6 +16,7 @@ public interface SlotRepository {
 
     Optional<Slot> getSlotById(UUID id);
 
-    void saveSlots(List<Slot> slots);
+    List<Slot> getAllSlotsForEvent(UUID eventId);
 
+    void saveSlots(List<Slot> slots);
 }

@@ -21,6 +21,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -137,5 +138,10 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
         Optional<Slot> result = repository.getSlotById(UUID.randomUUID());
         assertTrue(result.isEmpty());
     }
-
+    @Test
+    void getSlotsForEvent() {
+        List<Slot> eventSlots = repository.getAllSlotsForEvent(eventId);
+        assertEquals(1, eventSlots.size());
+        assertEquals(slotId, eventSlots.getFirst().id());
+    }
 }
