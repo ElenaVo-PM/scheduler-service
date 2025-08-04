@@ -5,6 +5,7 @@ import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.application.service.BookingService;
 import com.example.scheduler.application.usecase.BookSlotUseCase;
+import com.example.scheduler.application.usecase.CancelBookingUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,14 @@ public class BookingController {
 
     private static final Logger log = LoggerFactory.getLogger(BookingController.class);
     private final BookSlotUseCase bookSlotUseCase;
+    private final CancelBookingUseCase cancelBookingUseCase;
     private final BookingService bookingService;
 
     @Autowired
-    public BookingController(BookSlotUseCase bookSlotUseCase, BookingService bookingService) {
+    public BookingController(BookSlotUseCase bookSlotUseCase, CancelBookingUseCase cancelBookingUseCase,
+                             BookingService bookingService) {
         this.bookSlotUseCase = bookSlotUseCase;
+        this.cancelBookingUseCase = cancelBookingUseCase;
         this.bookingService = bookingService;
     }
 
@@ -60,7 +64,8 @@ public class BookingController {
      * DELETE /booking/{bookingId} - Отмена бронирования
      */
     @DeleteMapping("/{bookingId}")
-    public ResponseEntity<Void> cancelBooking(@PathVariable Long bookingId) {
+    public ResponseEntity<Void> cancelBooking(@PathVariable UUID bookingId) {
+        cancelBookingUseCase.execute(bookingId);
         return ResponseEntity.noContent().build();
     }
 }

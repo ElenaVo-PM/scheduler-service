@@ -4,6 +4,7 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.AbstractTestContainerTest;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
+import com.example.scheduler.domain.model.Booking;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.Slot;
 import com.example.scheduler.domain.model.User;
@@ -138,6 +139,88 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
         Optional<Slot> result = repository.getSlotById(UUID.randomUUID());
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    @DisplayName("Cancel existing booking successfully")
+    void cancelBookingSuccess() throws Exception {
+        User user = new User(
+                userId,
+                "TestUser",
+                "user@example.com",
+                "password",
+                "USER",
+                Instant.now(),
+                Instant.now()
+        );
+
+        BookingRequest request = new BookingRequest(
+                eventId, slotId, user.email(), user.username()
+        );
+
+        Event event = eventRepository.getEventById(eventId).get();
+
+        BookingResponse bookingResponse = repository.bookSlot(event, user, request);
+
+        UUID bookingId = bookingResponse.id();
+        Optional<Booking> bookingOpt = repository.findBookingById(bookingId);
+        assertTrue(bookingOpt.isPresent());
+        assertFalse(bookingOpt.get().isCanceled());
+
+        Instant cancelTime = Instant.now();
+        repository.cancelBooking(bookingId, cancelTime);
+
+        Optional<Booking> canceledBookingOpt = repository.findBookingById(bookingId);
+        assertTrue(canceledBookingOpt.isPresent());
+        assertTrue(canceledBookingOpt.get().isCanceled());
+    }
+
+    @Test
+    @DisplayName("Cancel non-existing booking does nothing")
+    void cancelBookingNonExisting() {
+        UUID fakeBookingId = UUID.randomUUID();
+
+        assertDoesNotThrow(() -> repository.cancelBooking(fakeBookingId, Instant.now()));
+
+        Optional<Booking> bookingOpt = repository.findBookingById(fakeBookingId);
+        assertTrue(bookingOpt.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Cancel already canceled booking does nothing")
+    void cancelBookingAlreadyCanceled() throws Exception {
+        User user = new User(
+                userId,
+                "TestUser",
+                "user@example.com",
+                "password",
+                "USER",
+                Instant.now(),
+                Instant.now()
+        );
+
+        BookingRequest request = new BookingRequest(
+                eventId, slotId, user.email(), user.username()
+        );
+
+        Event event = eventRepository.getEventById(eventId).get();
+
+        BookingResponse bookingResponse = repository.bookSlot(event, user, request);
+
+        UUID bookingId = bookingResponse.id();
+
+        repository.cancelBooking(bookingId, Instant.now());
+
+        Optional<Booking> canceledBookingOpt = repository.findBookingById(bookingId);
+        assertTrue(canceledBookingOpt.isPresent());
+        assertTrue(canceledBookingOpt.get().isCanceled());
+
+        assertDoesNotThrow(() -> repository.cancelBooking(bookingId, Instant.now()));
+
+        Optional<Booking> canceledBookingOpt2 = repository.findBookingById(bookingId);
+        assertTrue(canceledBookingOpt2.isPresent());
+        assertTrue(canceledBookingOpt2.get().isCanceled());
+    }
+
     @Test
     void getSlotsForEvent() {
         List<Slot> eventSlots = repository.getAllSlotsForEvent(eventId);

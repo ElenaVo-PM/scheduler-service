@@ -10,6 +10,6 @@ public record Booking(
         String inviteeName,
         String inviteeEmail,
         boolean isCanceled,
-        Instant createdAt
-) {
-}
+        Instant createdAt,
+        Instant updatedAt
+) {}

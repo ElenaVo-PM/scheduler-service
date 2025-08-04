@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ public class SlotRepositoryImpl implements SlotRepository {
             INSERT INTO booking_participants (id, booking_id, user_id, email, name, status, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?::booking_status, ?, ?)
             """;
+
     private final String ADD_NEW_BOOKING_QUERY_WITH_RETURN = """
             INSERT INTO bookings (event_template_id,
             slot_id,
@@ -38,16 +40,19 @@ public class SlotRepositoryImpl implements SlotRepository {
             VALUES (?, ?, ?, ?, ?)
             RETURNING id, created_at
             """;
+
     private final String UPDATE_SLOT_QUERY = """
             UPDATE time_slots
             SET is_available = ?, updated_at = ?
             WHERE id = ?
             """;
+
     private final String GET_SLOT_QUERY = """
             SELECT *
             FROM time_slots
             WHERE id = ?
             """;
+
     private final String COUNT_PARTICIPANTS_QUERY = """
             SELECT COUNT(id) AS participants_count
             FROM bookings
@@ -61,6 +66,24 @@ public class SlotRepositoryImpl implements SlotRepository {
             SELECT id, event_template_id AS event_id, start_time, end_time, is_available
             FROM time_slots WHERE event_template_id = ?
             """;
+
+    private final String FIND_BOOKING_BY_ID = """
+            SELECT id, event_template_id, slot_id, invitee_name, invitee_email, 
+                   is_canceled, created_at, updated_at
+            FROM bookings
+            WHERE id = ?
+            """;
+
+    private final String CANCEL_BOOKING = """
+            UPDATE bookings
+            SET is_canceled = true, updated_at = ?
+            WHERE id = ? AND is_canceled = false
+            """;
+
+    private final String HAS_AVAILABLE_SLOTS = """
+            SELECT (COUNT(*) < ?) FROM bookings
+            WHERE event_template_id = ? AND is_canceled = false
+             """;
 
     @Autowired
     public SlotRepositoryImpl(JdbcTemplate jdbc) {
@@ -103,6 +126,51 @@ public class SlotRepositoryImpl implements SlotRepository {
     @Override
     public List<Slot> getAllSlotsForEvent(UUID eventId) {
         return jdbc.query(GET_ALL_SLOTS_FOR_EVENT, mapper, eventId);
+    }
+
+    @Override
+    public Optional<Booking> findBookingById(UUID bookingId) {
+        try {
+            return Optional.ofNullable(jdbc.queryForObject(FIND_BOOKING_BY_ID,
+                    (rs, rowNum) -> new Booking(
+                            rs.getObject("id", UUID.class),
+                            rs.getObject("event_template_id", UUID.class),
+                            rs.getObject("slot_id", UUID.class),
+                            rs.getString("invitee_name"),
+                            rs.getString("invitee_email"),
+                            rs.getBoolean("is_canceled"),
+                            rs.getTimestamp("created_at").toInstant(),
+                            rs.getTimestamp("updated_at").toInstant()
+                    ),
+                    bookingId));
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public void cancelBooking(UUID bookingId, Instant updatedAt) {
+        jdbc.update(CANCEL_BOOKING,
+                java.sql.Timestamp.from(updatedAt),
+                bookingId);
+    }
+
+    @Override
+    public void updateSlotAvailability(UUID slotId, boolean isAvailable, Instant updatedAt) {
+        jdbc.update(UPDATE_SLOT_QUERY,
+                isAvailable,
+                java.sql.Timestamp.from(updatedAt),
+                slotId);
+    }
+
+    @Override
+    public boolean hasAvailableSlots(UUID eventId, int maxParticipants) {
+        Boolean available = jdbc.queryForObject(
+                HAS_AVAILABLE_SLOTS,
+                Boolean.class,
+                maxParticipants,
+                eventId);
+        return Boolean.TRUE.equals(available);
     }
 
     private void addParticipants(User user,
