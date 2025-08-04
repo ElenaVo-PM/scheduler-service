@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.util.Pair;
+import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -22,6 +24,8 @@ import java.util.UUID;
 public class SlotRepositoryImpl implements SlotRepository {
 
     private final JdbcTemplate jdbc;
+    private final RowMapper<Slot> mapper;
+
     private final String ADD_PARTICIPANTS = """
             INSERT INTO booking_participants (id, booking_id, user_id, email, name, status, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?::booking_status, ?, ?)
@@ -58,6 +62,10 @@ public class SlotRepositoryImpl implements SlotRepository {
             INSERT INTO time_slots (event_template_id, start_time, end_time, is_available)
             VALUES(?, ?, ?, ?)
             """;
+    private final String GET_ALL_SLOTS_FOR_EVENT = """
+            SELECT id, event_template_id AS event_id, start_time, end_time, is_available
+            FROM time_slots WHERE event_template_id = ?
+            """;
 
     private final String FIND_BOOKING_BY_ID = """
             SELECT id, event_template_id, slot_id, invitee_name, invitee_email, 
@@ -80,6 +88,7 @@ public class SlotRepositoryImpl implements SlotRepository {
     @Autowired
     public SlotRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
+        this.mapper = new DataClassRowMapper<>(Slot.class);
     }
 
     @Override
@@ -112,7 +121,11 @@ public class SlotRepositoryImpl implements SlotRepository {
         } catch (EmptyResultDataAccessException e) {
             return Optional.empty();
         }
+    }
 
+    @Override
+    public List<Slot> getAllSlotsForEvent(UUID eventId) {
+        return jdbc.query(GET_ALL_SLOTS_FOR_EVENT, mapper, eventId);
     }
 
     @Override

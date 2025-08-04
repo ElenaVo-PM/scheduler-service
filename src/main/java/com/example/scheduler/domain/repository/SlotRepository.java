@@ -25,6 +25,7 @@ public interface SlotRepository {
 
     boolean hasAvailableSlots(UUID eventId, int maxParticipants);
 
-    void saveSlots(List<Slot> slots);
+    List<Slot> getAllSlotsForEvent(UUID eventId);
 
+    void saveSlots(List<Slot> slots);
 }

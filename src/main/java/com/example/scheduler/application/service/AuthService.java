@@ -1,7 +1,7 @@
 package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.AuthResponse;
-import com.example.scheduler.domain.exception.InvalidTokenException;
+import com.example.scheduler.domain.exception.TokenRefreshException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.JwtRepository;
@@ -35,7 +35,7 @@ public class AuthService {
 
         if (!tokenProvider.isRefreshTokenValid(refreshToken) ||
                 !tokenRepository.contains(credential.getId(), refreshToken)) {
-            throw new InvalidTokenException(refreshToken);
+            throw new TokenRefreshException(refreshToken);
         }
 
         return createPair(credential);

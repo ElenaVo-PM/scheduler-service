@@ -1,5 +1,6 @@
 plugins {
     java
+    `jvm-test-suite`
     id("org.springframework.boot") version "3.5.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("checkstyle")
@@ -20,6 +21,8 @@ configurations {
         extendsFrom(configurations.annotationProcessor.get())
     }
 }
+
+val mockitoAgent = configurations.create("mockitoAgent")
 
 repositories {
     mavenCentral()
@@ -51,7 +54,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
+    mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
 
 }
 
@@ -68,9 +71,54 @@ tasks.compileJava {
     ))
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-    systemProperty("user.timezone", "UTC")
+testing {
+    suites {
+        val test by getting(JvmTestSuite::class) {
+            useJUnitJupiter()
+        }
+
+        val integrationTest by registering(JvmTestSuite::class) {
+
+            dependencies {
+                implementation(project())
+                implementation("org.springframework.boot:spring-boot-starter-test")
+                implementation("org.springframework.boot:spring-boot-starter-webflux")
+                implementation("org.testcontainers:junit-jupiter")
+                implementation("org.testcontainers:postgresql")
+            }
+
+            sources {
+                java {
+                    setSrcDirs(listOf("src/test-integration/java"))
+                }
+
+                resources {
+                    setSrcDirs(listOf("src/test-integration/resources"))
+                }
+            }
+
+            targets {
+                all {
+                    testTask.configure {
+                        shouldRunAfter(test)
+                    }
+                }
+            }
+        }
+    }
+}
+
+tasks.withType<Test>().configureEach {
+    jvmArgs(
+        "-Duser.timezone=UTC",
+        "-javaagent:${mockitoAgent.asPath}",
+        "-Xshare:off",
+        "--enable-native-access=ALL-UNNAMED",
+    )
+}
+
+tasks.check {
+    dependsOn(testing.suites.named("integrationTest"))
 }
 
 flyway {
