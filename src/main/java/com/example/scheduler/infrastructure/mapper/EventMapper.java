@@ -25,9 +25,6 @@ public interface EventMapper {
 
     @Mapping(target = "ownerId", source = "ownerId")
     @Mapping(target = "isActive", expression = "java(true)")
-    @Mapping(target = "startDate", expression = "java(Instant.now())")
-    @Mapping(target = "endDate",
-            expression = "java(java.time.Instant.now().plus(java.time.Duration.ofMinutes(request.durationMinutes())))")
     @Mapping(target = "createdAt", expression = "java(Instant.now())")
     @Mapping(target = "updatedAt", expression = "java(Instant.now())")
     Event toEntity(CreateEventRequest request, UUID ownerId);

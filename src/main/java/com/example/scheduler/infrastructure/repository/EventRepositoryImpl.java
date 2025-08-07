@@ -115,8 +115,8 @@ public class EventRepositoryImpl implements EventRepository {
         jdbc.update(SAVE_QUERY, id, e.ownerId(), e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
                 EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
-                Timestamp.from(e.startDate()), Timestamp.from(e.endDate()), Timestamp.from(e.createdAt()),
-                Timestamp.from(e.updatedAt()));
+                Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
+                Timestamp.from(e.createdAt()), Timestamp.from(e.updatedAt()));
 
         return getEventById(id).orElseThrow();
     }
@@ -180,7 +180,7 @@ public class EventRepositoryImpl implements EventRepository {
         jdbc.update(UPDATE_QUERY, e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
                 EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(),
-                Timestamp.from(e.startDate()), Timestamp.from(e.endDate()),
+                Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
                 e.id());
 
         getEventById(e.id()).orElseThrow();

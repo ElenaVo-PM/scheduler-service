@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
+import java.time.Instant;
+
 public record CreateEventRequest(
         @NotNull(groups = EntityAction.OnCreate.class)
         @Size(min = 1, max = 255)
@@ -24,6 +26,9 @@ public record CreateEventRequest(
         @PositiveOrZero
         Integer bufferBeforeMinutes,
         @PositiveOrZero
-        Integer bufferAfterMinutes
+        Integer bufferAfterMinutes,
+        @NotNull(groups = EntityAction.OnCreate.class)
+        Instant startDate,
+        Instant endDate
 ) {
 }

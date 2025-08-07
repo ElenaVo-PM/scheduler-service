@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SecuredEventControllerWebMvcTest {
 
     private final CreateEventRequest request = new CreateEventRequest("title", "description",
-            EventType.ONE2ONE, 1, 1, 0, 0);
+            EventType.ONE2ONE, 1, 1, 0, 0, Instant.now(), null);
 
     private final EventResponse response = new EventResponse(UUID.randomUUID(),
             "/api/public/event/%s".formatted(UUID.randomUUID()));
