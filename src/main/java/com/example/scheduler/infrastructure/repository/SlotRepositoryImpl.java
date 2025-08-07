@@ -195,7 +195,8 @@ public class SlotRepositoryImpl implements SlotRepository {
         );
     }
 
-    private BookingResponse privateBookSlot(Event event, User user, BookingRequest request) throws IllegalAccessException {
+    private BookingResponse privateBookSlot(Event event, User user, BookingRequest request)
+            throws IllegalAccessException {
         String username = user == null ? request.name() : user.username();
         String email = user == null ? request.email() : user.email();
 

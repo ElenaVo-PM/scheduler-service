@@ -152,7 +152,11 @@ class UserRegisterIT {
 
     @Test
     void givenEmailIsLongerThan255_WhenRegister_ThenRespondWithBadRequest() {
-        String longEmail = "a".repeat(64) + "@" + "b".repeat(63) + "." + "c".repeat(63) + "." + "d".repeat(59) + ".com";
+        String longEmail = "a".repeat(64)
+                + "@" + "b".repeat(63)
+                + "." + "c".repeat(63)
+                + "." + "d".repeat(59)
+                + ".com";
 
         webClient().post()
                 .accept(MediaType.APPLICATION_JSON)

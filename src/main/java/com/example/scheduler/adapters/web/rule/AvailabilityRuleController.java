@@ -43,7 +43,8 @@ public class AvailabilityRuleController {
      * GET /availability-rules - Получение всех доступных правил (графиков)
      */
     @GetMapping()
-    public ResponseEntity<List<AvailabilityRuleResponse>> getAllRulesByUser(@AuthenticationPrincipal Credential credential) {
+    public ResponseEntity<List<AvailabilityRuleResponse>> getAllRulesByUser(
+                                       @AuthenticationPrincipal Credential credential) {
         List<AvailabilityRuleResponse> rules = ruleService.getAllRulesByUser(credential.getId());
 
         return ResponseEntity
