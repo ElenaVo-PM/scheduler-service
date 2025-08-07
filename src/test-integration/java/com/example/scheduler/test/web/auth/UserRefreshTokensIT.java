@@ -3,6 +3,7 @@ package com.example.scheduler.test.web.auth;
 import com.example.scheduler.test.config.IntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -65,6 +66,9 @@ class UserRefreshTokensIT {
     }
 
     private WebTestClient webClient() {
-        return WebTestClient.bindToServer().baseUrl(HOST + ":" + port + BASE_URL).build();
+        return WebTestClient.bindToServer()
+                .baseUrl(HOST + ":" + port + BASE_URL)
+                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en-US")
+                .build();
     }
 }
