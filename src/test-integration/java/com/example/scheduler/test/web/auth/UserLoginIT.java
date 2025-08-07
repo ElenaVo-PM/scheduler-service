@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -25,7 +26,7 @@ class UserLoginIT {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue("""
                         {
-                          "username": "charlie",
+                          "username": "david",
                           "password": "12345"
                         }
                         """)
@@ -90,6 +91,9 @@ class UserLoginIT {
     }
 
     private WebTestClient webClient() {
-        return WebTestClient.bindToServer().baseUrl(HOST + ":" + port + BASE_URL).build();
+        return WebTestClient.bindToServer()
+                .baseUrl(HOST + ":" + port + BASE_URL)
+                .defaultHeader(HttpHeaders.ACCEPT_LANGUAGE, "en-US")
+                .build();
     }
 }
