@@ -3,11 +3,10 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.repository.EventRepository;
+import com.example.scheduler.infrastructure.mapper.EventRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
@@ -35,9 +34,23 @@ public class EventRepositoryImpl implements EventRepository {
             """;
 
     private static final String GET_EVENT_BY_SLUG = """
-            SELECT *
-            FROM event_tamplates
-            WHERE slug = ?
+            SELECT id,
+                    user_id AS ownerId,
+                    title,
+                    description,
+                    is_active AS isActive,
+                    max_participants AS maxParticipants,
+                    duration_minutes AS durationMinutes,
+                    buffer_before_minutes AS bufferBeforeMinutes,
+                    buffer_after_minutes AS bufferAfterMinutes,
+                    is_group_event,
+                    slug,
+                    start_date AS startDate,
+                    end_date AS endDate,
+                    created_at AS createdAt,
+                    updated_at AS updatedAt
+            FROM event_templates
+            WHERE slug = CAST(? AS TEXT)
             """;
     private static final String TOGGLE_EVENT_QUERY = """
             UPDATE event_templates
@@ -101,12 +114,12 @@ public class EventRepositoryImpl implements EventRepository {
             """;
 
     private final JdbcTemplate jdbc;
-    private final RowMapper<Event> mapper;
+    private final EventRowMapper mapper;
 
     @Autowired
     public EventRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.mapper = new DataClassRowMapper<>(Event.class);
+        this.mapper = new EventRowMapper();
     }
 
     @Override
