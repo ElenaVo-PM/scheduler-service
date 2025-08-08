@@ -1,6 +1,7 @@
 package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.CreateProfileRequest;
+import com.example.scheduler.adapters.dto.ProfilePublicDto;
 import com.example.scheduler.adapters.dto.ProfileResponse;
 import com.example.scheduler.adapters.dto.UpdateProfileRequest;
 import com.example.scheduler.adapters.mapper.ProfileMapper;
@@ -84,6 +85,16 @@ public class ProfileService {
         log.info("Updated profile for user {}", userId);
         log.debug("Profile updated = {}", updated);
         return profileMapper.toDto(updated, credential.getUsername());
+    }
+
+    public ProfilePublicDto getPublicProfile(UUID userId) {
+        Objects.requireNonNull(userId, "userId cannot be null");
+
+        Profile profile = profileRepository.findByUserId(userId).orElseThrow(
+                () -> new ProfileNotFoundException("profile not found for user " + userId)
+        );
+
+        return profileMapper.toPublicDto(profile);
     }
 
     private void requireOwnerAuthority(UUID userId, Credential credential, String noAuthorityMessage) {
