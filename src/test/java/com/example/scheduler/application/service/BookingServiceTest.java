@@ -39,7 +39,8 @@ public class BookingServiceTest {
         Booking testBooking = TestBooking.getTestBooking();
         Event testEvent = TestEvents.demo();
         Slot testSlot = TestSlot.getTestSlot();
-        Mockito.when(mockBookingRepository.getBookingById(Mockito.any(UUID.class))).thenReturn(Optional.of(testBooking));
+        Mockito.when(mockBookingRepository.getBookingById(Mockito.any(UUID.class)))
+                .thenReturn(Optional.of(testBooking));
         Mockito.when(mockEventRepository.getEventById(Mockito.any(UUID.class))).thenReturn(Optional.of(testEvent));
         Mockito.when(mockSlotRepository.getSlotById(Mockito.any(UUID.class))).thenReturn(Optional.of(testSlot));
 

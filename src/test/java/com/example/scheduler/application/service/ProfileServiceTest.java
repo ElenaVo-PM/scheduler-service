@@ -182,7 +182,8 @@ class ProfileServiceTest {
         given(mockRepository.update(Mockito.any()))
                 .willReturn(TestProfiles.aliceUpdated());
 
-        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateEveryField(), TestCredentials.alice());
+        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateEveryField(),
+                TestCredentials.alice());
 
         Mockito.verify(mockRepository).update(profileCaptor.capture());
         Profile capturedProfile = profileCaptor.getValue();
@@ -200,7 +201,8 @@ class ProfileServiceTest {
         given(mockRepository.update(Mockito.any()))
                 .willReturn(TestProfiles.aliceUpdated());
 
-        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateOnlyName(), TestCredentials.alice());
+        service.updateProfile(TestCredentials.alice().getId(), TestUpdateProfileRequest.aliceUpdateOnlyName(),
+                TestCredentials.alice());
 
         Mockito.verify(mockRepository).update(profileCaptor.capture());
         Profile capturedProfile = profileCaptor.getValue();

@@ -51,14 +51,14 @@ class EventControllerTest {
                 .hasStatus(HttpStatus.BAD_REQUEST)
                 .hasContentType(MediaType.APPLICATION_JSON)
                 .bodyJson().isEqualTo("""
-                        {
-                          "timestamp": "2001-02-03T04:05:06Z",
-                          "status": 400,
-                          "error": "Bad Request",
-                          "message": "Required request header 'X-USER-ID' for method parameter type UUID is not present",
-                          "path": "/api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd"
-                        }
-                        """);
+                       {
+                         "timestamp": "2001-02-03T04:05:06Z",
+                         "status": 400,
+                         "error": "Bad Request",
+                         "message": "Required request header 'X-USER-ID' for method parameter type UUID is not present",
+                         "path": "/api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd"
+                       }
+                       """);
     }
 
     @Test
