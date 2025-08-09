@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ class AvailabilityRuleRepositoryImplTest {
 
     @BeforeEach
     void setUp() {
-        rule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
+        rule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), DayOfWeek.MONDAY,
                 LocalTime.of(12, 0), LocalTime.of(13, 0),
                 Instant.now(), Instant.now());
         ruleRepository.save(rule);
@@ -44,56 +45,56 @@ class AvailabilityRuleRepositoryImplTest {
 
     @Test
     void whenSavedTimeIsInside_thenIntersected() {
-        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(0, 0), LocalTime.of(23, 59),
+        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(0, 0), LocalTime.of(23, 59),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
 
     @Test
     void whenStartTimeIsBeforeSavedEndTime_thenIntersected() {
-        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(12, 30), LocalTime.of(13, 0),
+        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(12, 30), LocalTime.of(13, 0),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
 
     @Test
     void whenEndTimeIsAfterSavedStartTime_thenIntersected() {
-        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(12, 0), LocalTime.of(12, 1),
+        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(12, 0), LocalTime.of(12, 1),
                 Instant.now(), Instant.now());
         assertTrue(ruleRepository.intersects(intersectedRule));
     }
 
     @Test
     void whenEndTimeIsBeforeSavedStartTime_thenNonIntersected() {
-        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(11, 0), LocalTime.of(11, 59),
+        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(11, 0), LocalTime.of(11, 59),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
 
     @Test
     void whenStartTimeIsAfterSavedEndTime_thenNonIntersected() {
-        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(13, 1), LocalTime.of(14, 0),
+        AvailabilityRule intersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(13, 1), LocalTime.of(14, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(intersectedRule));
     }
 
     @Test
     void whenEndTimeEqualsSavedStartTime_thenNonIntersected() {
-        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(11, 0), LocalTime.of(12, 0),
+        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(11, 0), LocalTime.of(12, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
 
     @Test
     void whenStartTimeEqualsSavedEndTime_thenNonIntersected() {
-        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(), 1,
-                LocalTime.of(13, 0), LocalTime.of(14, 0),
+        AvailabilityRule nonIntersectedRule = new AvailabilityRule(UUID.randomUUID(), TestUsers.ALICE.id(),
+                DayOfWeek.MONDAY, LocalTime.of(13, 0), LocalTime.of(14, 0),
                 Instant.now(), Instant.now());
         assertFalse(ruleRepository.intersects(nonIntersectedRule));
     }
@@ -103,13 +104,13 @@ class AvailabilityRuleRepositoryImplTest {
         UUID aliceId = TestUsers.ALICE.id();
         UUID bobId = TestUsers.BOB.id();
 
-        AvailabilityRule rule1 = new AvailabilityRule(UUID.randomUUID(), aliceId, 2,
+        AvailabilityRule rule1 = new AvailabilityRule(UUID.randomUUID(), aliceId, DayOfWeek.TUESDAY,
                 LocalTime.of(9, 0), LocalTime.of(10, 0),
                 Instant.now(), Instant.now());
-        AvailabilityRule rule2 = new AvailabilityRule(UUID.randomUUID(), aliceId, 1,
+        AvailabilityRule rule2 = new AvailabilityRule(UUID.randomUUID(), aliceId, DayOfWeek.MONDAY,
                 LocalTime.of(8, 0), LocalTime.of(9, 0),
                 Instant.now(), Instant.now());
-        AvailabilityRule rule3 = new AvailabilityRule(UUID.randomUUID(), bobId, 1,
+        AvailabilityRule rule3 = new AvailabilityRule(UUID.randomUUID(), bobId, DayOfWeek.MONDAY,
                 LocalTime.of(12, 0), LocalTime.of(13, 0),
                 Instant.now(), Instant.now());
 
@@ -127,7 +128,7 @@ class AvailabilityRuleRepositoryImplTest {
 
         List<AvailabilityRule> sortedCopy = new ArrayList<>(aliceRules);
         sortedCopy.sort(Comparator
-                .comparingInt(AvailabilityRule::weekday)
+                .comparing(AvailabilityRule::weekday)
                 .thenComparing(AvailabilityRule::startTime));
         assertEquals(sortedCopy, aliceRules);
     }

@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
@@ -38,9 +39,9 @@ class AvailabilityRuleControllerTest {
         when(credential.getId()).thenReturn(userId);
 
         List<AvailabilityRuleResponse> rules = List.of(new AvailabilityRuleResponse(UUID.randomUUID(),
-                TestUsers.ALICE.id(), 1, LocalTime.of(11, 0), LocalTime.of(12, 0),
+                TestUsers.ALICE.id(), DayOfWeek.MONDAY, LocalTime.of(11, 0), LocalTime.of(12, 0),
                 Instant.now()), new AvailabilityRuleResponse(UUID.randomUUID(),
-                TestUsers.ALICE.id(), 2, LocalTime.of(12, 0), LocalTime.of(13, 0),
+                TestUsers.ALICE.id(), DayOfWeek.TUESDAY, LocalTime.of(12, 0), LocalTime.of(13, 0),
                 Instant.now()));
         when(ruleService.getAllRulesByUser(userId)).thenReturn(rules);
 

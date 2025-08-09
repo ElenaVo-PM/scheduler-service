@@ -18,13 +18,13 @@ public class AvailabilityRuleRepositoryImpl implements AvailabilityRuleRepositor
 
     private static final String SAVE_QUERY = """
             INSERT INTO availability_rules (id, user_id, weekday, start_time, end_time, created_at, updated_at)
-            VALUES (:id, :userId, :weekday, :startTime, :endTime, :createdAt, :updatedAt)
+            VALUES (:id, :userId, :weekday::day_of_week, :startTime, :endTime, :createdAt, :updatedAt)
             RETURNING *
             """;
 
     private static final String GET_INTERSECTED_COUNT_QUERY = """
             SELECT COUNT(*) FROM availability_rules
-            WHERE user_id = :userId AND weekday = :weekday
+            WHERE user_id = :userId AND weekday = :weekday::day_of_week
             AND start_time < :endTime AND end_time > :startTime
             """;
 
