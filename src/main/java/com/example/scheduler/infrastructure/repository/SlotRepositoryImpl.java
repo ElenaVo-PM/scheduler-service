@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -94,7 +95,8 @@ public class SlotRepositoryImpl implements SlotRepository {
     @Override
     public void saveSlots(List<Slot> slots) {
         for (Slot slot : slots) {
-            jdbc.update(ADD_NEW_SLOT, slot.eventId(), slot.startTime(), slot.endTime(), slot.isAvailable());
+            jdbc.update(ADD_NEW_SLOT, slot.eventId(), Timestamp.from(slot.startTime()), Timestamp.from(slot.endTime()),
+                    slot.isAvailable());
         }
     }
 

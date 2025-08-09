@@ -4,6 +4,8 @@ package com.example.scheduler.infrastructure.repository;
 import com.example.scheduler.AbstractTestContainerTest;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
+import com.example.scheduler.domain.fixture.TestEvents;
+import com.example.scheduler.domain.fixture.TestTimeSlots;
 import com.example.scheduler.domain.model.Booking;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.Slot;
@@ -26,6 +28,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -226,5 +229,14 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
         List<Slot> eventSlots = repository.getAllSlotsForEvent(eventId);
         assertEquals(1, eventSlots.size());
         assertEquals(slotId, eventSlots.getFirst().id());
+    }
+
+    @Test
+    void givenSomeSlotsForEventExist_WhenSaveNewSlotsForSameEvent_ThenSlotsAccumulate() {
+
+        repository.saveSlots(TestTimeSlots.getSlots());
+        List<Slot> slots = repository.getAllSlotsForEvent(TestEvents.demo().id());
+
+        then(slots).hasSize(4);
     }
 }
