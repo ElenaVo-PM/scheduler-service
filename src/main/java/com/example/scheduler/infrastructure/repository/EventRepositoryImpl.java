@@ -50,7 +50,7 @@ public class EventRepositoryImpl implements EventRepository {
                     created_at AS createdAt,
                     updated_at AS updatedAt
             FROM event_templates
-            WHERE slug = CAST(? AS TEXT)
+            WHERE slug = ?
             """;
     private static final String TOGGLE_EVENT_QUERY = """
             UPDATE event_templates
@@ -232,6 +232,6 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public Optional<Event> getEventBySlug(UUID slug) {
-        return Optional.ofNullable(jdbc.queryForObject(GET_EVENT_BY_SLUG, mapper, slug));
+        return Optional.ofNullable(jdbc.queryForObject(GET_EVENT_BY_SLUG, mapper, slug.toString()));
     }
 }
