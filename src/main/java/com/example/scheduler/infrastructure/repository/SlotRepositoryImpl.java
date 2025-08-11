@@ -250,7 +250,7 @@ public class SlotRepositoryImpl implements SlotRepository {
                 throw new IllegalStateException("Limit of participants has reached");
             }
         } else {
-            if (countParticipants(event.id()) >= 1) {
+            if (countParticipants(event.id()) > 1) {
                 throw new IllegalStateException("Limit of participants has reached");
             }
         }
