@@ -43,7 +43,7 @@ public class CancelBookingUseCase {
             throw new NotEnoughAuthorityException("User not authenticated");
         }
 
-        Credential credential = (Credential) auth.getCredentials();
+        Credential credential = (Credential) auth.getPrincipal();
         User user = userRepository.findByUsername(credential.getUsername())
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
