@@ -67,7 +67,7 @@ class GenerateSlotsUseCaseTest {
         AvailabilityRule rule = new AvailabilityRule(
                 UUID.randomUUID(),
                 event.ownerId(),
-                2,
+                DayOfWeek.TUESDAY,
                 LocalTime.of(9, 0),
                 LocalTime.of(12, 0),
                 Instant.now(),
