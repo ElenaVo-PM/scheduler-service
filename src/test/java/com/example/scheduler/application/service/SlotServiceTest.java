@@ -34,9 +34,11 @@ public class SlotServiceTest {
     @Test
     public void getRemoveOneSlotTest() {
         Slot testSlot1 = TestTimeSlots.getSlots().getFirst();
-        TimeInterval testSlotInterval1 = new TimeInterval(testSlot1.startTime().plusSeconds(300), testSlot1.endTime().plusSeconds(300));
+        TimeInterval testSlotInterval1 = new TimeInterval(testSlot1.startTime().plusSeconds(300),
+                testSlot1.endTime().plusSeconds(300));
         when(mockSlotRepository.getAllSlotsForEvent(TestEvents.demo().id())).thenReturn(TestTimeSlots.getSlots());
-        when(mockBookingRepository.getTimeOfBookingsForUser(TestUsers.ALICE.id())).thenReturn(List.of(testSlotInterval1));
+        when(mockBookingRepository.getTimeOfBookingsForUser(TestUsers.ALICE.id()))
+                .thenReturn(List.of(testSlotInterval1));
 
         List<Slot> availableSlots = slotService.getAvailableSlots(TestEvents.demo().id(), TestUsers.ALICE.id());
         Assertions.assertEquals(2, availableSlots.size());
@@ -45,9 +47,11 @@ public class SlotServiceTest {
     @Test
     public void allSlotsAvailableTest() {
         Slot testSlot1 = TestTimeSlots.getSlots().getLast();
-        TimeInterval testSlotInterval1 = new TimeInterval(testSlot1.startTime().plusSeconds(3600), testSlot1.endTime().plusSeconds(3600));
+        TimeInterval testSlotInterval1 = new TimeInterval(testSlot1.startTime().plusSeconds(3600),
+                testSlot1.endTime().plusSeconds(3600));
         when(mockSlotRepository.getAllSlotsForEvent(TestEvents.demo().id())).thenReturn(TestTimeSlots.getSlots());
-        when(mockBookingRepository.getTimeOfBookingsForUser(TestUsers.ALICE.id())).thenReturn(List.of(testSlotInterval1));
+        when(mockBookingRepository.getTimeOfBookingsForUser(TestUsers.ALICE.id()))
+                .thenReturn(List.of(testSlotInterval1));
 
         List<Slot> availableSlots = slotService.getAvailableSlots(TestEvents.demo().id(), TestUsers.ALICE.id());
         Assertions.assertEquals(3, availableSlots.size());

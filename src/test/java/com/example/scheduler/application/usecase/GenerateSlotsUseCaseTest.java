@@ -41,8 +41,10 @@ class GenerateSlotsUseCaseTest {
     @Test
     void generateSlots_singleEventType_shouldGenerateSlotsCorrectly() {
         UUID eventId = UUID.randomUUID();
-        Instant startDate = LocalDate.of(2025, 7, 1).atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
-        Instant endDate = LocalDate.of(2025, 7, 3).atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
+        Instant startDate = LocalDate.of(2025, 7, 1)
+                .atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
+        Instant endDate = LocalDate.of(2025, 7, 3)
+                .atStartOfDay().atZone(ZoneOffset.UTC).toInstant();
 
         Event event = new Event(
                 eventId,
@@ -65,7 +67,7 @@ class GenerateSlotsUseCaseTest {
         AvailabilityRule rule = new AvailabilityRule(
                 UUID.randomUUID(),
                 event.ownerId(),
-                2,
+                DayOfWeek.TUESDAY,
                 LocalTime.of(9, 0),
                 LocalTime.of(12, 0),
                 Instant.now(),
@@ -92,7 +94,8 @@ class GenerateSlotsUseCaseTest {
                     "Mismatch in slot duration: slot ID = " + slot.id() +
                             ", start = " + slot.startTime() +
                             ", end = " + slot.endTime() +
-                            ", expected duration = " + event.durationMinutes() + " minutes, but was = " + minutes + " minutes"
+                            ", expected duration = " + event.durationMinutes() +
+                            " minutes, but was = " + minutes + " minutes"
             );
         }
     }

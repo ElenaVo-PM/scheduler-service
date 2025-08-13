@@ -54,9 +54,9 @@ public class GenerateSlotsUseCase {
                 event.endDate().atZone(zone).toLocalDate();
 
         while (!currDate.isAfter(endDate)) {
-            int dayOfWeek = currDate.getDayOfWeek().getValue();
+            DayOfWeek dayOfWeek = currDate.getDayOfWeek();
             for (AvailabilityRule rule : rules) {
-                if (rule.weekday() + 1 == dayOfWeek) {
+                if (rule.weekday() == dayOfWeek) {
 
                     LocalTime slotStartTime = rule.startTime();
                     LocalTime slotEndTime = slotStartTime.plusMinutes(event.durationMinutes());
@@ -88,9 +88,9 @@ public class GenerateSlotsUseCase {
                 event.endDate().atZone(zone).toLocalDate();
 
         while (!currDate.isAfter(endDate)) {
-            int dayOfWeek = currDate.getDayOfWeek().getValue();
+            DayOfWeek dayOfWeek = currDate.getDayOfWeek();
             for (AvailabilityRule rule : rules) {
-                if (rule.weekday() + 1 == dayOfWeek) {
+                if (rule.weekday() == dayOfWeek) {
 
                     LocalTime intervalStart = rule.startTime();
                     LocalTime intervalEnd = rule.endTime();
