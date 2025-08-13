@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.POST, "/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/booking").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/profiles/*").permitAll()
+                                .requestMatchers("/api/v1/public/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
