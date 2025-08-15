@@ -6,35 +6,462 @@ info:
 
 servers:
   - url: https://api.example.com
+  - url: http://localhost:8080
 
 components:
+
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-user-id
 
   schemas:
 
     ApiError:
       type: object
+      required:
+        - timestamp
+        - status
+        - error
+        - message
+        - path
       properties:
         timestamp:
           type: string
-          format: timestamp
+          nullable: false
+          format: date-time
           example: 2001-02-03T04:05:06Z
         status:
           type: integer
+          nullable: false
           example: 404
         error:
           type: string
           example: Not Found
         message:
           type: string
+          nullable: true
           example: Event [8840ddd5-e176-46d8-8f1b-babb00d989cd] not found
         path:
           type: string
+          nullable: false
           example: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
+
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          nullable: false
+          example: alice
+        password:
+          type: string
+          nullable: false
+          example: 12345
+
+    AuthResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          nullable: false
+          example: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkM2U2OGMzYi0yZDZkLTQ4YTEtYTAzNy05OWEzOTBlOTQzM2UiLCJ1c2VybmFtZSI6ImFsaWNlIiwiZXhwIjo5ODEyNTk1MDZ9.SmrevpAZjUVIG78-YOBZvNhu91wjSgd37l19_3w3pl7Qbf7rpUuOEQquY6WwJYMzB37z8tPKawNpFWgT01csxA'
+        refreshToken:
+          type: string
+          nullable: false
+          example: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
+
+    AvailabilityRuleResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f05deb12-af8f-430a-8455-7821ab25282e
+        userId:
+          type: string
+          format: uuid
+          example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        weekday:
+          type: string
+          enum:
+            - MONDAY
+            - TUESDAY
+            - WEDNESDAY
+            - THURSDAY
+            - FRIDAY
+            - SATURDAY
+            - SUNDAY
+          example: MONDAY
+        startTime:
+          type: string
+          format: HH:mm
+          example: 09:00
+        endTime:
+          type: string
+          format: HH:mm
+          example: 13:00
+        createdAt:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:05:06Z
+
+    BookingGeneralInfo:
+      type: object
+      properties:
+        eventName:
+          type: string
+          example: Demo
+        inviteeName:
+          type: string
+          example: Bob
+        inviteeEmail:
+          type: string
+          example: bob@mail.com
+        startTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:35:06.789012Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T05:05:06.789012Z
+        isCanceled:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:05:06Z
+
+    BookingRequest:
+      type: object
+      properties:
+        eventId:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        slotId:
+          type: string
+          format: uuid
+          example: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+        email:
+          type: string
+          format: email
+          example: bob@mail.com
+        name:
+          type: string
+          example: Bob
+
+    BookingResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: fc763648-4263-48c3-80dd-7e50edd30b22
+        eventId:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        slotId:
+          type: string
+          format: uuid
+          example: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+        startTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:35:06.789012Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T05:05:06.789012Z
+        isCanceled:
+          type: boolean
+          example: false
+
+    CreateAvailabilityRuleRequest:
+      type: object
+      required:
+        - weekday
+        - startTime
+        - endTime
+      properties:
+        weekday:
+          type: string
+          nullable: false
+          enum:
+            - MONDAY
+            - TUESDAY
+            - WEDNESDAY
+            - THURSDAY
+            - FRIDAY
+            - SATURDAY
+            - SUNDAY
+          example: MONDAY
+        startTime:
+          type: string
+          format: HH:mm
+          nullable: false
+          example: 09:00
+        endTime:
+          type: string
+          format: HH:mm
+          nullable: false
+          example: 13:00
+
+    CreateEventRequest:
+      type: object
+      required:
+        - title
+        - description
+        - eventType
+        - durationMinutes
+        - startDate
+      properties:
+        title:
+          type: string
+          nullable: false
+          minLength: 1
+          maxLength: 255
+          example: Demo
+        description:
+          type: string
+          nullable: false
+          minLength: 1
+          maxLength: 512
+          example: 'Sprint #42 demo'
+        eventType:
+          type: string
+          nullable: false
+          enum:
+            - ONE2ONE
+            - GROUP
+          example: ONE2ONE
+        maxParticipants:
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 1
+        durationMinutes:
+          type: integer
+          nullable: false
+          minimum: 15
+          example: 60
+        bufferBeforeMinutes:
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 10
+        bufferAfterMinutes:
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 15
+        startDate:
+          type: string
+          nullable: false
+          format: date-time
+          example: 2026-12-21T00:00:00Z
+        endDate:
+          type: string
+          nullable: true
+          format: date-time
+          example: 2026-12-25T23:59:59Z
+
+    CreateProfileRequest:
+      type: object
+      required:
+        - fullName
+        - timezone
+      properties:
+        fullName:
+          type: string
+          nullable: false
+          example: Alice Arno
+        timezone:
+          type: string
+          nullable: false
+          example: Europe/Paris
+        description:
+          type: string
+          nullable: true
+          example: Test description
+        logo:
+          type: string
+          nullable: true
+          format: uri
+          example: 'https://cdn.example.com/alice.jpg'
+
+    EventFullDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        ownerId:
+          type: string
+          format: uuid
+          example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        title:
+          type: string
+          example: Demo
+        description:
+          type: string
+          example: 'Sprint #42 demo'
+        durationMinutes:
+          type: integer
+          example: 60
+        bufferBeforeMinutes:
+          type: integer
+          example: 10
+        bufferAfterMinutes:
+          type: integer
+          example: 15
+        maxParticipants:
+          type: integer
+          example: 1
+        isActive:
+          type: boolean
+          example: true
+        eventType:
+          type: string
+          enum:
+            - ONE2ONE
+            - GROUP
+          example: ONE2ONE
+        slug:
+          type: string
+          example: b452644a-dba8-427a-8e44-d5c1bc528231
+        startDate:
+          type: string
+          format: date-time
+          example: 2024-07-01T10:00:00Z
+        endDate:
+          type: string
+          format: date-time
+          example: 2024-07-04T17:00:00Z
+        createdAt:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:05:06.789012Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2001-03-04T05:06:07.890123Z
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        shareLink:
+          type: string
+          example: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
+
+    EventShortDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        title:
+          type: string
+          example: Demo
+        isActive:
+          type: boolean
+          example: true
+        slug:
+          type: string
+          example: b452644a-dba8-427a-8e44-d5c1bc528231
+        eventType:
+          type: string
+          enum:
+            - ONE2ONE
+            - GROUP
+          example: ONE2ONE
+
+    ProfilePublicDto:
+      type: object
+      properties:
+        fullName:
+          type: string
+          example: Alice Arno
+        logo:
+          type: string
+          format: uri
+          example: 'https://cdn.example.com/alice.jpg'
+
+    ProfileResponse:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+        username:
+          type: string
+          example: alice
+        fullName:
+          type: string
+          example: Alice Arno
+        timezone:
+          type: string
+          example: Europe/Paris
+        description:
+          type: string
+          example: Test description
+        isActive:
+          type: boolean
+          example: true
+        logo:
+          type: string
+          format: uri
+          example: 'https://cdn.example.com/alice.jpg'
+
+    PublicEventResponse:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Demo
+        duration:
+          type: integer
+          example: 60
+        groupEvent:
+          type: string
+          enum:
+            - ONE2ONE
+            - GROUP
+          example: ONE2ONE
+        timeZone:
+          type: string
+          example: Europe/Paris
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - token
+      properties:
+        token:
+          type: string
+          nullable: false
+          example: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
 
     RegisterRequest:
       type: object
@@ -59,12 +486,52 @@ components:
           maxLength: 255
           example: alice@mail.com
 
+    Slot:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+        eventId:
+          type: string
+          format: uuid
+          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+        startTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:35:06.789012Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T05:05:06.789012Z
+        isAvailable:
+          type: boolean
+          example: true
+
+    UpdateProfileRequest:
+      type: object
+      properties:
+        fullName:
+          type: string
+          nullable: true
+          example: Charlie Crooks
+        timezone:
+          type: string
+          nullable: true
+          example: America/Detroit
+        description:
+          type: string
+          nullable: true
+          example: Sales Representative
+        logo:
+          type: string
+          format: uri
+          nullable: true
+          example: 'https://cdn.example.com/crooks.jpg'
+
     UserDto:
       type: object
-      required:
-        - id
-        - username
-        - email
       properties:
         id:
           type: string
@@ -78,208 +545,12 @@ components:
           format: email
           example: alice@mail.com
 
-    Profile:
-      type: object
-      required:
-        - userId
-        - fullName
-        - timezone
-        - isActive
-        - createdAt
-        - updatedAt
-      properties:
-        userId:
-          type: string
-          format: UUID
-        fullName:
-          type: string
-        timezone:
-          type: string
-        description:
-          type: string
-        isActive:
-          type: boolean
-          default: true
-        logo:
-          type: string
-        createdAt:
-          type: string
-          format: timestamp
-        updatedAt:
-          type: string
-          format: timestamp
-    CreateProfileRequest:
-      type: object
-      required:
-        - fullName
-        - timezone
-      properties:
-        fullName:
-          type: string
-        timezone:
-          type: string
-        description:
-          type: string
-        logo:
-          type: string
-      example:
-        fullName: Alice Arno
-        timezone: Europe/Paris
-        description: Test description
-        logo: Logo
-    ProfileResponse:
-      type: object
-      required:
-        - userId
-        - fullName
-        - timezone
-        - isActive
-      properties:
-        userId:
-          type: string
-          format: UUID
-        fullName:
-          type: string
-        timezone:
-          type: string
-        description:
-          type: string
-        isActive:
-          type: boolean
-        logo:
-          type: string
-      example:
-        userId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-        username: alice
-        fullName: Alice Arno
-        timezone: Europe/Paris
-        description: Test description
-        isActive: true
-        logo: Logo
-
-    EventFullDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: UUID
-        ownerId:
-          type: string
-          format: UUID
-        title:
-          type: string
-        description:
-          type: string
-        durationMinutes:
-          type: integer
-        bufferBeforeMinutes:
-          type: integer
-        bufferAfterMinutes:
-          type: integer
-        maxParticipants:
-          type: integer
-        isActive:
-          type: boolean
-        eventType:
-          type: string
-          enum:
-            - ONE2ONE
-            - GROUP
-        slug:
-          type: string
-        startDate:
-          type: string
-          format: timestamp
-        endDate:
-          type: string
-          format: timestamp
-        createdAt:
-          type: string
-          format: timestamp
-        updatedAt:
-          type: string
-          format: timestamp
-      example:
-        id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
-        ownerId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-        title: Demo
-        description: 'Sprint #42 demo'
-        durationMinutes: 60
-        bufferBeforeMinutes: 10
-        bufferAfterMinutes: 15
-        maxParticipants: 1
-        isActive: true
-        eventType: ONE2ONE
-        slug: b452644a-dba8-427a-8e44-d5c1bc528231
-        startDate: 2024-07-01T10:00:00Z
-        endDate: 2024-07-04T17:00:00Z
-        createdAt: 2001-02-03T04:05:06.789012Z
-        updatedAt: 2001-03-04T05:06:07.890123Z
-
-    EventResponse:
-      type: object
-      properties:
-        id:
-          type: string
-          format: UUID
-        shareLink:
-          type: string
-      example:
-        id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
-        slug: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
-
-    AvailabilityRule:
-      type: object
-      properties:
-        id:
-          type: string
-        weekday:
-          type: integer
-        start_time:
-          type: string
-          format: time
-        end_time:
-          type: string
-          format: time
-    TimeSlot:
-      type: object
-      properties:
-        id:
-          type: string
-        start_time:
-          type: string
-          format: date-time
-        end_time:
-          type: string
-          format: date-time
-        available:
-          type: boolean
-    Booking:
-      type: object
-      properties:
-        id:
-          type: string
-        invitee_name:
-          type: string
-        invitee_email:
-          type: string
-        start_time:
-          type: string
-          format: date-time
-        end_time:
-          type: string
-          format: date-time
-        canceled:
-          type: boolean
-
-security:
-  - BearerAuth: []
-
 paths:
+
   /auth/register:
     post:
       tags:
-        - Authentication
+        - 'Public: Authentication'
       summary: Register new user
       requestBody:
         required: true
@@ -288,10 +559,76 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
-            example:
-              username: alice
-              password: 12345
-              email: alice@mail.com
+            examples:
+              no-username:
+                summary: Username not set
+                value:
+                  password: 12345
+                  email: charlie@mail.com
+              too-long-username:
+                summary: Username too long
+                value:
+                  username: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                  password: 12345
+                  email: charlie@mail.com
+              no-password:
+                summary: Password not set
+                value:
+                  username: charlie
+                  email: charlie@mail.com
+              no-email:
+                summary: Email not set
+                value:
+                  username: charlie
+                  password: 12345
+              empty-email:
+                summary: Email empty
+                value:
+                  username: charlie
+                  password: 12345
+                  email: ""
+              malformed-email:
+                summary: Email of wrong format
+                value:
+                  username: charlie
+                  password: 12345
+                  email: " "
+              too-long-email:
+                summary: Email too long
+                value:
+                  username: charlie
+                  password: 12345
+                  email: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb.ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc.ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd.com
+              username-exists:
+                summary: Username already exists
+                value:
+                  username: alice
+                  password: 12345
+                  email: charlie@mail.com
+              username-exists-different-case:
+                summary: Username already exists in different case
+                value:
+                  username: ALICE
+                  password: 12345
+                  email: charlie@mail.com
+              email-exists:
+                summary: Email already exists
+                value:
+                  username: charlie
+                  password: 12345
+                  email: alice@mail.com
+              email-exists-different-case:
+                summary: Email already exists in different case
+                value:
+                  username: charlie
+                  password: 12345
+                  email: ALICE@MAIL.COM
+              correct-credentials:
+                summary: Correct user credentials
+                value:
+                  username: charlie
+                  password: 12345
+                  email: charlie@mail.com
       responses:
         '201':
           description: User created
@@ -331,72 +668,113 @@ paths:
   /auth/login:
     post:
       tags:
-        - Authentication
+        - 'Public: Authentication'
       summary: Login user
       requestBody:
         required: true
+        description: User credentials
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
+              $ref: '#/components/schemas/AuthRequest'
+            examples:
+              not-registered-user:
+                summary: User not registered
+                value:
+                  username: david
+                  password: 54321
+              registered-user:
+                summary: User registered
+                value:
+                  username: charlie
+                  password: 12345
       responses:
         '200':
           description: Login successful, returns JWT
-
-  /profiles:
-    get:
-      summary: Get current user profile
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: x-user-id
-          description: Current user id
-          in: header
-          schema:
-            type: string
-            format: UUID
-            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-          required: true
-      responses:
-        '200':
-          description: Current user profile
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProfileResponse'
-        '400':
-          description: No user id in request or user id of wrong format
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                accessToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkM2U2OGMzYi0yZDZkLTQ4YTEtYTAzNy05OWEzOTBlOTQzM2UiLCJ1c2VybmFtZSI6ImFsaWNlIiwiZXhwIjo5ODEyNTk1MDZ9.SmrevpAZjUVIG78-YOBZvNhu91wjSgd37l19_3w3pl7Qbf7rpUuOEQquY6WwJYMzB37z8tPKawNpFWgT01csxA'
+                refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
         '401':
-          description: User not authorized
-        '403':
-          description: User not allowed to get profile (profile belongs to another user)
-        '404':
-          description: Profile for current user not found
+          description: User is unknown or wrong password
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2001-02-03T04:05:06Z
+                status: 401
+                error: Unauthorized
+                message: Username or password does not match
+                path: /auth/login
+
+  /auth/refresh:
     post:
+      tags:
+        - 'Public: Authentication'
+      summary: Refresh tokens
+      requestBody:
+        required: true
+        description: Valid refresh token
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+            examples:
+              with-refresh-token:
+                summary: With refresh token
+                value:
+                  token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
+      responses:
+        '200':
+          description: New tokens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+              example:
+                accessToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkM2U2OGMzYi0yZDZkLTQ4YTEtYTAzNy05OWEzOTBlOTQzM2UiLCJ1c2VybmFtZSI6ImFsaWNlIiwiZXhwIjo5ODEyNTk1MDZ9.SmrevpAZjUVIG78-YOBZvNhu91wjSgd37l19_3w3pl7Qbf7rpUuOEQquY6WwJYMzB37z8tPKawNpFWgT01csxA'
+                refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
+        '401':
+          description: Refresh token expired or wrong refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2001-02-03T04:05:06Z
+                status: 401
+                error: Unauthorized
+                message: 'JWT expired 1789 milliseconds ago at 2001-02-03T04:05:05.000Z. Current time: 2001
+                        -02-03T04:05:06.789Z. Allowed clock skew: 0 milliseconds.'
+                path: /auth/refresh
+
+  /profiles:
+    post:
+      tags:
+        - 'Protected: Profiles'
       summary: Create profile for current user
       security:
-        - BearerAuth: []
-      parameters:
-        - name: x-user-id
-          description: Current user id
-          in: header
-          schema:
-            type: string
-            format: UUID
-            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-          required: true
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
       requestBody:
+        required: true
         description: User profile parameters
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateProfileRequest'
-        required: true
+            examples:
+              new-user-profile:
+                summary: New user profile
+                value:
+                  fullName: Charlie Cook
+                  timezone: UTC
+                  description: Representative of a BigTech.
+                  logo: 'https://cdn.example.com/charlie.jpg'
       responses:
         '201':
           description: Created profile
@@ -412,64 +790,242 @@ paths:
           description: User not allowed to create profile (profile belongs to another user)
         '409':
           description: Profile for current user already exist
-
-  /me:
-    get:
-      summary: Get current user
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: Current user
-
-  /api/events:
     get:
       tags:
-        - Events
-      summary: List event templates
+        - 'Protected: Profiles'
+      summary: Get current user profile
       security:
         - BearerAuth: []
+          ApiKeyAuth: []
       responses:
         '200':
-          description: OK
-    post:
+          description: Current user profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+        '400':
+          description: No user id in request or user id of wrong format
+        '401':
+          description: User not authorized
+        '403':
+          description: User not allowed to get profile (profile belongs to another user)
+        '404':
+          description: Profile for current user not found
+    patch:
       tags:
-        - Events
-      summary: Create event template
+        - 'Protected: Profiles'
+      summary: Update profile for current user
       security:
         - BearerAuth: []
+          ApiKeyAuth: []
       requestBody:
         required: true
+        description: New user profile parameters
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventResponse'
+              $ref: '#/components/schemas/UpdateProfileRequest'
+            examples:
+              new-profile:
+                summary: User profile update
+                value:
+                  fullName: Charlie Crooks
+                  timezone: America/Detroit
+                  description: Sales Representative
+                  logo: 'https://cdn.example.com/crooks.jpg'
       responses:
         '201':
-          description: Created
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfileResponse'
+
+  /api/profiles/{id}:
+    get:
+      tags:
+        - 'Public: Profiles'
+      summary: Get information about a host of an event
+      parameters:
+        - name: id
+          description: Event host id
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+      responses:
+        '200':
+          description: Information about a host of an event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProfilePublicDto'
+              example:
+                fullName: Alice Arno
+                logo: 'https://cdn.example.com/alice.jpg'
+        '400':
+          description: Event host id of wrong format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 400
+                error: Bad Request
+                message: "Method parameter 'id': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'; Invalid UUID string: nope"
+                path: /api/profiles/nope
+        '404':
+          description: Profile of a host of an event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
+              example:
+                timestamp: 2024-07-01T02:03:04Z
+                status: 404
+                error: Not Found
+                message: profile not found for user d3e68c3b-2d6d-48a1-a037-99a390e9433e
+                path: /api/profiles/d3e68c3b-2d6d-48a1-a037-99a390e9433e
+
+  /availability-rules:
+    post:
+      tags:
+        - 'Protected: Availability Rules'
+      summary: Add availability rule for current user
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      requestBody:
+        required: true
+        description: Hours when current user is available
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAvailabilityRuleRequest'
+            examples:
+              availability-hours:
+                summary: Monday morning
+                value:
+                  weekday: MONDAY
+                  startTime: 09:00
+                  endTime: 13:00
+      responses:
+        '201':
+          description: Created availability rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailabilityRuleResponse'
+              example:
+                id: f05deb12-af8f-430a-8455-7821ab25282e
+                userId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+                weekday: MONDAY
+                startTime: 09:00
+                endTime: 13:00
+                createdAt: 2001-02-03T04:05:06Z
+    get:
+      tags:
+        - 'Protected: Availability Rules'
+      summary: Get availability rules for current user
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      responses:
+        '200':
+          description: Current user availability rules list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AvailabilityRuleResponse'
+                example:
+                  - id: f05deb12-af8f-430a-8455-7821ab25282e
+                    userId: d3e68c3b-2d6d-48a1-a037-99a390e9433e
+                    weekday: MONDAY
+                    startTime: 09:00
+                    endTime: 13:00
+                    createdAt: 2001-02-03T04:05:06Z
+
+  /api/events:
+    post:
+      tags:
+        - 'Protected: Events'
+      summary: Create event template
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        description: Event parameters
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateEventRequest'
+            examples:
+              one-to-one:
+                summary: One-to-one meeting
+                value:
+                  title: Demo
+                  description: 'Sprint #42 demo'
+                  eventType: ONE2ONE
+                  maxParticipants: 1
+                  durationMinutes: 60
+                  bufferBeforeMinutes: 10
+                  bufferAfterMinutes: 15
+                  startDate: 2026-12-21T00:00:00Z
+                  endDate: 2026-12-25T23:59:59Z
+      responses:
+        '201':
+          description: Created event ID and slug
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+              example:
+                id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                slug: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
+    get:
+      tags:
+        - 'Protected: Events'
+      summary: List event templates
+      security:
+        - BearerAuth: []
+          ApiKeyAuth: []
+      responses:
+        '200':
+          description: Current user events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventShortDto'
+              example:
+                - id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                  title: Demo
+                  isActive: true
+                  slug: b452644a-dba8-427a-8e44-d5c1bc528231
+                  eventType: ONE2ONE
 
   /api/events/{id}:
     get:
       tags:
-        - Events
-      summary: Get event
+        - 'Protected: Events'
+      summary: Get event by ID
       security:
-        - BearerAuth: []
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
       parameters:
-        - name: x-user-id
-          description: Current user id
-          in: header
-          schema:
-            type: string
-            format: UUID
-            example: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-          required: true
         - name: id
           description: Event id
           in: path
           schema:
             type: string
-            format: UUID
+            format: uuid
             example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
           required: true
       responses:
@@ -529,106 +1085,289 @@ paths:
                 path: /api/events/8840ddd5-e176-46d8-8f1b-babb00d989cd
     put:
       tags:
-        - Events
+        - 'Protected: Events'
       summary: Update event template
       security:
-        - BearerAuth: []
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
       parameters:
-        - in: path
-          name: id
-          required: true
+        - name: id
+          description: Event id
+          in: path
           schema:
             type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
       requestBody:
         required: true
+        description: Event parameters
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/EventFullDto'
+              $ref: '#/components/schemas/CreateEventRequest'
+            examples:
+              one-to-one:
+                summary: One-to-one meeting
+                value:
+                  title: Call
+                  description: Job interview
+                  eventType: ONE2ONE
+                  maxParticipants: 1
+                  durationMinutes: 60
+                  bufferBeforeMinutes: 10
+                  bufferAfterMinutes: 15
+                  startDate: 2026-12-21T00:00:00Z
+                  endDate: 2026-12-25T23:59:59Z
       responses:
         '200':
           description: Updated
     delete:
       tags:
-        - Events
+        - 'Protected: Events'
       summary: Delete event template
       security:
-        - BearerAuth: []
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
       parameters:
-        - in: path
-          name: id
-          required: true
+        - name: id
+          description: Event id
+          in: path
           schema:
             type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
       responses:
         '204':
           description: Deleted
-
-  /availability-rules:
-    get:
-      summary: List availability rules
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: OK
+          
+  /api/events/{id}/generate-slots:
     post:
-      summary: Create availability rule
+      tags:
+        - 'Protected: Events'
+      summary: Generate slots for event
       security:
-        - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AvailabilityRule'
-      responses:
-        '201':
-          description: Created
-
-  /time-slots:
-    get:
-      summary: Get available time slots for a template
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
       parameters:
-        - in: query
-          name: event_template_id
+        - name: id
+          description: Event id
+          in: path
           schema:
             type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
+      responses:
+        '201':
+          description: Slots generated
+
+  /api/events/{id}/activate:
+    patch:
+      tags:
+        - 'Protected: Events'
+      summary: Activate/deactivate event
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          description: Event id
+          in: path
+          schema:
+            type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
+      responses:
+        '200':
+          description: Event id and new slug
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+              example:
+                id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                slug: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
+          
+  /api/events/{id}/regenerate-link:
+    post:
+      tags:
+        - 'Protected: Events'
+      summary: Regenerate public slug for event
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          description: Event id
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
+      responses:
+        '200':
+          description: Event id and new slug
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventResponse'
+              example:
+                id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                shareLink: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
+
+  /api/public/event/{sharedLink}:
+    get:
+      tags:
+        - 'Public: Events'
+      summary: Get event by public slug
+      parameters:
+        - name: sharedLink
+          description: Event public slug
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: b452644a-dba8-427a-8e44-d5c1bc528231
+          required: true
+      responses:
+        '200':
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicEventResponse'
+              example:
+                title: Demo
+                duration: 60
+                groupEvent: ONE2ONE
+                timeZone: Europe/Paris
+
+  /api/slots:
+    get:
+      tags:
+        - 'Protected: Slots'
+      summary: Get available time slots for an event
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: eventId
+          description: Event id
+          in: query
+          schema:
+            type: string
+            format: UUID
+            example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+          required: true
       responses:
         '200':
           description: List of time slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+                example:
+                  id: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+                  eventId: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                  startTime: 2001-02-03T04:35:06.789012Z
+                  endTime: 2001-02-03T05:05:06.789012Z
+                  isAvailable: true
 
-  /bookings:
-    get:
-      summary: List my bookings
-      security:
-        - BearerAuth: []
-      responses:
-        '200':
-          description: List of bookings
+  /booking:
     post:
-      summary: Public booking
+      tags:
+        - 'Public: Bookings'
+      summary: Create a booking for an event
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Booking'
-      responses:
-        '201':
-          description: Created
-
-  /bookings/{id}/cancel:
-    post:
-      summary: Cancel booking
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+              $ref: '#/components/schemas/BookingRequest'
+            example:
+              eventId: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+              slotId: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+              email: bob@mail.com
+              name: Bob
       responses:
         '200':
+          description: Booking created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+              example:
+                id: fc763648-4263-48c3-80dd-7e50edd30b22
+                eventId: 8840ddd5-e176-46d8-8f1b-babb00d989cd
+                slotId: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+                startTime: 2001-02-03T04:35:06.789012Z
+                endTime: 2001-02-03T05:05:06.789012Z
+                isCanceled: false
+    get:
+      tags:
+        - 'Protected: Bookings'
+      summary: List my bookings
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      responses:
+        '200':
+          description: List of bookings
+
+  /booking/{id}:
+    get:
+      tags:
+        - 'Protected: Bookings'
+      summary: Get booking by id
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          description: Booking id
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: fc763648-4263-48c3-80dd-7e50edd30b22
+          required: true
+      responses:
+        '200':
+          description: Booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingGeneralInfo'
+              example:
+                eventName: Demo
+                inviteeName: Bob
+                inviteeEmail: bob@mail.com
+                startTime: 2001-02-03T04:35:06.789012Z
+                endTime: 2001-02-03T05:05:06.789012Z
+                isCanceled: false
+                createdAt: 2001-02-03T04:05:06Z
+    delete:
+      tags:
+        - 'Protected: Bookings'
+      summary: Cancel booking
+      security:
+        - BearerAuth: [ ]
+          ApiKeyAuth: [ ]
+      parameters:
+        - name: id
+          description: Booking id
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: fc763648-4263-48c3-80dd-7e50edd30b22
+          required: true
+      responses:
+        '204':
           description: Booking canceled
