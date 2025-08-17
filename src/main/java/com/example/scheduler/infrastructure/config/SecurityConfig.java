@@ -48,6 +48,7 @@ public class SecurityConfig {
                                 .requestMatchers(HttpMethod.GET, "/api/profiles/*").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/api/public/event/*").permitAll()
                                 .requestMatchers("/api/v1/public/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
@@ -68,13 +69,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("!local")
+    @Profile("!local & !test")
     public Customizer<CorsConfigurer<HttpSecurity>> defaultCorsCustomizer() {
         return AbstractHttpConfigurer::disable;
     }
 
     @Bean
-    @Profile("local")
+    @Profile("local | test")
     public Customizer<CorsConfigurer<HttpSecurity>> permitAllCorsCustomizer() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOriginPattern("http://localhost:*");
