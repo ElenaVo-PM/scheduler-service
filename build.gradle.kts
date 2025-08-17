@@ -127,6 +127,3 @@ flyway {
     password = "password"
 }
 
-tasks.named("jar") {
-    enabled = false
-}
