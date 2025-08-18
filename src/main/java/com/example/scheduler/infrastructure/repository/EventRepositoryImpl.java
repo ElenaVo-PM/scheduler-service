@@ -1,7 +1,6 @@
 package com.example.scheduler.infrastructure.repository;
 
 import com.example.scheduler.domain.model.Event;
-import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.repository.EventRepository;
 import com.example.scheduler.infrastructure.mapper.EventRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,9 +9,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,7 +19,7 @@ public class EventRepositoryImpl implements EventRepository {
     private static final String SAVE_QUERY = """
             INSERT INTO event_templates (id, user_id, title, description,
             duration_minutes, buffer_before_minutes, buffer_after_minutes,
-            is_group_event, max_participants, is_active, slug, start_date,
+            event_type, max_participants, is_active, slug, start_date,
             end_date, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
@@ -43,7 +40,7 @@ public class EventRepositoryImpl implements EventRepository {
                     duration_minutes AS durationMinutes,
                     buffer_before_minutes AS bufferBeforeMinutes,
                     buffer_after_minutes AS bufferAfterMinutes,
-                    is_group_event,
+                    event_type,
                     slug,
                     start_date AS startDate,
                     end_date AS endDate,
@@ -69,7 +66,7 @@ public class EventRepositoryImpl implements EventRepository {
                     duration_minutes AS durationMinutes,
                     buffer_before_minutes AS bufferBeforeMinutes,
                     buffer_after_minutes AS bufferAfterMinutes,
-                    is_group_event,
+                    event_type,
                     slug,
                     start_date AS startDate,
                     end_date AS endDate,
@@ -82,7 +79,7 @@ public class EventRepositoryImpl implements EventRepository {
     private static final String UPDATE_QUERY = """
             UPDATE event_templates SET title = ?, description = ?,
             duration_minutes = ?, buffer_before_minutes = ?, buffer_after_minutes = ?,
-            is_group_event = ?, max_participants = ?, is_active = ?,
+            event_type = ?, max_participants = ?, is_active = ?,
             start_date = ?, end_date = ?, updated_at = now()
             WHERE id = ?
             """;
@@ -98,7 +95,7 @@ public class EventRepositoryImpl implements EventRepository {
                     duration_minutes AS durationMinutes,
                     buffer_before_minutes AS bufferBeforeMinutes,
                     buffer_after_minutes AS bufferAfterMinutes,
-                    is_group_event,
+                    event_type,
                     slug,
                     start_date AS startDate,
                     end_date AS endDate,
@@ -127,7 +124,7 @@ public class EventRepositoryImpl implements EventRepository {
         UUID id = UUID.randomUUID();
         jdbc.update(SAVE_QUERY, id, e.ownerId(), e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
-                EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
+                e.eventType(), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
                 Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
                 Timestamp.from(e.createdAt()), Timestamp.from(e.updatedAt()));
 
@@ -147,25 +144,7 @@ public class EventRepositoryImpl implements EventRepository {
         try {
             return Optional.ofNullable(
                     jdbc.queryForObject(FIND_BY_ID_QUERY,
-                            (res, num) -> new Event(
-                                    res.getObject("id", UUID.class),
-                                    res.getObject("ownerId", UUID.class),
-                                    res.getString("title"),
-                                    res.getString("description"),
-                                    res.getBoolean("isActive"),
-                                    res.getInt("maxParticipants"),
-                                    res.getInt("durationMinutes"),
-                                    res.getInt("bufferBeforeMinutes"),
-                                    res.getInt("bufferAfterMinutes"),
-                                    res.getBoolean("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
-                                    res.getString("slug"),
-                                    res.getTimestamp("startDate").toInstant(),
-                                    res.getTimestamp("endDate") == null
-                                            ? null
-                                            : res.getTimestamp("endDate").toInstant(),
-                                    res.getTimestamp("createdAt").toInstant(),
-                                    res.getTimestamp("updatedAt").toInstant()
-                            ),
+                            mapper,
                             id)
             );
 
@@ -192,7 +171,7 @@ public class EventRepositoryImpl implements EventRepository {
     public void update(Event e) {
         jdbc.update(UPDATE_QUERY, e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
-                EventType.GROUP.equals(e.eventType()), e.maxParticipants(), e.isActive(),
+                e.eventType(), e.maxParticipants(), e.isActive(),
                 Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
                 e.id());
 
@@ -201,28 +180,7 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public List<Event> getAllEvents(UUID ownerId) {
-        List<Map<String, Object>> rows = jdbc.queryForList(GET_ALL_ACTIVE_EVENTS, ownerId);
-        List<Event> events = new ArrayList<>();
-        for (Map<String, Object> row : rows) {
-            Event event = new Event(
-                    (UUID) row.get("id"),
-                    (UUID) row.get("ownerId"),
-                    (String) row.get("title"),
-                    (String) row.get("description"),
-                    (boolean) row.get("isActive"),
-                    (int) row.get("maxParticipants"),
-                    (int) row.get("durationMinutes"),
-                    (int) row.get("bufferBeforeMinutes"),
-                    (int) row.get("bufferAfterMinutes"),
-                    (boolean) row.get("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
-                    (String) row.get("slug"),
-                    ((Timestamp) row.get("startDate")).toInstant(),
-                    row.get("endDate") == null ? null : ((Timestamp) row.get("endDate")).toInstant(),
-                    ((Timestamp) row.get("createdAt")).toInstant(),
-                    ((Timestamp) row.get("updatedAt")).toInstant());
-            events.add(event);
-        }
-        return events;
+        return jdbc.query(GET_ALL_ACTIVE_EVENTS, mapper, ownerId);
     }
 
     @Override

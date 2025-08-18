@@ -22,7 +22,7 @@ public class EventRowMapper implements RowMapper<Event> {
                 res.getInt("durationMinutes"),
                 res.getInt("bufferBeforeMinutes"),
                 res.getInt("bufferAfterMinutes"),
-                res.getBoolean("is_group_event") ? EventType.GROUP : EventType.ONE2ONE,
+                EventType.valueOf(res.getString("event_type")),
                 res.getString("slug"),
                 res.getTimestamp("startDate").toInstant(),
                 res.getTimestamp("endDate") == null
