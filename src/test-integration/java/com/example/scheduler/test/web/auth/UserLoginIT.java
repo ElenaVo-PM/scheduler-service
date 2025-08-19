@@ -14,7 +14,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class UserLoginIT {
 
     private static final String HOST = "http://localhost";
-    private static final String BASE_URL = "/auth/login";
+    private static final String BASE_URL = "/api/v1/public/auth/login";
 
     @LocalServerPort
     private int port;
@@ -39,7 +39,7 @@ class UserLoginIT {
                           "status": 401,
                           "error": "Unauthorized",
                           "message": "Username or password does not match",
-                          "path": "/auth/login"
+                          "path": "/api/v1/public/auth/login"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -64,7 +64,7 @@ class UserLoginIT {
                           "status": 401,
                           "error": "Unauthorized",
                           "message": "Username or password does not match",
-                          "path": "/auth/login"
+                          "path": "/api/v1/public/auth/login"
                         }
                         """, JsonCompareMode.STRICT);
     }

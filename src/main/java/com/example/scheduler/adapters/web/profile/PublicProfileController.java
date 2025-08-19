@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/profiles")
+@RequestMapping("/api/v1/public/profiles")
 public class PublicProfileController {
     private static final Logger log = LoggerFactory.getLogger(PublicProfileController.class);
 
