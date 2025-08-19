@@ -182,7 +182,7 @@ public class GlobalExceptionHandler {
         logger.error("Unexpected exception occurred: {}", exception.getMessage(), exception);
         return toResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                exception.getMessage(),
+                "Неизвестная ошибка",
                 request.getRequest().getRequestURI()
         );
     }
