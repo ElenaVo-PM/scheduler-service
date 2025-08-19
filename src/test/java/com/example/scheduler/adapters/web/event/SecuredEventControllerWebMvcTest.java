@@ -40,7 +40,7 @@ class SecuredEventControllerWebMvcTest {
             EventType.ONE2ONE, 1, 1, 0, 0, Instant.now(), null);
 
     private final EventResponse response = new EventResponse(UUID.randomUUID(),
-            "/api/public/event/%s".formatted(UUID.randomUUID()));
+            "/api/v1/public/event/%s".formatted(UUID.randomUUID()));
 
     @MockitoBean
     private EventService eventService;

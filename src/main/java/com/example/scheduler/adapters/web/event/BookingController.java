@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/booking")
 public class BookingController {
 
     private static final Logger log = LoggerFactory.getLogger(BookingController.class);
@@ -33,9 +32,9 @@ public class BookingController {
     }
 
     /**
-     * POST /booking - Создание брони
+     * POST /api/v1/public/booking - Создание брони
      */
-    @PostMapping
+    @PostMapping("/api/v1/public/booking")
     public ResponseEntity<BookingResponse> bookSlot(@RequestBody BookingRequest request) throws IllegalAccessException {
 
         return ResponseEntity.ok(bookSlotUseCase.execute(request));
@@ -44,7 +43,7 @@ public class BookingController {
     /**
      * GET /booking - Список всех бронирований пользователя
      */
-    @GetMapping
+    @GetMapping("/booking")
     public ResponseEntity<List<BookingResponse>> getBookings() {
         return ResponseEntity.ok(null);
     }
@@ -52,7 +51,7 @@ public class BookingController {
     /**
      * GET /booking/{bookingId} - Получение конкретного бронирования
      */
-    @GetMapping("/{bookingId}")
+    @GetMapping("/booking/{bookingId}")
     public ResponseEntity<BookingGeneralInfo> getBooking(@PathVariable UUID bookingId) {
         log.info("Request for booking id {}", bookingId);
         BookingGeneralInfo bookingInfoResponse = bookingService.getOneBooking(bookingId);
@@ -63,7 +62,7 @@ public class BookingController {
     /**
      * DELETE /booking/{bookingId} - Отмена бронирования
      */
-    @DeleteMapping("/{bookingId}")
+    @DeleteMapping("/booking/{bookingId}")
     public ResponseEntity<Void> cancelBooking(@PathVariable UUID bookingId) {
         cancelBookingUseCase.execute(bookingId);
         return ResponseEntity.noContent().build();

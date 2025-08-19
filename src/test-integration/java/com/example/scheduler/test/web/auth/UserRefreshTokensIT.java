@@ -12,7 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class UserRefreshTokensIT {
 
     private static final String HOST = "http://localhost";
-    private static final String BASE_URL = "/auth/refresh";
+    private static final String BASE_URL = "/api/v1/public/auth/refresh";
 
     @LocalServerPort
     private int port;
@@ -39,7 +39,7 @@ class UserRefreshTokensIT {
                           "error": "Unauthorized",
                           "message": "JWT expired 1789 milliseconds ago at 2001-02-03T04:05:05.000Z. Current time: 2001\
                         -02-03T04:05:06.789Z. Allowed clock skew: 0 milliseconds.",
-                          "path": "/auth/refresh"
+                          "path": "/api/v1/public/auth/refresh"
                         }
                         """, JsonCompareMode.STRICT);
     }

@@ -22,7 +22,7 @@ import static org.mockito.BDDMockito.given;
 @WithSecurityStubs
 class PublicProfileControllerTest {
 
-    private static final String BASE_URL = "/api/profiles";
+    private static final String BASE_URL = "/api/v1/public/profiles";
 
     @MockitoBean
     private ProfileService mockProfileService;

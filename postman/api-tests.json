@@ -81,7 +81,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('username must not be null');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -103,11 +103,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -187,7 +190,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('username size must be between 0 and 255');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -209,11 +212,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -290,7 +296,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('password must not be null');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -312,11 +318,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -393,7 +402,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('email must not be empty');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -415,11 +424,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -497,7 +509,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('email must not be empty');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -519,11 +531,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -601,7 +616,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('email must be a well-formed email address');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -623,11 +638,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -707,7 +725,7 @@
 											"    pm.expect(response.status).equal(400);",
 											"    pm.expect(response.error).equal('Bad Request');",
 											"    pm.expect(response.message).equal('email size must be between 0 and 255');",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											""
 										],
@@ -729,11 +747,14 @@
 									}
 								},
 								"url": {
-									"raw": "{{baseUrl}}/auth/register",
+									"raw": "{{baseUrl}}/api/v1/public/auth/register",
 									"host": [
 										"{{baseUrl}}"
 									],
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -779,7 +800,7 @@
 											"    pm.expect(response.status).equal(409);",
 											"    pm.expect(response.error).equal('Conflict');",
 											"    pm.expect(response.message).equal('Username already exists: ' + request.username);",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											"",
 											""
@@ -849,13 +870,16 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/auth/register",
+									"raw": "http://localhost:8080/api/v1/public/auth/register",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -896,7 +920,7 @@
 											"    pm.expect(response.status).equal(409);",
 											"    pm.expect(response.error).equal('Conflict');",
 											"    pm.expect(response.message).equal('Username already exists: ' + request.username);",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											"",
 											""
@@ -968,13 +992,16 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/auth/register",
+									"raw": "http://localhost:8080/api/v1/public/auth/register",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -1015,7 +1042,7 @@
 											"    pm.expect(response.status).equal(409);",
 											"    pm.expect(response.error).equal('Conflict');",
 											"    pm.expect(response.message).equal('Email already exists: ' + request.email);",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											"",
 											""
@@ -1085,13 +1112,16 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/auth/register",
+									"raw": "http://localhost:8080/api/v1/public/auth/register",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -1132,7 +1162,7 @@
 											"    pm.expect(response.status).equal(409);",
 											"    pm.expect(response.error).equal('Conflict');",
 											"    pm.expect(response.message).equal('Email already exists: ' + request.email);",
-											"    pm.expect(response.path).equal(\"/auth/register\");",
+											"    pm.expect(response.path).equal(\"/api/v1/public/auth/register\");",
 											"});",
 											"",
 											""
@@ -1204,13 +1234,16 @@
 									}
 								},
 								"url": {
-									"raw": "http://localhost:8080/auth/register",
+									"raw": "http://localhost:8080/api/v1/public/auth/register",
 									"protocol": "http",
 									"host": [
 										"localhost"
 									],
 									"port": "8080",
 									"path": [
+										"api",
+										"v1",
+										"public",
 										"auth",
 										"register"
 									]
@@ -1317,13 +1350,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/register",
+							"raw": "http://localhost:8080/api/v1/public/auth/register",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
+								"v1",
+								"public",
 								"auth",
 								"register"
 							]
@@ -1409,13 +1445,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/login",
+							"raw": "http://localhost:8080/api/v1/public/auth/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
+								"v1",
+								"public",
 								"auth",
 								"login"
 							]
@@ -1507,13 +1546,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/login",
+							"raw": "http://localhost:8080/api/v1/public/auth/login",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
+								"v1",
+								"public",
 								"auth",
 								"login"
 							]
@@ -1602,13 +1644,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/refresh",
+							"raw": "http://localhost:8080/api/v1/public/auth/refresh",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
+								"v1",
+								"public",
 								"auth",
 								"refresh"
 							]
@@ -1704,13 +1749,16 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/auth/refresh",
+							"raw": "http://localhost:8080/api/v1/public/auth/refresh",
 							"protocol": "http",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
+								"api",
+								"v1",
+								"public",
 								"auth",
 								"refresh"
 							]
@@ -1735,11 +1783,11 @@
 					"    }",
 					"",
 					"    async registerUser(registerRequest) {",
-					"        return this.post('/auth/register', registerRequest);",
+					"        return this.post('/api/v1/public/auth/register', registerRequest);",
 					"    }",
 					"",
 					"    async login(authRequest) {",
-					"        return this.post('/auth/login', authRequest);",
+					"        return this.post('/api/v1/public/auth/login', authRequest);",
 					"    }",
 					"",
 					"    async createUser(userDetails) {",

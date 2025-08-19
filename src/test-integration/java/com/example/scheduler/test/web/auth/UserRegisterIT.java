@@ -15,7 +15,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 class UserRegisterIT {
 
     private static final String HOST = "http://localhost";
-    private static final String BASE_URL = "/auth/register";
+    private static final String BASE_URL = "/api/v1/public/auth/register";
 
     @LocalServerPort
     private int port;
@@ -40,7 +40,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "username must not be null",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -68,7 +68,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "username size must be between 0 and 255",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -93,7 +93,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "password must not be null",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -120,7 +120,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "email must not be empty",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -146,7 +146,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "email must be a well-formed email address",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -178,7 +178,7 @@ class UserRegisterIT {
                           "status": 400,
                           "error": "Bad Request",
                           "message": "email size must be between 0 and 255",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """, JsonCompareMode.STRICT);
     }
@@ -205,7 +205,7 @@ class UserRegisterIT {
                           "status": 409,
                           "error": "Conflict",
                           "message": "Username already exists: %s",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """.formatted(username), JsonCompareMode.STRICT);
     }
@@ -232,7 +232,7 @@ class UserRegisterIT {
                           "status": 409,
                           "error": "Conflict",
                           "message": "Email already exists: %s",
-                          "path": "/auth/register"
+                          "path": "/api/v1/public/auth/register"
                         }
                         """.formatted(email), JsonCompareMode.STRICT);
     }
