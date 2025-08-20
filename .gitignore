@@ -1,9 +1,12 @@
 HELP.md
 .gradle
 build/
+data/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+prod.env
+test.env
 local.env
 
 ### STS ###

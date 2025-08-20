@@ -1,0 +1,81 @@
+name: Rollout new version
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: elenavo-pm/scheduler-service
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 24
+          distribution: temurin
+
+      - name: Build JAR file for prod stage
+        run: ./gradlew build
+
+      - name: Remove non-executable JAR
+        run: rm build/libs/*plain.jar
+
+      - name: Set up Docker
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "debug": true,
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image for prod stage
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-prod:latest
+          platforms: linux/amd64,linux/arm64/v8
+
+      - name: Add test data for test stage
+        run: cp ./src/test/resources/db/migration/* ./src/main/resources/db/migration/
+
+      - name: Build JAR file for test stage
+        run: ./gradlew build
+
+      - name: Remove non-executable JAR
+        run: rm build/libs/*plain.jar
+
+      - name: Build and push image for test stage
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: .
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-test:latest
+          platforms: linux/amd64,linux/arm64/v8

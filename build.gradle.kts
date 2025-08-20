@@ -126,3 +126,4 @@ flyway {
     user = "postgres"
     password = "password"
 }
+
