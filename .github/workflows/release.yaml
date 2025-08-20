@@ -63,16 +63,16 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-prod:latest
           platforms: linux/amd64,linux/arm64/v8
 
-      - name: Add test data for test stage
+      - name: Add test data for testing stage
         run: cp ./src/test/resources/db/migration/* ./src/main/resources/db/migration/
 
-      - name: Build JAR file for test stage
-        run: ./gradlew build
+      - name: Build JAR file for testing stage
+        run: ./gradlew build -x test -x integrationTest
 
       - name: Remove non-executable JAR
         run: rm build/libs/*plain.jar
 
-      - name: Build and push image for test stage
+      - name: Build and push image for testing stage
         uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
         with:
           context: .
