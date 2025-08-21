@@ -8,6 +8,7 @@ import com.example.scheduler.domain.fixture.TestEvents;
 import com.example.scheduler.domain.fixture.TestTimeSlots;
 import com.example.scheduler.domain.model.Booking;
 import com.example.scheduler.domain.model.Event;
+import com.example.scheduler.domain.model.EventType;
 import com.example.scheduler.domain.model.Slot;
 import com.example.scheduler.domain.model.User;
 import com.example.scheduler.domain.repository.EventRepository;
@@ -64,12 +65,12 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
                             INSERT INTO event_templates (
                                 id, user_id, title, description,
                                 duration_minutes, buffer_before_minutes, buffer_after_minutes,
-                                is_group_event, max_participants, is_active, slug,
+                                event_type, max_participants, is_active, slug,
                                 start_date, end_date, created_at, updated_at
                             )
                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, now(), now())
                         """, eventId, userId, "Title", "Description",
-                30, 0, 0, true, 4, true, UUID.randomUUID(),
+                30, 0, 0, EventType.GROUP.name() , 4, true, UUID.randomUUID(),
                 Timestamp.from(Instant.now()),
                 Timestamp.from(Instant.now().plus(Duration.ofDays(1)))
         );
