@@ -238,7 +238,7 @@ class UserRegisterIT {
     }
 
     @Test
-    void givenCorrectUsernameAndPasswordAndEmail_WhenRegister_ThenRespondWithCreatedAndUserDto() {
+    void givenCorrectUsernameAndPasswordAndEmail_WhenRegister_ThenRespondWithCreatedAndTokenPair() {
         webClient().post()
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -253,10 +253,9 @@ class UserRegisterIT {
                 .expectStatus().isCreated()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody()
-                .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$.id").isNotEmpty()
-                .jsonPath("$.username").isEqualTo("charlie")
-                .jsonPath("$.email").isEqualTo("charlie@mail.com");
+                .jsonPath("$.accessToken").isNotEmpty()
+                .jsonPath("$.refreshToken").isNotEmpty()
+                .jsonPath("$.size()").isEqualTo(2);
     }
 
     private WebTestClient webClient() {
