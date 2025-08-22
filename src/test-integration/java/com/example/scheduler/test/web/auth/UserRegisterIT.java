@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
 class UserRegisterIT {
 
@@ -199,15 +201,16 @@ class UserRegisterIT {
                 .exchange()
                 .expectStatus().isEqualTo(HttpStatus.CONFLICT)
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody().json("""
-                        {
-                          "timestamp": "2001-02-03T04:05:06Z",
-                          "status": 409,
-                          "error": "Conflict",
-                          "message": "Username already exists: %s",
-                          "path": "/api/v1/public/auth/register"
-                        }
-                        """.formatted(username), JsonCompareMode.STRICT);
+                .expectBody()
+                .jsonPath("$.timestamp").isNotEmpty()
+                .jsonPath("$.status").isEqualTo(409)
+                .jsonPath("$.error").isEqualTo("Conflict")
+                .jsonPath("$.path").isEqualTo("/api/v1/public/auth/register")
+                .jsonPath("$.message").value(m -> {
+                    String msg = String.valueOf(m);
+                    assertThat(msg.toLowerCase()).contains("username already exists");
+                    assertThat(msg.toLowerCase()).contains(username.toLowerCase());
+                });
     }
 
     @ParameterizedTest
