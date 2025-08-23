@@ -190,6 +190,10 @@ public class EventRepositoryImpl implements EventRepository {
 
     @Override
     public Optional<Event> getEventBySlug(UUID slug) {
-        return Optional.ofNullable(jdbc.queryForObject(GET_EVENT_BY_SLUG, mapper, slug.toString()));
+        try {
+            return Optional.ofNullable(jdbc.queryForObject(GET_EVENT_BY_SLUG, mapper, slug.toString()));
+        } catch (EmptyResultDataAccessException _) {
+            return Optional.empty();
+        }
     }
 }
