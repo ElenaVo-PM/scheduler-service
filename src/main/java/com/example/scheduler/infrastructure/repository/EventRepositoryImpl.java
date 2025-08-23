@@ -124,7 +124,7 @@ public class EventRepositoryImpl implements EventRepository {
         UUID id = UUID.randomUUID();
         jdbc.update(SAVE_QUERY, id, e.ownerId(), e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
-                e.eventType(), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
+                e.eventType().name(), e.maxParticipants(), e.isActive(), UUID.randomUUID(),
                 Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
                 Timestamp.from(e.createdAt()), Timestamp.from(e.updatedAt()));
 
@@ -171,7 +171,7 @@ public class EventRepositoryImpl implements EventRepository {
     public void update(Event e) {
         jdbc.update(UPDATE_QUERY, e.title(), e.description(),
                 e.durationMinutes(), e.bufferBeforeMinutes(), e.bufferAfterMinutes(),
-                e.eventType(), e.maxParticipants(), e.isActive(),
+                e.eventType().name(), e.maxParticipants(), e.isActive(),
                 Timestamp.from(e.startDate()), e.endDate() == null ? null : Timestamp.from(e.endDate()),
                 e.id());
 
