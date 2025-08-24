@@ -2,8 +2,6 @@ package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.AuthResponse;
 import com.example.scheduler.adapters.dto.user.RegisterRequest;
-import com.example.scheduler.adapters.dto.user.UserDto;
-import com.example.scheduler.adapters.mapper.UserMapper;
 import com.example.scheduler.domain.exception.UserNotAuthorizedException;
 import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.User;
@@ -25,33 +23,32 @@ public class UserServiceImpl implements UserService {
     private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private final UserRepository userRepo;
-    private final UserMapper userMapper;
     private final PasswordEncoder encoder;
     private final AuthService authService;
     private final Clock clock;
 
     public UserServiceImpl(
             UserRepository userRepo,
-            UserMapper userMapper,
             PasswordEncoder encoder,
             AuthService authService,
             Clock clock
     ) {
         this.userRepo = userRepo;
-        this.userMapper = userMapper;
         this.encoder = encoder;
         this.authService = authService;
         this.clock = clock;
     }
 
     @Override
-    public UserDto registerUser(RegisterRequest request) {
+    public AuthResponse registerUser(RegisterRequest request) {
         Objects.requireNonNull(request, "request cannot be null");
         User prepared = createUser(request, encoder, clock);
         User registered = userRepo.insert(prepared);
         log.info("Registered new user [{}]", registered.id());
         log.debug("User registered = {}", registered);
-        return userMapper.toDto(registered);
+
+        Credential credential = Credential.fromUser(registered);
+        return authService.createTokens(credential);
     }
 
     @Override
@@ -60,7 +57,6 @@ public class UserServiceImpl implements UserService {
         if (userOptional.isEmpty() || !encoder.matches(password, userOptional.get().passwordHash())) {
             throw new UserNotAuthorizedException("Username or password does not match");
         }
-
         Credential credential = Credential.fromUser(userOptional.get());
         return authService.createTokens(credential);
     }

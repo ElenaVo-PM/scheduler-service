@@ -631,15 +631,14 @@ paths:
                   email: charlie@mail.com
       responses:
         '201':
-          description: User created
+          description: User created; returns JWT token pair (same as /auth/login)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserDto'
+                $ref: '#/components/schemas/AuthResponse'
               example:
-                id: d3e68c3b-2d6d-48a1-a037-99a390e9433e
-                username: alice
-                email: alice@mail.com
+                accessToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJkM2U2OGMzYi0yZDZkLTQ4YTEtYTAzNy05OWEzOTBlOTQzM2UiLCJ1c2VybmFtZSI6ImFsaWNlIiwiZXhwIjo5ODEyNTk1MDZ9.SmrevpAZjUVIG78-YOBZvNhu91wjSgd37l19_3w3pl7Qbf7rpUuOEQquY6WwJYMzB37z8tPKawNpFWgT01csxA'
+                refreshToken: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI5ZTdmN2UzMy00NTc0LTQzYjYtODNkOC1kZWQ3ZjE2OWMwM2YiLCJ1c2VybmFtZSI6ImJvYiIsImV4cCI6OTgxMTczMTA1fQ.IrR7tKqE_vDHKNGBTEo-b_wRCQyuSchemNAlevxllycYDSIY8oVQ0sqYzfMJIZ5kvzvDf_fVqkvCS0NYq6omqA'
         '400':
           description: User credentials do not match constraints set
           content:
