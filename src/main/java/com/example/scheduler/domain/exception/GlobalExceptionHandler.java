@@ -27,6 +27,7 @@ public class GlobalExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     private final Clock clock;
+    private final String UNEXPECTED_ERROR_MESSAGE = "Неизвестная ошибка";
 
     public GlobalExceptionHandler(Clock clock) {
         this.clock = clock;
@@ -182,7 +183,7 @@ public class GlobalExceptionHandler {
         logger.error("Unexpected exception occurred: {}", exception.getMessage(), exception);
         return toResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
-                "Неизвестная ошибка",
+                UNEXPECTED_ERROR_MESSAGE,
                 request.getRequest().getRequestURI()
         );
     }
