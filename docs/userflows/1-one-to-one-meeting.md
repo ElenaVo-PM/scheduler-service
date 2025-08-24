@@ -141,7 +141,7 @@ curl -X 'POST' \
 Фронтенд отправляет в бэкенд приложения запрос на получение общей информации о встрече:
 ```bash
 curl -X 'GET' \
-  'http://api.example.com:8080/api/v1/public/event/6c5a580d-af1d-4cb4-81e9-ef079ecd6925' \
+  'http://api.example.com:8080/api/v1/public/events/6c5a580d-af1d-4cb4-81e9-ef079ecd6925' \
   -H 'accept: application/json'
 ```
 
@@ -156,12 +156,77 @@ curl -X 'GET' \
 ```
 
 Параллельно фронтенд отправляет в бэкенд приложения запрос на получение информации об организаторе встречи:
-> [!WARNING]
-> Not implemented yet
+```bash
+curl -X 'GET' \
+  'http://api.example.com:8080/api/v1/public/events/6c5a580d-af1d-4cb4-81e9-ef079ecd6925/host' \
+  -H 'accept: application/json'
+```
+
+Ответ содержит информацию об организаторе встречи:
+```json
+{
+  "fullName": "Alice Arno",
+  "logo": "https://cdn.example.com/alice.jpg"
+}
+```
 
 Параллельно фронтенд отправляет в бэкенд приложения запрос на получение списка доступных слотов:
-> [!WARNING]
-> Not implemented yet
+```bash
+curl -X 'GET' \
+  'http://api.example.com:8080/api/v1/public/events/6c5a580d-af1d-4cb4-81e9-ef079ecd6925/slots' \
+  -H 'accept: application/json'
+```
+
+Ответ содержит доступные для бронирования слоты:
+```json
+[
+  {
+    "id": "d3b07f3c-bac2-4bdb-9199-ba3d46f6b1b1",
+    "startTime": "2026-07-20T10:00:00Z",
+    "endTime": "2026-07-20T11:00:00Z"
+  },
+  {
+    "id": "03d2f49a-84d2-43ba-ae9a-0cc0fddbc595",
+    "startTime": "2026-07-20T11:00:00Z",
+    "endTime": "2026-07-20T12:00:00Z"
+  },
+  {
+    "id": "9419c292-b91c-4f61-b5f6-c910489b5ede",
+    "startTime": "2026-07-20T12:00:00Z",
+    "endTime": "2026-07-20T13:00:00Z"
+  },
+  {
+    "id": "8d9027f0-c3e8-4d41-9dbc-b0824a13c1d9",
+    "startTime": "2026-07-20T13:00:00Z",
+    "endTime": "2026-07-20T14:00:00Z"
+  },
+  {
+    "id": "494295a5-46ba-4c8f-b051-31b1875fa7f6",
+    "startTime": "2026-07-20T14:00:00Z",
+    "endTime": "2026-07-20T15:00:00Z"
+  },
+  {
+    "id": "75419df0-ebfb-4429-8480-62a6ecab218c",
+    "startTime": "2026-07-20T15:00:00Z",
+    "endTime": "2026-07-20T16:00:00Z"
+  },
+  {
+    "id": "24e33052-1175-4b47-a8e9-683e5df7f709",
+    "startTime": "2026-07-20T16:00:00Z",
+    "endTime": "2026-07-20T17:00:00Z"
+  },
+  {
+    "id": "1cc93318-6dd6-4bc8-aff2-98ce51f2c1e8",
+    "startTime": "2026-07-20T17:00:00Z",
+    "endTime": "2026-07-20T18:00:00Z"
+  },
+  {
+    "id": "aeca5f71-5b28-48f8-8850-51f0b7095618",
+    "startTime": "2026-07-20T18:00:00Z",
+    "endTime": "2026-07-20T19:00:00Z"
+  }
+]
+```
 
 #### Шаг 8. Боб бронирует слот
 
@@ -171,25 +236,24 @@ curl -X 'GET' \
 
 ```bash
 curl -X 'POST' \
-  'http://api.example.com:8080/api/v1/public/booking' \
+  'http://api.example.com:8080/api/v1/public/events/6c5a580d-af1d-4cb4-81e9-ef079ecd6925/bookings' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
   -d '{
-  "eventId": "a3330b9a-d044-4f1d-a388-5239116b1681",
-  "slotId": "689ebbfb-1fc4-462c-a07c-95a13b1c9d23",
+  "slotId": "9419c292-b91c-4f61-b5f6-c910489b5ede",
   "email": "bob@mail.com",
   "name": "Bob"
 }'
 ```
 
-В случае успешного бронирования ответ будет содержать код `200 Ok` и информацию о бронировании.
+В случае успешного бронирования ответ будет содержать код `201 Created` и информацию о бронировании.
 ```json
 {
-  "id": "b77f6564-e02d-478d-abb8-49fc4e12c819",
+  "id": "cc79ce2f-63fc-4687-90c5-55cdfe080b99",
   "eventId": "a3330b9a-d044-4f1d-a388-5239116b1681",
-  "slotId": "689ebbfb-1fc4-462c-a07c-95a13b1c9d23",
-  "startTime": "2026-07-20T10:00:00Z",
-  "endTime": "2026-07-20T11:00:00Z",
+  "slotId": "9419c292-b91c-4f61-b5f6-c910489b5ede",
+  "startTime": "2026-07-20T12:00:00Z",
+  "endTime": "2026-07-20T13:00:00Z",
   "isCanceled": false
 }
 ```
