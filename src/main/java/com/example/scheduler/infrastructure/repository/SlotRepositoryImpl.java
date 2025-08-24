@@ -5,11 +5,11 @@ import com.example.scheduler.adapters.dto.BookingResponse;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.model.*;
 import com.example.scheduler.domain.repository.SlotRepository;
+import com.example.scheduler.infrastructure.mapper.SlotRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.util.Pair;
-import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -23,16 +23,12 @@ import java.util.UUID;
 
 @Repository
 public class SlotRepositoryImpl implements SlotRepository {
-
-    private final JdbcTemplate jdbc;
-    private final RowMapper<Slot> mapper;
-
-    private final String ADD_PARTICIPANTS = """
+    private static final String ADD_PARTICIPANTS = """
             INSERT INTO booking_participants (id, booking_id, user_id, email, name, status, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, ?::booking_status, ?, ?)
             """;
 
-    private final String ADD_NEW_BOOKING_QUERY_WITH_RETURN = """
+    private static final String ADD_NEW_BOOKING_QUERY_WITH_RETURN = """
             INSERT INTO bookings (event_template_id,
             slot_id,
             invitee_name,
@@ -42,54 +38,71 @@ public class SlotRepositoryImpl implements SlotRepository {
             RETURNING id, created_at
             """;
 
-    private final String UPDATE_SLOT_QUERY = """
+    private static final String UPDATE_SLOT_QUERY = """
             UPDATE time_slots
             SET is_available = ?, updated_at = ?
             WHERE id = ?
             """;
 
-    private final String GET_SLOT_QUERY = """
+    private static final String GET_SLOT_QUERY = """
             SELECT *
             FROM time_slots
             WHERE id = ?
             """;
 
-    private final String COUNT_PARTICIPANTS_QUERY = """
+    private static final String COUNT_PARTICIPANTS_QUERY = """
             SELECT COUNT(id) AS participants_count
             FROM bookings
             WHERE is_canceled = false AND event_template_id = ?
             """;
-    private final String ADD_NEW_SLOT = """
+
+    private static final String ADD_NEW_SLOT = """
             INSERT INTO time_slots (event_template_id, start_time, end_time, is_available)
             VALUES(?, ?, ?, ?)
             """;
-    private final String GET_ALL_SLOTS_FOR_EVENT = """
-            SELECT id, event_template_id AS event_id, start_time, end_time, is_available
+
+    private static final String GET_ALL_SLOTS_FOR_EVENT = """
+            SELECT
+              *
             FROM time_slots WHERE event_template_id = ?
+            ORDER BY start_time
             """;
 
-    private final String FIND_BOOKING_BY_ID = """
-            SELECT id, event_template_id, slot_id, invitee_name, invitee_email, 
+    private static final String FIND_ALL_BOOKED_BY_EVENT_OWNER_ID_ORDER_BY_START_TIME_QUERY = """
+            SELECT
+              s.*
+            FROM time_slots AS s
+            INNER JOIN bookings AS b ON s.id = b.slot_id
+            INNER JOIN event_templates AS e ON s.event_template_id = e.id
+            WHERE e.user_id = ?
+            ORDER BY s.start_time
+            """;
+
+    private static final String FIND_BOOKING_BY_ID = """
+            SELECT id, event_template_id, slot_id, invitee_name, invitee_email,
                    is_canceled, created_at, updated_at
             FROM bookings
             WHERE id = ?
             """;
 
-    private final String CANCEL_BOOKING = """
+    private static final String CANCEL_BOOKING = """
             UPDATE bookings
             SET is_canceled = true, updated_at = ?
             WHERE id = ? AND is_canceled = false
             """;
 
-    private final String HAS_AVAILABLE_SLOTS = """
+    private static final String HAS_AVAILABLE_SLOTS = """
             SELECT (COUNT(*) < ?) FROM bookings
             WHERE event_template_id = ? AND is_canceled = false
-             """;
+            """;
+
+    private final JdbcTemplate jdbc;
+    private final RowMapper<Slot> mapper;
 
     @Autowired
     public SlotRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
-        this.mapper = new DataClassRowMapper<>(Slot.class);
+        this.mapper = new SlotRowMapper();
     }
 
     @Override
@@ -120,7 +133,7 @@ public class SlotRepositoryImpl implements SlotRepository {
                             res.getTimestamp("end_time").toInstant(),
                             res.getBoolean("is_available")),
                     slotId));
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             return Optional.empty();
         }
     }
@@ -131,10 +144,15 @@ public class SlotRepositoryImpl implements SlotRepository {
     }
 
     @Override
+    public List<Slot> findAllBookedByEventOwnerIdOrderByStartTime(UUID eventOwnerId) {
+        return jdbc.query(FIND_ALL_BOOKED_BY_EVENT_OWNER_ID_ORDER_BY_START_TIME_QUERY, mapper, eventOwnerId);
+    }
+
+    @Override
     public Optional<Booking> findBookingById(UUID bookingId) {
         try {
             return Optional.ofNullable(jdbc.queryForObject(FIND_BOOKING_BY_ID,
-                    (rs, rowNum) -> new Booking(
+                    (rs, _) -> new Booking(
                             rs.getObject("id", UUID.class),
                             rs.getObject("event_template_id", UUID.class),
                             rs.getObject("slot_id", UUID.class),
@@ -145,7 +163,7 @@ public class SlotRepositoryImpl implements SlotRepository {
                             rs.getTimestamp("updated_at").toInstant()
                     ),
                     bookingId));
-        } catch (EmptyResultDataAccessException e) {
+        } catch (EmptyResultDataAccessException _) {
             return Optional.empty();
         }
     }

@@ -23,4 +23,6 @@ public interface EventRepository {
     void delete(UUID id);
 
     Optional<Event> getEventBySlug(UUID slug);
+
+    Optional<Event> getActiveByPublicId(UUID publicId);
 }

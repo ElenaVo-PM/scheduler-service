@@ -23,11 +23,13 @@ public interface EventMapper {
 
     String EVENT_SHARE_LINK_PATTERN = "/api/v1/public/event/%s";
 
+    @Mapping(target = "id", source = "eventId")
     @Mapping(target = "ownerId", source = "ownerId")
     @Mapping(target = "isActive", expression = "java(true)")
+    @Mapping(target = "slug", source = "slug")
     @Mapping(target = "createdAt", expression = "java(Instant.now())")
     @Mapping(target = "updatedAt", expression = "java(Instant.now())")
-    Event toEntity(CreateEventRequest request, UUID ownerId);
+    Event toEntity(CreateEventRequest request, UUID ownerId, UUID eventId, String slug);
 
     @Mapping(target = "shareLink", source = "slug", qualifiedByName = "getShareLink")
     EventResponse toResponse(Event event);

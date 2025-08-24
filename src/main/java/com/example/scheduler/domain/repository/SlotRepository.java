@@ -27,5 +27,7 @@ public interface SlotRepository {
 
     List<Slot> getAllSlotsForEvent(UUID eventId);
 
+    List<Slot> findAllBookedByEventOwnerIdOrderByStartTime(UUID eventOwnerId);
+
     void saveSlots(List<Slot> slots);
 }

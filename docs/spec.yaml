@@ -453,6 +453,22 @@ components:
           type: string
           example: Europe/Paris
 
+    PublicSlotDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+        startTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T04:35:06.789012Z
+        endTime:
+          type: string
+          format: date-time
+          example: 2001-02-03T05:05:06.789012Z
+
     RefreshTokenRequest:
       type: object
       required:
@@ -1245,6 +1261,34 @@ paths:
                 duration: 60
                 groupEvent: ONE2ONE
                 timeZone: Europe/Paris
+
+  /api/v1/public/events/{sharedLink}/slots:
+    get:
+      tags:
+        - 'Public: Events'
+      summary: Get available slots for event
+      parameters:
+        - name: sharedLink
+          description: Event public slug
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: b452644a-dba8-427a-8e44-d5c1bc528231
+          required: true
+      responses:
+        '200':
+          description: List of available slots
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicSlotDto'
+                example:
+                  - id: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
+                    startTime: 2001-02-03T04:35:06.789012Z
+                    endTime: 2001-02-03T05:05:06.789012Z
 
   /api/slots:
     get:

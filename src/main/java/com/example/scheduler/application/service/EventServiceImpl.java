@@ -4,6 +4,7 @@ import com.example.scheduler.adapters.dto.CreateEventRequest;
 import com.example.scheduler.adapters.dto.EventFullDto;
 import com.example.scheduler.adapters.dto.EventResponse;
 import com.example.scheduler.adapters.dto.EventShortDto;
+import com.example.scheduler.domain.exception.EventNotFoundException;
 import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.NotFoundException;
 import com.example.scheduler.domain.exception.UserNotAuthorizedException;
@@ -34,7 +35,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponse createEvent(CreateEventRequest request, UUID ownerId) {
-        Event requestEvent = eventMapper.toEntity(request, ownerId);
+        UUID eventId = UUID.randomUUID();
+        String slug = UUID.randomUUID().toString();
+        Event requestEvent = eventMapper.toEntity(request, ownerId, eventId, slug);
 
         if (requestEvent.eventType() == EventType.GROUP) {
             Instant eventStartDate = requestEvent.startDate();
@@ -83,6 +86,13 @@ public class EventServiceImpl implements EventService {
         );
         requireUserIsEventOwner(userId, event);
         return eventMapper.toEventFullDto(event);
+    }
+
+    @Override
+    public Event getActiveByPublicId(UUID publicId) {
+        return eventRepository.getActiveByPublicId(publicId).orElseThrow(
+                () -> new EventNotFoundException("Event not found with public id [%s]".formatted(publicId))
+        );
     }
 
     @Override
