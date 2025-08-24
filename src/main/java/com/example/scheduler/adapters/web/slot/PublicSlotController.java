@@ -25,7 +25,7 @@ public class PublicSlotController {
     public List<PublicSlotDto> findSlots(@PathVariable UUID eventPublicId) {
         log.info("Received request for event slots: eventPublicId = {}", eventPublicId);
         List<PublicSlotDto> slots = getAvailableSlotsUseCase.getAvailableSlotsByEventPublicId(eventPublicId);
-        log.info("Responded with event slots requests: eventPublicId = {}", eventPublicId);
+        log.info("Responded with event slots requested: eventPublicId = {}", eventPublicId);
         log.debug("Requested slots = {}", slots);
         return slots;
     }
