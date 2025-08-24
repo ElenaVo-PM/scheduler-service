@@ -200,12 +200,12 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ProfileNotFoundException.class)
+    @ExceptionHandler({ProfileNotFoundException.class, EventNotFoundException.class})
     public ResponseEntity<ApiError> handleProfileNotFoundException(
-            ProfileNotFoundException exception,
+            RuntimeException exception,
             ServletWebRequest request
     ) {
-        logger.warn("Profile not found: {}", exception.getMessage());
+        logger.warn(exception.getMessage());
         return toResponse(
                 HttpStatus.NOT_FOUND,
                 exception.getMessage(),

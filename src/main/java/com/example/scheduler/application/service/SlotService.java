@@ -25,4 +25,12 @@ public class SlotService {
         return requiredEventSlots.stream().filter(slot -> occupiedTime.stream()
                 .noneMatch(timeInterval -> timeInterval.overlapsWithSlot(slot))).toList();
     }
+
+    public List<Slot> findAllByEventIdOrderByStartTime(UUID eventId) {
+        return slotRepository.getAllSlotsForEvent(eventId);
+    }
+
+    public List<Slot> findAllBookedByEventOwnerIdOrderByStartTime(UUID eventOwnerId) {
+        return slotRepository.findAllBookedByEventOwnerIdOrderByStartTime(eventOwnerId);
+    }
 }
