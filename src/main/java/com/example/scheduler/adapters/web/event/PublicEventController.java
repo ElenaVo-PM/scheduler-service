@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/public/event")
+@RequestMapping("/api/v1/public/events")
 public class PublicEventController {
     private final PublicEventService publicEventService;
 
