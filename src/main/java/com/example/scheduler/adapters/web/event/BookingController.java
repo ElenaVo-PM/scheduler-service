@@ -9,6 +9,7 @@ import com.example.scheduler.application.usecase.CancelBookingUseCase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,12 +33,13 @@ public class BookingController {
     }
 
     /**
-     * POST /api/v1/public/booking - Создание брони
+     * POST /api/v1/public/events/{eventPublicId}/bookings - Создание брони
      */
-    @PostMapping("/api/v1/public/booking")
-    public ResponseEntity<BookingResponse> bookSlot(@RequestBody BookingRequest request) throws IllegalAccessException {
-
-        return ResponseEntity.ok(bookSlotUseCase.execute(request));
+    @PostMapping("/api/v1/public/events/{eventPublicId}/bookings")
+    @ResponseStatus(HttpStatus.CREATED)
+    public BookingResponse bookSlot(@PathVariable UUID eventPublicId, @RequestBody BookingRequest request)
+            throws IllegalAccessException {
+        return bookSlotUseCase.execute(eventPublicId, request);
     }
 
     /**

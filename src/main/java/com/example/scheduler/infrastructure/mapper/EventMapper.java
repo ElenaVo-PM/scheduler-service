@@ -21,7 +21,7 @@ import java.util.UUID;
         unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface EventMapper {
 
-    String EVENT_SHARE_LINK_PATTERN = "/api/v1/public/event/%s";
+    String EVENT_SHARE_LINK_PATTERN = "/api/v1/public/events/%s";
 
     @Mapping(target = "id", source = "eventId")
     @Mapping(target = "ownerId", source = "ownerId")

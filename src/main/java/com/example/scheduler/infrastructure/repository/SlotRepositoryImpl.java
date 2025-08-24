@@ -222,6 +222,9 @@ public class SlotRepositoryImpl implements SlotRepository {
 
         Slot slot = getSlotById(request.slotId())
                 .orElseThrow(() -> new NotFoundException("Slot not found"));
+        if (!event.id().equals(slot.eventId())) {
+            throw new NotFoundException("Slot not found");
+        }
 
         if (!slot.isAvailable()) {
             throw new IllegalAccessException("Slot already have booked");
@@ -230,8 +233,8 @@ public class SlotRepositoryImpl implements SlotRepository {
         List<Pair<UUID, LocalDateTime>> ids = jdbc.query(
                 ADD_NEW_BOOKING_QUERY_WITH_RETURN,
                 ps -> {
-                    ps.setObject(1, request.eventId());
-                    ps.setObject(2, request.slotId());
+                    ps.setObject(1, event.id());
+                    ps.setObject(2, slot.id());
                     ps.setString(3, username);
                     ps.setString(4, email);
                     ps.setBoolean(5, false);

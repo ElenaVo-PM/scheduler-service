@@ -148,10 +148,6 @@ components:
     BookingRequest:
       type: object
       properties:
-        eventId:
-          type: string
-          format: uuid
-          example: 8840ddd5-e176-46d8-8f1b-babb00d989cd
         slotId:
           type: string
           format: uuid
@@ -1234,7 +1230,7 @@ paths:
                 id: 8840ddd5-e176-46d8-8f1b-babb00d989cd
                 shareLink: /api/public/event/b452644a-dba8-427a-8e44-d5c1bc528231
 
-  /api/v1/public/event/{sharedLink}:
+  /api/v1/public/events/{sharedLink}:
     get:
       tags:
         - 'Public: Events'
@@ -1322,11 +1318,20 @@ paths:
                   endTime: 2001-02-03T05:05:06.789012Z
                   isAvailable: true
 
-  /api/v1/public/booking:
+  /api/v1/public/events/{sharedLink}/bookings:
     post:
       tags:
-        - 'Public: Bookings'
+        - 'Public: Events'
       summary: Create a booking for an event
+      parameters:
+        - name: sharedLink
+          description: Event public slug
+          in: path
+          schema:
+            type: string
+            format: uuid
+            example: b452644a-dba8-427a-8e44-d5c1bc528231
+          required: true
       requestBody:
         required: true
         content:
@@ -1334,12 +1339,11 @@ paths:
             schema:
               $ref: '#/components/schemas/BookingRequest'
             example:
-              eventId: 8840ddd5-e176-46d8-8f1b-babb00d989cd
               slotId: b5d8fe6c-b1cb-49f1-89f7-6a1bbe2631ae
               email: bob@mail.com
               name: Bob
       responses:
-        '200':
+        '201':
           description: Booking created
           content:
             application/json:

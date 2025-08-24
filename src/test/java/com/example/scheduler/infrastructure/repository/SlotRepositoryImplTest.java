@@ -1,6 +1,5 @@
 package com.example.scheduler.infrastructure.repository;
 
-
 import com.example.scheduler.AbstractTestContainerTest;
 import com.example.scheduler.adapters.dto.BookingRequest;
 import com.example.scheduler.adapters.dto.BookingResponse;
@@ -35,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-public class SlotRepositoryImplTest extends AbstractTestContainerTest {
+class SlotRepositoryImplTest extends AbstractTestContainerTest {
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -99,9 +98,7 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
                 Instant.now()
         );
 
-        BookingRequest request = new BookingRequest(
-                eventId, slotId, user.email(), user.username()
-        );
+        BookingRequest request = new BookingRequest(slotId, user.email(), user.username());
 
         Event event = eventRepository.getEventById(eventId).get();
         BookingResponse response = repository.bookSlot(event, user, request);
@@ -114,9 +111,7 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
     @Test
     @DisplayName("Unauthorized user successfully booked a slot")
     void bookSlotAnonymousSuccess() throws Exception {
-        BookingRequest request = new BookingRequest(
-                eventId, slotId, "email@email.con", "anonymous"
-        );
+        BookingRequest request = new BookingRequest(slotId, "email@email.con", "anonymous");
 
         Event event = eventRepository.getEventById(eventId).get();
 
@@ -157,9 +152,7 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
                 Instant.now()
         );
 
-        BookingRequest request = new BookingRequest(
-                eventId, slotId, user.email(), user.username()
-        );
+        BookingRequest request = new BookingRequest(slotId, user.email(), user.username());
 
         Event event = eventRepository.getEventById(eventId).get();
 
@@ -202,9 +195,7 @@ public class SlotRepositoryImplTest extends AbstractTestContainerTest {
                 Instant.now()
         );
 
-        BookingRequest request = new BookingRequest(
-                eventId, slotId, user.email(), user.username()
-        );
+        BookingRequest request = new BookingRequest(slotId, user.email(), user.username());
 
         Event event = eventRepository.getEventById(eventId).get();
 
