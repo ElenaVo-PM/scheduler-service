@@ -1,8 +1,7 @@
 package com.example.scheduler.adapters.web.profile;
 
 import com.example.scheduler.adapters.dto.ProfilePublicDto;
-import com.example.scheduler.application.service.ProfileService;
-import com.example.scheduler.domain.exception.ProfileNotFoundException;
+import com.example.scheduler.application.usecase.GetEventHostUseCase;
 import com.example.scheduler.infrastructure.config.WithSecurityStubs;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,25 +21,26 @@ import static org.mockito.BDDMockito.given;
 @WithSecurityStubs
 class PublicProfileControllerTest {
 
-    private static final String BASE_URL = "/api/v1/public/profiles";
+    private static final UUID EVENT_PUBLIC_ID = UUID.fromString("b452644a-dba8-427a-8e44-d5c1bc528231");
+    private static final String BASE_URL = "/api/v1/public/events/" + EVENT_PUBLIC_ID + "/host";
+
 
     @MockitoBean
-    private ProfileService mockProfileService;
+    private GetEventHostUseCase mockGetEventHostUseCase;
 
     @Autowired
     private MockMvcTester mockMvcTester;
 
     @Test
     void givenProfileExists_WhenGetPublicProfile_ThenRespondWithProfileData() {
-        UUID userId = UUID.fromString("d3e68c3b-2d6d-48a1-a037-99a390e9433e");
         ProfilePublicDto expectedResponse = new ProfilePublicDto("Alice Arno", "logo.jpg");
 
-        given(mockProfileService.getPublicProfile(userId))
+        given(mockGetEventHostUseCase.getEventHostByEventPublicId(EVENT_PUBLIC_ID))
                 .willReturn(expectedResponse);
 
         MvcTestResult response = mockMvcTester
                 .get()
-                .uri(BASE_URL + "/" + userId)
+                .uri(BASE_URL)
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange();
 
@@ -53,34 +53,5 @@ class PublicProfileControllerTest {
                             "logo": "logo.jpg"
                         }
                         """);
-    }
-
-    @Test
-    void givenProfileNotExists_WhenGetPublicProfile_ThenRespondWithNotFound() {
-        UUID userId = UUID.randomUUID();
-
-        given(mockProfileService.getPublicProfile(userId))
-                .willThrow(new ProfileNotFoundException("Profile not found"));
-
-        MvcTestResult response = mockMvcTester
-                .get()
-                .uri(BASE_URL + "/" + userId)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange();
-
-        then(response)
-                .hasStatus(HttpStatus.NOT_FOUND);
-    }
-
-    @Test
-    void givenInvalidProfileId_WhenGetPublicProfile_ThenRespondWithBadRequest() {
-        MvcTestResult response = mockMvcTester
-                .get()
-                .uri(BASE_URL + "/invalid-uuid")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange();
-
-        then(response)
-                .hasStatus(HttpStatus.BAD_REQUEST);
     }
 }
