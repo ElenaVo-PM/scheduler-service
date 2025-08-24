@@ -1,8 +1,11 @@
 package com.example.scheduler.application.service;
 
 import com.example.scheduler.adapters.dto.BookingGeneralInfo;
+import com.example.scheduler.domain.exception.NotEnoughAuthorityException;
 import com.example.scheduler.domain.exception.NotFoundException;
+import com.example.scheduler.domain.exception.UserNotAuthorizedException;
 import com.example.scheduler.domain.model.Booking;
+import com.example.scheduler.domain.model.Credential;
 import com.example.scheduler.domain.model.Event;
 import com.example.scheduler.domain.model.Slot;
 import com.example.scheduler.domain.repository.BookingRepository;
@@ -12,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -28,6 +33,12 @@ public class BookingService {
         this.slotRepository = slotRepository;
     }
 
+    public List<BookingGeneralInfo> findAllBookingsByUserId(UUID userId, Credential credential) {
+        Objects.requireNonNull(userId, "userId cannot be null");
+        requireOwnerAuthority(userId, credential, "user can get bookings for their events only");
+        return bookingRepository.findAllByEventOwnerIdOrderByStartTime(userId);
+    }
+
     @Transactional
     public BookingGeneralInfo getOneBooking(UUID bookingId) {
         Booking requiredBooking = bookingRepository.getBookingById(bookingId)
@@ -35,6 +46,14 @@ public class BookingService {
         Event bookingEvent = eventRepository.getEventById(requiredBooking.eventTemplateId()).orElseThrow();
         Slot bookingSlot = slotRepository.getSlotById(requiredBooking.slotId()).orElseThrow();
         return mapToGeneralInfo(requiredBooking, bookingEvent, bookingSlot);
+    }
+
+    private void requireOwnerAuthority(UUID userId, Credential credential, String noAuthorityMessage) {
+        if (credential == null) {
+            throw new UserNotAuthorizedException("user %s is not authorized".formatted(userId));
+        } else if (!userId.equals(credential.getId())) {
+            throw new NotEnoughAuthorityException(noAuthorityMessage);
+        }
     }
 
     private BookingGeneralInfo mapToGeneralInfo(Booking booking, Event event, Slot slot) {

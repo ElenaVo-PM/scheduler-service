@@ -1334,7 +1334,7 @@ paths:
                 endTime: 2001-02-03T05:05:06.789012Z
                 isCanceled: false
 
-  /booking:
+  /bookings:
     get:
       tags:
         - 'Protected: Bookings'
@@ -1345,8 +1345,22 @@ paths:
       responses:
         '200':
           description: List of bookings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BookingGeneralInfo'
+                example:
+                  - eventName: Demo
+                    inviteeName: Bob
+                    inviteeEmail: bob@mail.com
+                    startTime: 2001-02-03T04:35:06.789012Z
+                    endTime: 2001-02-03T05:05:06.789012Z
+                    isCanceled: false
+                    createdAt: 2001-02-03T04:05:06Z
 
-  /booking/{id}:
+  /bookings/{id}:
     get:
       tags:
         - 'Protected: Bookings'

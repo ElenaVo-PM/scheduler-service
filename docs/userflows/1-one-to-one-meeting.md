@@ -263,9 +263,28 @@ curl -X 'POST' \
 Алиса получает список бронирований на организованные ею встречи и видит информацию о бронировании Боба.
 
 Фронтенд отправляет в бэкенд приложения запрос на получение списка бронирований:
-> [!WARNING]
-> Not implemented yet
+```bash
+curl -X 'GET' \
+  'http://api.example.com:8080/bookings' \
+  -H 'accept: application/json' \
+  -H 'Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJmNmRkZWY5Ni0wZjA4LTQxZjgtOGY2ZC1mY2U5MjU1ODk0MzUiLCJ1c2VybmFtZSI6ImFsaWNlIiwicm9sZSI6IlVTRVIiLCJleHAiOjE3NTU5NTUwNzB9.z_8EE21p6nlwWwgtO-ZxP8c52A0fVOKCIOLmylfAc7yWgXQNk8d8LVLE0RYfDWiJQAa0Zb5kgwcoK4YU9xyUow' \
+  -H 'x-user-id: f6ddef96-0f08-41f8-8f6d-fce925589435'
+```
 
+Ответ содержит список бронирований на встречи, организованные Алисой. В том числе забронированный Бобом слот:
+```json
+[
+  {
+    "eventName": "Alice + Bob",
+    "inviteeName": "Bob",
+    "inviteeEmail": "bob@mail.com",
+    "startTime": "2026-07-20T12:00:00Z",
+    "endTime": "2026-07-20T13:00:00Z",
+    "isCanceled": false,
+    "createdAt": "2025-08-24T19:51:15.672707Z"
+  }
+]
+```
  
 #### Шаг 10. Алиса и Боб вносят встречу в свои календари
 
